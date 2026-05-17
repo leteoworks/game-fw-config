@@ -121,6 +121,11 @@
             }
           }
         },
+        "cohortPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
         "overrides": {
           "type": "object",
           "additionalProperties": false,
@@ -181,6 +186,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -240,6 +250,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -299,6 +314,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -358,6 +378,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -417,6 +442,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -476,6 +506,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -535,6 +570,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             }
@@ -613,6 +653,11 @@
             }
           }
         },
+        "cohortPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
         "overrides": {
           "type": "object",
           "additionalProperties": false,
@@ -687,6 +732,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -760,6 +810,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -833,6 +888,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -906,6 +966,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -979,6 +1044,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -1052,6 +1122,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             },
@@ -1125,6 +1200,11 @@
                       ]
                     }
                   }
+                },
+                "cohortPercent": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
                 }
               }
             }
