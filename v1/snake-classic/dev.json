@@ -26,6 +26,8 @@
         "remote.config.rejected",
         "paywall.shown",
         "paywall.dismissed",
+        "freewall.shown",
+        "freewall.continued",
         "paywall.purchase.started",
         "paywall.purchase.completed",
         "paywall.purchase.failed",
