@@ -71,11 +71,6 @@
         "enabled": {
           "type": "boolean"
         },
-        "freeEpisodeLimit": {
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 99
-        },
         "triggers": {
           "type": "array",
           "maxItems": 16,
@@ -96,6 +91,451 @@
                 "type": "integer",
                 "minimum": 0,
                 "maximum": 99
+              }
+            }
+          }
+        },
+        "freeEpisodeLimit": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99
+        },
+        "versionRange": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "max": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ios": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "android": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "browser": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "electron-windows": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "electron-linux": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "electron-mac-steam": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            },
+            "electron-mac-appstore": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "triggers": {
+                  "type": "array",
+                  "maxItems": 16,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "episodeIndex",
+                      "beforeSceneIndex"
+                    ],
+                    "properties": {
+                      "episodeIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      },
+                      "beforeSceneIndex": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 99
+                      }
+                    }
+                  }
+                },
+                "freeEpisodeLimit": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 99
+                },
+                "versionRange": {
+                  "type": [
+                    "object",
+                    "null"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "min": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
               }
             }
           }
