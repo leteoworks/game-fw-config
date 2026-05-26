@@ -53,7 +53,14 @@
         "tutorial.dismissed",
         "control.mode.chosen",
         "orientation.chosen",
-        "profiling.hotspot"
+        "profiling.hotspot",
+        "app.booted",
+        "screen.viewed",
+        "screen.exited",
+        "first.action.after.boot",
+        "run.input.breakdown",
+        "modal.opened",
+        "modal.closed"
       ]
     }
   },
