@@ -68,6 +68,7 @@
         "modsys.health.perf-degradation",
         "modsys.health.engine-fallback",
         "modsys.health.cb-throws",
+        "modsys.health.freeze-fallback",
         "modsys.security.permission-denied",
         "modsys.security.rate-limit-hit",
         "modsys.security.too-many-hooks",
