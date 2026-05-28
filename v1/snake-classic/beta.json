@@ -51,6 +51,7 @@
         "crash.recovery.detected",
         "crash.recovery.resumed",
         "tutorial.dismissed",
+        "music.toggled",
         "control.mode.chosen",
         "orientation.chosen",
         "profiling.hotspot",
