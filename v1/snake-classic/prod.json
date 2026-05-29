@@ -52,6 +52,7 @@
         "crash.recovery.resumed",
         "tutorial.dismissed",
         "music.toggled",
+        "bonus.level.entered",
         "bonus.level.played",
         "control.mode.chosen",
         "orientation.chosen",
