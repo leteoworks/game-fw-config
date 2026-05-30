@@ -151,7 +151,7 @@
   },
   "profiling": {
     "enabled": true,
-    "cohortPercent": 1,
+    "cohortPercent": 10,
     "signals": {
       "fps": true,
       "longTasks": true,
