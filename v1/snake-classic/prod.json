@@ -57,6 +57,10 @@
         "control.mode.chosen",
         "orientation.chosen",
         "profiling.hotspot",
+        "performance.fps",
+        "performance.load",
+        "migration.completed",
+        "migration.failed",
         "app.booted",
         "screen.viewed",
         "screen.exited",
@@ -150,8 +154,11 @@
     "cohortPercent": 1,
     "signals": {
       "fps": true,
-      "longTasks": false,
-      "memory": false
+      "longTasks": true,
+      "memory": true,
+      "systems": true,
+      "entities": false,
+      "events": false
     }
   }
 }
