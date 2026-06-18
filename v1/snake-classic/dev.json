@@ -111,7 +111,18 @@
         "modsys.framework.sideload_retail_expired",
         "modsys.framework.sideload_hot_reload",
         "modsys.framework.support_author_clicked",
-        "modsys.framework.rate-limit-exceeded"
+        "modsys.framework.rate-limit-exceeded",
+        "ads.impression",
+        "ads.view",
+        "ads.mini_click",
+        "ads.close",
+        "ads.autoclose",
+        "ads.dismiss",
+        "ads.video_impression",
+        "ads.video_complete",
+        "ads.video_skip",
+        "ads.video_cap",
+        "ads.video_error"
       ]
     }
   },
