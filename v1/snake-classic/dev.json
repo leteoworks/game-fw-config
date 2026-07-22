@@ -122,7 +122,15 @@
         "ads.video_complete",
         "ads.video_skip",
         "ads.video_cap",
-        "ads.video_error"
+        "ads.video_error",
+        "mp.room.created",
+        "mp.join.requested",
+        "mp.join.accepted",
+        "mp.join.rejected",
+        "mp.match.started",
+        "mp.match.ended",
+        "mp.notify.toggled",
+        "mp.deeplink.new_room"
       ]
     }
   },
