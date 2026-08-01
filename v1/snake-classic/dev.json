@@ -130,7 +130,10 @@
         "mp.match.started",
         "mp.match.ended",
         "mp.notify.toggled",
-        "mp.deeplink.new_room"
+        "mp.deeplink.new_room",
+        "mp.retry.requested",
+        "mp.retry.granted",
+        "mp.retry.denied"
       ]
     }
   },

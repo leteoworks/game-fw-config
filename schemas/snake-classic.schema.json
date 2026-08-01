@@ -1212,6 +1212,63 @@
         }
       }
     },
+    "mp": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Subarbol opcional del modo multijugador (snake.mp.*). Todos los campos son opcionales: el cliente normaliza con `validateMp` y aplica `DEFAULT_MP_FLAGS` a lo ausente. Documentacion: docs/architecture/p2p/verticals/snake-classic/multiplayer-paywall.md y mp-retry-attempts.md.",
+      "properties": {
+        "showButton": {
+          "type": "boolean",
+          "description": "Visibilidad del boton Multijugador en home (default true). Se combina en AND con la disponibilidad de P2P."
+        },
+        "deviceHostFilter": {
+          "type": "boolean",
+          "description": "Filtrar el hall por dispositivo del host (movil<->movil, desktop<->desktop; tablet = puente). Default false = se ven todas las salas."
+        },
+        "paywall": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Muro del multijugador: gatea CREAR y UNIRSE por numero de partidas MP jugadas. Independiente de `mp.retry.paywall`.",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "triggerGames": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99999
+            }
+          }
+        },
+        "retry": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Reintentos del espectador (boton 'Nuevo intento'). Subarbol HERMANO de `paywall`, NO cuelga de el: son dos muros distintos y encender uno no debe armar el otro.",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Kill-switch de la feature entera (default true). false apaga boton, ventana de gracia y candidatos."
+            },
+            "maxAttempts": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10,
+              "description": "Reintentos por partida y participante (default 3). 0 es VALIDO = feature apagada. El cap 10 replica MP_RETRY_MAX_ATTEMPTS_CAP del cliente."
+            },
+            "paywall": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Candado del boton 'Nuevo intento' (suscripcion anual MP). Sin contador de partidas: es otro muro.",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "profiling": {
       "type": "object",
       "additionalProperties": false,
