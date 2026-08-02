@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://game-fw-config/snake-classic.schema.json",
-  "title": "Snake Classic \u2014 Remote analytics config",
+  "title": "Snake Classic — Remote analytics config",
   "type": "object",
   "required": [
     "schemaVersion"
@@ -1261,7 +1261,21 @@
               "description": "Candado del boton 'Nuevo intento' (suscripcion anual MP). Sin contador de partidas: es otro muro.",
               "properties": {
                 "enabled": {
-                  "type": "boolean"
+                  "type": "boolean",
+                  "description": "Interruptor MAESTRO del candado (default false). Cada plataforma lo HEREDA salvo que la anule en `platforms`."
+                },
+                "platforms": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "description": "Override POR PLATAFORMA. Ausente = hereda `enabled`. Existe para el lanzamiento ESCALONADO: si el producto solo esta dado de alta en una tienda, encender el maestro dejaria a la otra plataforma con el candado puesto y SIN camino de pago. Solo ios/android: son las unicas con rail de IAP (en browser/electron el muro nunca gatea).",
+                  "properties": {
+                    "ios": {
+                      "type": "boolean"
+                    },
+                    "android": {
+                      "type": "boolean"
+                    }
+                  }
                 }
               }
             }
@@ -1287,7 +1301,7 @@
         "signals": {
           "type": "object",
           "additionalProperties": false,
-          "description": "Senales activas. Los collectors hacen feature-detect por plataforma \u2014 pasar true no fuerza activacion en plataformas no soportadas (p.ej. longTasks/memory en iOS WKWebView). systems/entities/events requieren ademas que el juego declare gameSignalsConfig en su wiring (lista de sistemas, intervalos de polling, sampling rate de eventos).",
+          "description": "Senales activas. Los collectors hacen feature-detect por plataforma — pasar true no fuerza activacion en plataformas no soportadas (p.ej. longTasks/memory en iOS WKWebView). systems/entities/events requieren ademas que el juego declare gameSignalsConfig en su wiring (lista de sistemas, intervalos de polling, sampling rate de eventos).",
           "properties": {
             "fps": {
               "type": "boolean"
