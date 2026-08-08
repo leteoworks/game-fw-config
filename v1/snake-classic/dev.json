@@ -1,14 +1,7 @@
 {
   "schemaVersion": 1,
   "analytics": {
-    "posthog": {
-      "enabled": true,
-      "batching": {
-        "flushIntervalMs": 2000,
-        "maxBatchSize": 1,
-        "flushOnPageHide": true
-      },
-      "blockedEvents": [],
+    "eventPolicy": {
       "allowedEvents": [
         "run.started",
         "run.ended",
@@ -138,8 +131,33 @@
         "mp.retry.requested",
         "mp.retry.granted",
         "mp.retry.denied",
-        "user.error.shown"
-      ]
+        "user.error.shown",
+        "session.started",
+        "session.ended",
+        "name.form.shown",
+        "name.form.resolved",
+        "ranking.opened",
+        "ranking.session.summary"
+      ],
+      "blockedEvents": []
+    },
+    "providers": {
+      "posthog": {
+        "enabled": true,
+        "batching": {
+          "flushIntervalMs": 2000,
+          "maxBatchSize": 1,
+          "flushOnPageHide": true
+        }
+      },
+      "gamefw": {
+        "enabled": true,
+        "batching": {
+          "flushIntervalMs": 2000,
+          "maxBatchSize": 1,
+          "flushOnPageHide": true
+        }
+      }
     }
   },
   "paywall": {

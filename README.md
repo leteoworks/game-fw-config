@@ -51,12 +51,37 @@ https://cdn.jsdelivr.net/gh/<user>/game-fw-config@v1.0.0/v1/snake-classic/prod.j
 
 ## Kill-switch de emergencia
 
+Apagar UN destino (no toca a los demas ni a que
+eventos emite el juego):
+
 ```json
 {
   "schemaVersion": 1,
-  "analytics": { "posthog": { "enabled": false } }
+  "analytics": {
+    "providers": { "posthog": { "enabled": false } }
+  }
 }
 ```
+
+Silenciar el juego ENTERO (allowlist vacia: no sale
+ni un evento por ningun destino):
+
+```json
+{
+  "schemaVersion": 1,
+  "analytics": { "eventPolicy": { "allowedEvents": [] } }
+}
+```
+
+⚠️ ADR-030: la allowlist/blocklist es **una sola y
+del juego** (`analytics.eventPolicy`). Un destino
+—`analytics.providers.<id>`— solo declara `enabled`
+y `batching`. Si le metes `allowedEvents` o
+`blockedEvents`, el cliente **descarta ese subarbol
+entero** y ese destino se queda con los valores del
+bundle: los dos destinos tienen que ver siempre los
+mismos eventos o sus dashboards no se pueden
+comparar.
 
 Commitea a `main` y espera al purge (o ejecuta
 `curl "https://purge.jsdelivr.net/gh/<user>/game-fw-config@main/v1/snake-classic/prod.json"`).
