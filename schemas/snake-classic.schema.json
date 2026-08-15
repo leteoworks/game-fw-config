@@ -1388,6 +1388,304 @@
           }
         }
       }
+    },
+    "ads": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Subarbol opcional del modulo de publicidad (@modules/ads): interstitial post-splash + mini-banner de home, con pre-roll de video opcional. Todo es opcional: el cliente normaliza con `validateRemoteAds` (clamps defensivos + defaults conservadores; enabled=false y ttlMs=null si faltan). Documentacion: src/modules/ads/README.md y docs/architecture/ads/ads-testing-playbook.md en el repo del framework.",
+      "properties": {
+        "banners": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id"
+            ],
+            "description": "Un banner. El gate elige el PRIMER banner aplicable de la lista (el orden es la prioridad). Un banner sin `id` o mal formado lo descarta el cliente sin tumbar al resto.",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Identificador estable: cohorte, persistencia (cooldown / cierre por sesion) y logs. Cambiarlo reinicia esas marcas."
+              },
+              "enabled": {
+                "type": "boolean",
+                "description": "Kill-switch del banner. Default conservador: false."
+              },
+              "platforms": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "enum": [
+                    "ios",
+                    "android",
+                    "web",
+                    "electron"
+                  ]
+                },
+                "description": "Plataformas objetivo. Lista vacia o ausente = todas."
+              },
+              "minVersion": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Version minima de la app (inclusive). null = sin limite."
+              },
+              "maxVersion": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Version maxima de la app (inclusive). null = sin limite."
+              },
+              "cohortPercent": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Porcentaje del parque (hash FNV-1a del anonymousId). Default 100. Ojo: en post-splash el anonymousId puede no estar resuelto todavia y una cohorte <100 infra-entrega en esa ventana."
+              },
+              "placement": {
+                "enum": [
+                  "post-splash"
+                ],
+                "description": "Unico emplazamiento soportado hoy: tras el splash, antes de la home."
+              },
+              "ttlMs": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 600000,
+                "description": "Vida del fullscreen: null = NO mostrar nunca; 0 = infinito (solo cierre manual); >0 = ms hasta el autocierre. Con 0 y sin closeButton el cliente coacciona a 8000 (anti-soft-lock)."
+              },
+              "cooldownMs": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "minimum": 0,
+                "maximum": 2592000000,
+                "description": "Frequency cap: ms minimos entre impresiones del mismo banner, persistido entre sesiones. null o 0 = sin cap."
+              },
+              "url": {
+                "type": "string",
+                "description": "Destino de 'ver' y del click en el mini. Solo se abre si es https:."
+              },
+              "images": {
+                "type": "array",
+                "maxItems": 24,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "url"
+                  ],
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "minLength": 1,
+                      "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
+                    },
+                    "orientation": {
+                      "enum": [
+                        "portrait",
+                        "landscape"
+                      ],
+                      "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
+                    },
+                    "minWidth": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
+                    },
+                    "minHeight": {
+                      "type": "number",
+                      "minimum": 0,
+                      "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
+                    }
+                  }
+                },
+                "description": "Imagenes del fullscreen por orientacion/resolucion. SIN una imagen aplicable no se muestra NADA (ni siquiera el pre-roll de video)."
+              },
+              "viewButton": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": false,
+                "required": [
+                  "label"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Texto por codigo de idioma (en, es, pt-BR...). Se resuelve al idioma activo con fallback a `en` y luego al primero disponible."
+                  }
+                },
+                "description": "Boton 'ver' (abre la url). Omitir = sin boton. `null` equivale a omitirlo."
+              },
+              "closeButton": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": false,
+                "required": [
+                  "label"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Texto por codigo de idioma (en, es, pt-BR...). Se resuelve al idioma activo con fallback a `en` y luego al primero disponible."
+                  }
+                },
+                "description": "Boton 'cerrar' (pasa al mini). Omitir = sin boton; con ttlMs 0 fuerza el TTL de rescate. `null` equivale a omitirlo."
+              },
+              "preRollVideo": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "sources"
+                ],
+                "description": "Pre-roll de video OPCIONAL previo al fullscreen. Sin este bloque (o sin variante aplicable al dispositivo) el comportamiento es el clasico.",
+                "properties": {
+                  "sources": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 12,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "url"
+                      ],
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
+                        },
+                        "orientation": {
+                          "enum": [
+                            "portrait",
+                            "landscape"
+                          ],
+                          "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
+                        },
+                        "minWidth": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
+                        },
+                        "minHeight": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
+                        },
+                        "type": {
+                          "type": "string",
+                          "description": "Tipo MIME para el <source> (video/mp4, video/webm). Varias variantes del mismo bucket con distinto MIME = fallback de codec."
+                        }
+                      }
+                    },
+                    "description": "Variantes por orientacion/resolucion (+ codec)."
+                  },
+                  "maxDurationMs": {
+                    "type": "number",
+                    "minimum": 1000,
+                    "maximum": 60000,
+                    "description": "TECHO DE SEGURIDAD (no la duracion): si el video no termina, a los N ms se salta al fullscreen. Default 30000."
+                  },
+                  "skippableAfterMs": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0,
+                    "description": "Muestra 'Saltar' tras N ms (0 = desde el inicio). null = sin boton. Un valor >= maxDurationMs se coacciona a null."
+                  },
+                  "allowAudio": {
+                    "type": "boolean",
+                    "description": "Ofrecer boton de sonido. El video SIEMPRE arranca muteado (requisito de autoplay). Default false."
+                  }
+                }
+              },
+              "miniBanner": {
+                "type": "object",
+                "additionalProperties": false,
+                "description": "Barra superior a la que se encoge el fullscreen al cerrarse. Visible en todas las pantallas MENOS gameplay. No es opcional: siempre hay mini (si no tiene imagen propia, reusa la del fullscreen).",
+                "properties": {
+                  "heightPercent": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Alto como % del viewport. Default 12."
+                  },
+                  "closeXWidthPercent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 50,
+                    "description": "% de ancho reservado a la X. La X SIEMPRE se pinta: 0 = ancho minimo tappable, NO 'sin X'."
+                  },
+                  "images": {
+                    "type": "array",
+                    "maxItems": 24,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "url"
+                      ],
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "minLength": 1,
+                          "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
+                        },
+                        "orientation": {
+                          "enum": [
+                            "portrait",
+                            "landscape"
+                          ],
+                          "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
+                        },
+                        "minWidth": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
+                        },
+                        "minHeight": {
+                          "type": "number",
+                          "minimum": 0,
+                          "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
+                        }
+                      }
+                    },
+                    "description": "Imagenes propias del mini. Lista vacia = reusa la del fullscreen."
+                  }
+                }
+              }
+            }
+          },
+          "description": "Lista ordenada de banners: gana el PRIMERO aplicable."
+        },
+        "showToEntitled": {
+          "type": "boolean",
+          "description": "¿Los usuarios con compra/entitlement ven ads? Default false (el comprador no ve ads)."
+        }
+      }
     }
   }
 }
