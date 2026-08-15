@@ -1475,6 +1475,15 @@
                 "type": "string",
                 "description": "Destino de 'ver' y del click en el mini. Solo se abre si es https:."
               },
+              "urlByLocale": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": "Destino por idioma ({'es': 'https://.../es'}). Cascada: idioma exacto -> idioma base -> ingles -> `url`. A diferencia de los textos NO cae a 'la primera disponible': sin entrada para su idioma ni inglesa, el jugador va al `url` generico."
+              },
               "images": {
                 "type": "array",
                 "maxItems": 24,
@@ -1506,6 +1515,15 @@
                       "type": "number",
                       "minimum": 0,
                       "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
+                    },
+                    "locales": {
+                      "type": "array",
+                      "maxItems": 24,
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
                     }
                   }
                 },
@@ -1597,6 +1615,15 @@
                         "type": {
                           "type": "string",
                           "description": "Tipo MIME para el <source> (video/mp4, video/webm). Varias variantes del mismo bucket con distinto MIME = fallback de codec."
+                        },
+                        "locales": {
+                          "type": "array",
+                          "maxItems": 24,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
                         }
                       }
                     },
@@ -1670,6 +1697,15 @@
                           "type": "number",
                           "minimum": 0,
                           "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
+                        },
+                        "locales": {
+                          "type": "array",
+                          "maxItems": 24,
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
                         }
                       }
                     },
