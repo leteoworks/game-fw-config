@@ -153,8 +153,8 @@
       "gamefw": {
         "enabled": true,
         "batching": {
-          "flushIntervalMs": 2000,
-          "maxBatchSize": 1,
+          "flushIntervalMs": 30000,
+          "maxBatchSize": 100,
           "flushOnPageHide": true
         }
       }
