@@ -227,11 +227,11 @@
         "url": "https://example.com/promo",
         "images": [
           {
-            "url": "https://cdn.jsdelivr.net/gh/leteoworks/game-fw-config@28bd8186bf2eec0ba74f7580c5a1c72f68736dbb/v1/assets/mock-ads/full-portrait.svg",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg",
             "orientation": "portrait"
           },
           {
-            "url": "https://cdn.jsdelivr.net/gh/leteoworks/game-fw-config@28bd8186bf2eec0ba74f7580c5a1c72f68736dbb/v1/assets/mock-ads/full-landscape.svg",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg",
             "orientation": "landscape"
           }
         ],
@@ -246,7 +246,7 @@
           "closeXWidthPercent": 15,
           "images": [
             {
-              "url": "https://cdn.jsdelivr.net/gh/leteoworks/game-fw-config@28bd8186bf2eec0ba74f7580c5a1c72f68736dbb/v1/assets/mock-ads/mini-wide.svg"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg"
             }
           ]
         }
