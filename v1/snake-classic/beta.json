@@ -116,6 +116,7 @@
         "ads.video_skip",
         "ads.video_cap",
         "ads.video_error",
+        "ads.gate_skipped",
         "mp.room.created",
         "mp.entry.opened",
         "mp.entry.resolved",
