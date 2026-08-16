@@ -126,6 +126,7 @@
         "mp.join.accepted",
         "mp.join.rejected",
         "mp.match.started",
+        "mp.join.device",
         "mp.match.ended",
         "mp.notify.toggled",
         "mp.deeplink.new_room",
