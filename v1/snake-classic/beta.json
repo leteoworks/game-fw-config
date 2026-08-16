@@ -255,6 +255,7 @@
           ]
         }
       }
-    ]
+    ],
+    "showToEntitled": true
   }
 }
