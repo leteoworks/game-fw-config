@@ -215,7 +215,7 @@
   "ads": {
     "banners": [
       {
-        "id": "mock-a",
+        "id": "s00-mock-a",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -227,14 +227,20 @@
         "url": "https://example.com/promo",
         "images": [
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg?s=00",
             "orientation": "portrait"
           },
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg?s=00",
             "orientation": "landscape"
           }
         ],
+        "viewButton": {
+          "label": {
+            "en": "Learn more",
+            "es": "Saber mas"
+          }
+        },
         "closeButton": {
           "label": {
             "en": "Close",
@@ -246,7 +252,7 @@
           "closeXWidthPercent": 15,
           "images": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg?s=00"
             }
           ]
         }
