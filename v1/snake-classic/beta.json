@@ -215,7 +215,7 @@
   "ads": {
     "banners": [
       {
-        "id": "worker-probe-1786912687",
+        "id": "mock-a",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
