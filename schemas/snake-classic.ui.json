@@ -1,0 +1,622 @@
+{
+  "$comment": "Etiquetas y explicaciones EN ESPAÑOL para el dashboard. Separado del schema a proposito: el schema es el CONTRATO (tipos, rangos, lo que valida el CI) y esto es documentacion de producto, que cambia por otros motivos y con otro tono. Las claves son rutas GENERICAS (sin indices) y admiten comodines: `paywall.overrides.*.enabled` cubre las ocho plataformas. Un guard del dashboard comprueba que no falte ninguna ruta: si el schema crece y esto no, el test se pone rojo.",
+  "sections": {
+    "ads": {
+      "label": "Publicidad",
+      "help": "El anuncio a pantalla completa que sale UNA vez tras el splash, antes de la home, y el mini-banner en el que se encoge al cerrarse. Toda la seccion es opcional: sin ella no hay publicidad de ningun tipo. Lo que se configura aqui llega a las apps ya instaladas sin publicar una release, que es justo para lo que existe."
+    },
+    "ads.banners": {
+      "label": "Campañas",
+      "help": "Lista ORDENADA de campañas. Se evalua de arriba abajo y gana la PRIMERA que sea aplicable al dispositivo, version, idioma y cohorte del jugador; el resto ni se miran. Por eso el orden es una decision de producto, no una casualidad: para dar prioridad a una campaña, subela."
+    },
+    "ads.banners.images": {
+      "label": "Imagenes del anuncio a pantalla completa",
+      "help": "Variantes de la creatividad. Se elige la primera que encaje con la orientacion, el tamaño de pantalla y el idioma del jugador. ⚠️ Si NINGUNA encaja, la campaña no se muestra en absoluto: conviene dejar siempre una variante universal (sin orientacion ni idioma) como red de seguridad."
+    },
+    "ads.banners.viewButton": {
+      "label": "Boton «ver»",
+      "help": "Boton que abre el enlace de la campaña. Si se omite el bloque entero, no se pinta el boton y el anuncio solo se puede cerrar."
+    },
+    "ads.banners.closeButton": {
+      "label": "Boton «cerrar»",
+      "help": "Boton que cierra el anuncio a pantalla completa y lo encoge al mini-banner. ⚠️ Omitirlo con «duracion» a 0 (infinita) dejaria al jugador atrapado sin salida, asi que en ese caso el juego fuerza un tiempo de rescate."
+    },
+    "ads.banners.miniBanner": {
+      "label": "Mini-banner",
+      "help": "La barra que queda arriba cuando el jugador cierra el anuncio grande. Sigue visible en TODAS las pantallas menos durante la partida, y desaparece del todo al cerrarla (una vez por sesion)."
+    },
+    "ads.banners.miniBanner.images": {
+      "label": "Imagenes del mini-banner",
+      "help": "Creatividades propias de la barra, que es muy apaisada. Dejar la lista vacia hace que reutilice la imagen del anuncio grande, normalmente recortada: para que se lea bien conviene una pieza pensada para esa proporcion."
+    },
+    "ads.banners.preRollVideo": {
+      "label": "Video previo (pre-roll)",
+      "help": "Video OPCIONAL que se reproduce ANTES del anuncio a pantalla completa. Sin este bloque —o sin una variante aplicable— se va directo a la imagen. El video SIEMPRE arranca en silencio, porque los navegadores no permiten reproducir con sonido sin que el usuario lo pida."
+    },
+    "ads.banners.preRollVideo.sources": {
+      "label": "Variantes de video",
+      "help": "Fuentes por orientacion, tamaño, idioma y codec. Conviene ofrecer mp4 (compatible en todas partes) y webm (mas ligero) de la misma variante: el navegador elige el primero que sepa reproducir."
+    },
+    "analytics": {
+      "label": "Analitica",
+      "help": "Que eventos se envian y a que destinos. Es la seccion mas delicada del fichero: apagar algo aqui no da ningun error, simplemente deja de llegar informacion, y eso se descubre semanas despues mirando un panel plano."
+    },
+    "analytics.eventPolicy": {
+      "label": "Politica de eventos",
+      "help": "La lista de eventos permitidos es UNA sola para el juego entero, no una por destino. Un evento que no este dado de alta aqui se descarta EN SILENCIO: el juego lo emite, nadie lo recibe y no hay ni un aviso en consola. Es la causa numero uno de «he instrumentado esto y no aparece»."
+    },
+    "analytics.providers": {
+      "label": "Destinos",
+      "help": "Un bloque por cada destino al que se envian los eventos. Los ids que el juego reconoce son `posthog` y `gamefw` (el que alimenta los paneles de Grafana). ⚠️ Un id que no exista se ignora sin avisar, asi que ojo con los typos: `grafana` NO es un destino valido."
+    },
+    "analytics.providers.batching": {
+      "label": "Agrupacion de envios",
+      "help": "Los eventos no se mandan de uno en uno sino por lotes. Estos valores deciden cada cuanto se vacia la cola y de que tamaño. Subir mucho el tamaño de lote retrasa la llegada de los datos; bajarlo mucho multiplica las peticiones desde el movil del jugador."
+    },
+    "paywall": {
+      "label": "Muro de pago",
+      "help": "El muro que pide la compra del juego completo en un jugador. Solo actua en iOS y Android; en escritorio y navegador no se muestra nunca. ⚠️ Estado deseado hoy: APAGADO. Encenderlo cobra a jugadores que hoy juegan gratis."
+    },
+    "paywall.triggers": {
+      "label": "Momentos en que aparece",
+      "help": "Puntos concretos de la progresion en los que se interpone el muro. Cada disparador es un episodio y, opcionalmente, la escena antes de la cual saltar."
+    },
+    "paywall.versionRange": {
+      "label": "Versiones afectadas",
+      "help": "Acota el muro a un rango de versiones de la app. Sirve para estrenar un cambio de monetizacion solo en la version nueva sin tocar a quien no ha actualizado."
+    },
+    "paywall.overrides": {
+      "label": "Excepciones por plataforma",
+      "help": "Cada plataforma puede pisar la configuracion general. Lo que no se declare aqui SE HEREDA de arriba, asi que un bloque vacio no significa «apagado» sino «como el general». Sirve para lanzamientos escalonados: cobrar en Android mientras iOS sigue en revision."
+    },
+    "freewall": {
+      "label": "Muro «gratis»",
+      "help": "El aviso recurrente que se le enseña a quien juega gratis (recordatorio de compra, no bloqueo). A diferencia del muro de pago, este SI esta encendido hoy en todos los entornos."
+    },
+    "freewall.frequency": {
+      "label": "Con que frecuencia",
+      "help": "Cada cuanto se le repite el aviso al mismo jugador. Sin un limite razonable se convierte en molestia y empuja a desinstalar."
+    },
+    "freewall.triggers": {
+      "label": "Momentos en que aparece",
+      "help": "Puntos de la progresion en los que se enseña el aviso."
+    },
+    "freewall.versionRange": {
+      "label": "Versiones afectadas",
+      "help": "Acota el aviso a un rango de versiones de la app."
+    },
+    "freewall.overrides": {
+      "label": "Excepciones por plataforma",
+      "help": "Igual que en el muro de pago: lo no declarado se hereda del bloque general."
+    },
+    "mp": {
+      "label": "Multijugador",
+      "help": "Interruptores del modo multijugador online: si se ve el boton, con quien se empareja la gente y como se monetiza. Todos los campos son opcionales y cada uno tiene su valor por defecto en el codigo del juego."
+    },
+    "mp.paywall": {
+      "label": "Muro del multijugador",
+      "help": "Muro INDEPENDIENTE del de un jugador: una suscripcion anual que desbloquea el multijugador. Gatea crear partida e intentar unirse a una en curso. ⚠️ Quien lo compra desbloquea TAMBIEN el juego de un jugador."
+    },
+    "mp.retry": {
+      "label": "Nuevo intento",
+      "help": "Cuando a un jugador lo eliminan se queda de espectador y puede volver a entrar en la MISMA partida. Es lo que evita que morir pronto sea quedarse mirando."
+    },
+    "mp.retry.paywall": {
+      "label": "Candado del boton",
+      "help": "Pone el boton «Nuevo intento» detras de la suscripcion. Es un muro HERMANO del de crear/unirse, con el mismo producto pero interruptor propio: encender la puerta no debe poner candado al boton, ni al reves."
+    },
+    "mp.retry.paywall.platforms": {
+      "label": "Por plataforma",
+      "help": "Enciende el candado solo donde el producto ya este dado de alta en la tienda. Lo que no se declare hereda el interruptor maestro. ⚠️ Encenderlo en una plataforma donde el producto no exista deja al jugador ante un muro que no puede pagar."
+    },
+    "profiling": {
+      "label": "Rendimiento",
+      "help": "Medicion de rendimiento en produccion: fotogramas, memoria, tareas largas. Se envia solo desde una parte del parque (la cohorte) porque medir cuesta rendimiento a quien lo sufre."
+    },
+    "profiling.signals": {
+      "label": "Que se mide",
+      "help": "Cada señal se puede apagar por separado. Apagar las que no se esten mirando reduce el coste de la medicion en el movil del jugador."
+    },
+    "profiling.thresholds": {
+      "label": "Umbrales de alerta",
+      "help": "A partir de que valores se considera que algo va mal. `warn` es «mirarlo» y `critical` es «esto ya lo esta notando el jugador»."
+    },
+    "profiling.thresholds.frameMs": {
+      "label": "Duracion del fotograma",
+      "help": "Milisegundos que tarda en dibujarse un fotograma. Como referencia: 16,7 ms son 60 fotogramas por segundo, y por encima de 33 ms el juego se ve a tirones."
+    },
+    "profiling.thresholds.longTaskMs": {
+      "label": "Tareas largas",
+      "help": "Trozos de trabajo que bloquean el hilo principal. Mientras duran, el juego no responde al dedo ni dibuja."
+    },
+    "profiling.thresholds.memoryGrowthMb": {
+      "label": "Crecimiento de memoria",
+      "help": "Megabytes que crece la memoria durante la sesion. Un crecimiento sostenido es una fuga: acaba en cierre de la app en moviles con poca memoria."
+    },
+    "paywall.overrides.ios": {
+      "label": "iOS",
+      "help": "Configuracion del muro de pago solo para iOS. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.android": {
+      "label": "Android",
+      "help": "Configuracion del muro de pago solo para Android. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.browser": {
+      "label": "navegador",
+      "help": "Configuracion del muro de pago solo para navegador. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.electron-windows": {
+      "label": "Windows (escritorio)",
+      "help": "Configuracion del muro de pago solo para Windows (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.electron-linux": {
+      "label": "Linux (escritorio)",
+      "help": "Configuracion del muro de pago solo para Linux (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.electron-mac-steam": {
+      "label": "macOS via Steam",
+      "help": "Configuracion del muro de pago solo para macOS via Steam. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.electron-mac-appstore": {
+      "label": "macOS via App Store",
+      "help": "Configuracion del muro de pago solo para macOS via App Store. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
+    },
+    "paywall.overrides.*.versionRange": {
+      "label": "Versiones afectadas",
+      "help": "Rango de versiones de la app al que aplica en esta plataforma. Sin declarar, hereda el rango general."
+    },
+    "freewall.overrides.ios": {
+      "label": "iOS",
+      "help": "Configuracion del aviso de compra solo para iOS. Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.android": {
+      "label": "Android",
+      "help": "Configuracion del aviso de compra solo para Android. Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.browser": {
+      "label": "navegador",
+      "help": "Configuracion del aviso de compra solo para navegador. Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.electron-windows": {
+      "label": "Windows (escritorio)",
+      "help": "Configuracion del aviso de compra solo para Windows (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.electron-linux": {
+      "label": "Linux (escritorio)",
+      "help": "Configuracion del aviso de compra solo para Linux (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.electron-mac-steam": {
+      "label": "macOS via Steam",
+      "help": "Configuracion del aviso de compra solo para macOS via Steam. Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.electron-mac-appstore": {
+      "label": "macOS via App Store",
+      "help": "Configuracion del aviso de compra solo para macOS via App Store. Lo que no se declare aqui se HEREDA de la configuracion general."
+    },
+    "freewall.overrides.*.versionRange": {
+      "label": "Versiones afectadas",
+      "help": "Rango de versiones de la app al que aplica en esta plataforma. Sin declarar, hereda el rango general."
+    },
+    "freewall.overrides.*.frequency": {
+      "label": "Con que frecuencia",
+      "help": "Cada cuanto se repite el aviso en esta plataforma. Sin declarar, hereda la frecuencia general."
+    }
+  },
+  "fields": {
+    "ads.showToEntitled": {
+      "label": "Enseñar anuncios a quien ha pagado",
+      "help": "Si esta desactivado, quien haya comprado el juego (o tenga la suscripcion) no ve ningun anuncio. Activarlo se lo enseña igualmente. Lo normal es dejarlo desactivado: cobrar y seguir poniendo publicidad es la via rapida a una mala reseña."
+    },
+    "ads.banners.id": {
+      "label": "Identificador",
+      "help": "Nombre estable de la campaña. NO es decorativo: con el se calcula a que jugadores les toca (la cohorte), se recuerda que ya la vieron y se agrupan sus metricas. ⚠️ Cambiarlo equivale a crear una campaña nueva: se reinicia el limite de repeticion y quien la habia cerrado la volvera a ver."
+    },
+    "ads.banners.enabled": {
+      "label": "Campaña activa",
+      "help": "Interruptor de esta campaña. Es la forma de apagar un anuncio al instante sin borrar su configuracion, por ejemplo si la creatividad tiene un error o el anunciante lo pide."
+    },
+    "ads.banners.platforms": {
+      "label": "Plataformas",
+      "help": "Donde se muestra esta campaña. Dejarlo vacio significa TODAS. Sirve para campañas que solo tienen sentido en movil, o para no enseñar publicidad en la version de escritorio de pago."
+    },
+    "ads.banners.minVersion": {
+      "label": "Version minima de la app",
+      "help": "Solo se enseña a partir de esta version (incluida). Util cuando la creatividad usa algo que las versiones antiguas no saben pintar. Sin limite = se muestra en todas."
+    },
+    "ads.banners.maxVersion": {
+      "label": "Version maxima de la app",
+      "help": "Deja de enseñarse por encima de esta version (incluida). Sirve para retirar una campaña de las versiones nuevas sin tocar a las antiguas."
+    },
+    "ads.banners.cohortPercent": {
+      "label": "Porcentaje del parque",
+      "help": "A que fraccion de jugadores le toca esta campaña. El reparto es estable por jugador: a quien le toca, le toca siempre, asi que no vera el anuncio un dia si y otro no. ⚠️ Recuerda que gana la PRIMERA campaña aplicable: una campaña al 100 % arriba de la lista tapa a todas las de abajo."
+    },
+    "ads.banners.placement": {
+      "label": "Emplazamiento",
+      "help": "Donde se inserta el anuncio. Hoy solo existe «tras el splash, antes de la home»: es el unico momento en el que no interrumpe una partida."
+    },
+    "ads.banners.ttlMs": {
+      "label": "Duracion del anuncio grande",
+      "help": "Cuanto permanece el anuncio a pantalla completa. ⚠️ Los dos casos limite significan cosas OPUESTAS: «sin valor» (null) es NO ENSEÑARLO NUNCA a pantalla completa —solo el mini-banner—, y 0 es dejarlo hasta que el jugador lo cierre. Confundirlos es el error mas caro de esta pantalla."
+    },
+    "ads.banners.cooldownMs": {
+      "label": "Descanso entre repeticiones",
+      "help": "Tiempo minimo entre dos apariciones de la MISMA campaña al mismo jugador. Se recuerda aunque cierre la app. Sin valor = puede salir en cada arranque, que en la practica es lo que mas quema."
+    },
+    "ads.banners.url": {
+      "label": "Enlace de destino",
+      "help": "Adonde lleva el boton «ver» y el clic en el mini-banner. Solo se abre si empieza por https: — un enlace http se ignora sin avisar."
+    },
+    "ads.banners.urlByLocale": {
+      "label": "Enlace por idioma",
+      "help": "Destino distinto segun el idioma del jugador, para mandarle a la pagina en su lengua. Se busca su idioma exacto, luego el idioma base y, si no hay nada, el enlace general de arriba."
+    },
+    "ads.banners.viewButton.label": {
+      "label": "Texto del boton",
+      "help": "Texto del boton por idioma. El ingles es el idioma de reserva: sin una entrada `en`, cualquier idioma no listado se queda con el boton SIN TEXTO."
+    },
+    "ads.banners.closeButton.label": {
+      "label": "Texto del boton",
+      "help": "Texto del boton de cerrar por idioma. Igual que el anterior: sin `en`, los idiomas no listados se quedan sin texto."
+    },
+    "ads.banners.images.url": {
+      "label": "Archivo de imagen",
+      "widget": "asset-image",
+      "help": "La creatividad. Al subirla se guarda en el repositorio de configuracion y la URL se rellena sola con el host correcto. ⚠️ Si apuntara a otro host, el navegador la bloquearia y el anuncio saldria EN BLANCO sin ningun error: ni en el juego ni en la consola."
+    },
+    "ads.banners.images.orientation": {
+      "label": "Orientacion",
+      "help": "Para que orientacion de pantalla sirve esta variante. Sin marcar, vale para las dos. Una creatividad vertical estirada en horizontal se ve fatal, asi que lo normal es tener una de cada."
+    },
+    "ads.banners.images.minWidth": {
+      "label": "Ancho minimo de pantalla",
+      "help": "A partir de cuantos pixeles de ancho se usa esta variante. Es como se sirve una version de mas resolucion a las pantallas grandes sin castigar a los moviles pequeños con una descarga enorme."
+    },
+    "ads.banners.images.minHeight": {
+      "label": "Alto minimo de pantalla",
+      "help": "Lo mismo que el ancho minimo, pero para el alto."
+    },
+    "ads.banners.images.locales": {
+      "label": "Idiomas",
+      "help": "Idiomas a los que sirve esta creatividad, cuando la imagen lleva texto. Vacio = vale para todos. ⚠️ Conviene dejar SIEMPRE una variante sin idioma: si un jugador no encaja con ninguna, la campaña entera no se muestra."
+    },
+    "ads.banners.miniBanner.heightPercent": {
+      "label": "Alto de la barra",
+      "help": "Alto del mini-banner como porcentaje de la pantalla. Un valor alto come sitio a la interfaz del juego en todas las pantallas donde se ve."
+    },
+    "ads.banners.miniBanner.closeXWidthPercent": {
+      "label": "Ancho de la X",
+      "help": "Espacio reservado al boton de cerrar. ⚠️ El 0 NO quita la X: la deja en el ancho minimo para que se pueda pulsar con el dedo. La X siempre se pinta."
+    },
+    "ads.banners.miniBanner.images.url": {
+      "label": "Archivo de imagen",
+      "widget": "asset-image",
+      "help": "Creatividad propia de la barra. Si se deja vacia la lista entera, se reutiliza la del anuncio grande recortada."
+    },
+    "ads.banners.miniBanner.images.orientation": {
+      "label": "Orientacion",
+      "help": "Para que orientacion sirve esta variante de la barra."
+    },
+    "ads.banners.miniBanner.images.minWidth": {
+      "label": "Ancho minimo de pantalla",
+      "help": "A partir de cuantos pixeles de ancho se usa esta variante."
+    },
+    "ads.banners.miniBanner.images.minHeight": {
+      "label": "Alto minimo de pantalla",
+      "help": "A partir de cuantos pixeles de alto se usa esta variante."
+    },
+    "ads.banners.miniBanner.images.locales": {
+      "label": "Idiomas",
+      "help": "Idiomas a los que sirve esta variante de la barra. Vacio = todos."
+    },
+    "ads.banners.preRollVideo.sources.url": {
+      "label": "Archivo de video",
+      "widget": "asset-video",
+      "help": "El video. Se sube al almacenamiento de objetos (no al repositorio, porque pesa demasiado) y queda servido al momento, sin necesidad de publicar."
+    },
+    "ads.banners.preRollVideo.sources.type": {
+      "label": "Formato",
+      "help": "Tipo del archivo (`video/mp4` o `video/webm`). El navegador recorre las variantes y reproduce la primera que sabe leer, asi que ofrecer las dos maximiza la compatibilidad."
+    },
+    "ads.banners.preRollVideo.sources.orientation": {
+      "label": "Orientacion",
+      "help": "Para que orientacion de pantalla sirve esta variante de video."
+    },
+    "ads.banners.preRollVideo.sources.minWidth": {
+      "label": "Ancho minimo de pantalla",
+      "help": "A partir de cuantos pixeles de ancho se usa esta variante."
+    },
+    "ads.banners.preRollVideo.sources.minHeight": {
+      "label": "Alto minimo de pantalla",
+      "help": "A partir de cuantos pixeles de alto se usa esta variante."
+    },
+    "ads.banners.preRollVideo.sources.locales": {
+      "label": "Idiomas",
+      "help": "Idiomas a los que sirve esta variante. Vacio = todos."
+    },
+    "ads.banners.preRollVideo.maxDurationMs": {
+      "label": "Tope de seguridad",
+      "help": "NO es la duracion del video: es el limite tras el cual el juego pasa al anuncio grande pase lo que pase. Existe para que un video que no termina de cargar —conexion mala, archivo corrupto— no deje al jugador atrapado en una pantalla negra."
+    },
+    "ads.banners.preRollVideo.skippableAfterMs": {
+      "label": "Permitir saltar a partir de",
+      "help": "Cuando aparece el boton «saltar». En 0 se puede saltar desde el principio; sin valor no aparece nunca. ⚠️ Ponerlo por encima del tope de seguridad equivale a no poder saltar, porque el video se corta antes."
+    },
+    "ads.banners.preRollVideo.allowAudio": {
+      "label": "Ofrecer sonido",
+      "help": "Enseña un boton para activar el audio. El video SIEMPRE empieza en silencio (los navegadores no dejan otra cosa); esto solo decide si se le da al jugador la opcion de quitarlo."
+    },
+    "analytics.eventPolicy.allowedEvents": {
+      "label": "Eventos permitidos",
+      "help": "La lista blanca de eventos que se envian. ⚠️ Es la unica del juego —no hay una por destino— y un evento que no aparezca aqui se DESCARTA EN SILENCIO: se emite, no llega a ninguna parte y no hay ni un aviso. Si acabas de instrumentar algo y no aparece en los paneles, mira aqui primero. ⚠️ El nombre lleva PUNTOS, no guiones bajos: un nombre mal escrito deja el evento mudo igual que si no estuviera."
+    },
+    "analytics.eventPolicy.blockedEvents": {
+      "label": "Eventos bloqueados",
+      "help": "Lista negra que se aplica DESPUES de la blanca. Sirve para silenciar un evento concreto que se ha vuelto ruidoso o esta disparandose de mas, sin tener que rehacer la lista de permitidos."
+    },
+    "analytics.providers.enabled": {
+      "label": "Destino activo",
+      "help": "Apaga o enciende este destino en caliente, sin publicar una release. Es la palanca para un incidente: un pico de cuota, un endpoint caido o un dashboard lleno de ruido. Apagar un destino NO cambia que eventos emite el juego, solo adonde van."
+    },
+    "analytics.providers.batching.flushIntervalMs": {
+      "label": "Cada cuanto se envia",
+      "help": "Cada cuanto se vacia la cola de eventos. Mas corto = los datos llegan antes pero se hacen mas peticiones desde el movil; mas largo = menos bateria y menos datos, con mas retraso."
+    },
+    "analytics.providers.batching.maxBatchSize": {
+      "label": "Eventos por envio",
+      "help": "Cuantos eventos caben en un envio. ⚠️ Un valor muy bajo genera MUCHISIMOS objetos pequeños en el almacen y puede llegar a atascar el proceso nocturno que consolida los datos, con el efecto visible de paneles vacios aunque los datos crudos esten ahi."
+    },
+    "analytics.providers.batching.flushOnPageHide": {
+      "label": "Enviar al cerrar",
+      "help": "Intenta mandar lo que quede en la cola cuando el jugador cierra la app o la manda a segundo plano. Sin esto se pierden los eventos del final de la sesion, que suelen ser los mas interesantes (por que se fue)."
+    },
+    "paywall.enabled": {
+      "label": "Muro activo",
+      "help": "Interruptor general del muro de pago. ⚠️ Hoy debe estar APAGADO: encenderlo empieza a pedir la compra a jugadores que hasta ahora jugaban gratis. Solo actua en iOS y Android."
+    },
+    "paywall.freeEpisodeLimit": {
+      "label": "Episodios gratis",
+      "help": "Cuantos episodios se pueden jugar sin pagar. El muro aparece al intentar pasar de ahi. Es la palanca principal para ajustar cuanto juego se regala antes de pedir la compra."
+    },
+    "paywall.cohortPercent": {
+      "label": "Porcentaje del parque",
+      "help": "A que fraccion de jugadores se le aplica el muro. Sirve para probar la monetizacion en una parte pequeña antes de extenderla. El reparto es estable: a quien le toca, le toca siempre."
+    },
+    "paywall.triggers.episodeIndex": {
+      "label": "Episodio",
+      "help": "Numero de episodio en el que se interpone el muro."
+    },
+    "paywall.triggers.beforeSceneIndex": {
+      "label": "Antes de la escena",
+      "help": "Escena concreta del episodio antes de la cual aparece el muro. Permite afinar el momento dentro del episodio en vez de cortar al entrar."
+    },
+    "paywall.versionRange.min": {
+      "label": "Version minima",
+      "help": "El muro solo aplica desde esta version de la app. Sin valor = sin limite inferior."
+    },
+    "paywall.versionRange.max": {
+      "label": "Version maxima",
+      "help": "El muro deja de aplicar por encima de esta version. Sin valor = sin limite superior."
+    },
+    "paywall.overrides.*.enabled": {
+      "label": "Muro activo en esta plataforma",
+      "help": "Pisa el interruptor general SOLO en esta plataforma. Es como se cobra en una tienda mientras la otra sigue en revision."
+    },
+    "paywall.overrides.*.freeEpisodeLimit": {
+      "label": "Episodios gratis en esta plataforma",
+      "help": "Cuantos episodios se regalan aqui. Sin declarar, se hereda el valor general."
+    },
+    "paywall.overrides.*.cohortPercent": {
+      "label": "Porcentaje en esta plataforma",
+      "help": "Fraccion de jugadores de esta plataforma a los que aplica. Sin declarar, hereda el general."
+    },
+    "paywall.overrides.*.triggers": {
+      "label": "Momentos en esta plataforma",
+      "help": "Disparadores propios de esta plataforma. Declararlos SUSTITUYE a los generales, no los suma."
+    },
+    "paywall.overrides.*.triggers.episodeIndex": {
+      "label": "Episodio",
+      "help": "Episodio en el que aparece el muro en esta plataforma."
+    },
+    "paywall.overrides.*.triggers.beforeSceneIndex": {
+      "label": "Antes de la escena",
+      "help": "Escena antes de la cual aparece el muro en esta plataforma."
+    },
+    "paywall.overrides.*.versionRange.min": {
+      "label": "Version minima",
+      "help": "Limite inferior de version para esta plataforma."
+    },
+    "paywall.overrides.*.versionRange.max": {
+      "label": "Version maxima",
+      "help": "Limite superior de version para esta plataforma."
+    },
+    "freewall.enabled": {
+      "label": "Aviso activo",
+      "help": "Interruptor general del aviso de compra. Hoy esta ENCENDIDO en todos los entornos: recuerda la compra sin bloquear el juego."
+    },
+    "freewall.cohortPercent": {
+      "label": "Porcentaje del parque",
+      "help": "A que fraccion de jugadores se le enseña el aviso."
+    },
+    "freewall.frequency.mode": {
+      "label": "Modo de repeticion",
+      "help": "Como se decide cuando repetir el aviso al mismo jugador."
+    },
+    "freewall.frequency.cooldownDays": {
+      "label": "Dias de descanso",
+      "help": "Dias que tienen que pasar antes de volver a enseñar el aviso al mismo jugador. Bajarlo mucho convierte un recordatorio en una molestia."
+    },
+    "freewall.triggers.episodeIndex": {
+      "label": "Episodio",
+      "help": "Episodio en el que se enseña el aviso."
+    },
+    "freewall.triggers.beforeSceneIndex": {
+      "label": "Antes de la escena",
+      "help": "Escena antes de la cual se enseña el aviso."
+    },
+    "freewall.versionRange.min": {
+      "label": "Version minima",
+      "help": "El aviso solo aplica desde esta version. Sin valor = sin limite."
+    },
+    "freewall.versionRange.max": {
+      "label": "Version maxima",
+      "help": "El aviso deja de aplicar por encima de esta version. Sin valor = sin limite."
+    },
+    "freewall.overrides.*.enabled": {
+      "label": "Aviso activo en esta plataforma",
+      "help": "Pisa el interruptor general solo aqui."
+    },
+    "freewall.overrides.*.cohortPercent": {
+      "label": "Porcentaje en esta plataforma",
+      "help": "Fraccion de jugadores de esta plataforma. Sin declarar, hereda el general."
+    },
+    "freewall.overrides.*.frequency.mode": {
+      "label": "Modo de repeticion",
+      "help": "Modo propio de esta plataforma."
+    },
+    "freewall.overrides.*.frequency.cooldownDays": {
+      "label": "Dias de descanso",
+      "help": "Descanso propio de esta plataforma."
+    },
+    "freewall.overrides.*.triggers": {
+      "label": "Momentos en esta plataforma",
+      "help": "Disparadores propios. Declararlos SUSTITUYE a los generales."
+    },
+    "freewall.overrides.*.triggers.episodeIndex": {
+      "label": "Episodio",
+      "help": "Episodio en el que aparece el aviso en esta plataforma."
+    },
+    "freewall.overrides.*.triggers.beforeSceneIndex": {
+      "label": "Antes de la escena",
+      "help": "Escena antes de la cual aparece el aviso en esta plataforma."
+    },
+    "freewall.overrides.*.versionRange.min": {
+      "label": "Version minima",
+      "help": "Limite inferior de version para esta plataforma."
+    },
+    "freewall.overrides.*.versionRange.max": {
+      "label": "Version maxima",
+      "help": "Limite superior de version para esta plataforma."
+    },
+    "mp.showButton": {
+      "label": "Boton de multijugador en la home",
+      "help": "Enseña u oculta el boton de multijugador. Es el kill-switch del modo entero: si el servicio de partidas falla, apagarlo aqui lo retira de todas las apps instaladas al momento, sin publicar nada. ⚠️ No basta con esto para que se vea: ademas tiene que haber transporte de red disponible."
+    },
+    "mp.deviceHostFilter": {
+      "label": "Emparejar por tipo de dispositivo",
+      "help": "Hace que en el listado de partidas cada cual vea solo las creadas desde un dispositivo parecido (movil con movil, escritorio con escritorio; la tablet hace de puente y ve todas). Existe porque el tablero se crea con la forma de la pantalla del anfitrion, y cruzar movil con escritorio obliga a girar o a dejar franjas negras. ⚠️ Encenderlo reduce las partidas visibles, asi que con poca gente conectada puede dejar el listado vacio."
+    },
+    "mp.paywall.enabled": {
+      "label": "Muro activo",
+      "help": "Pone el multijugador detras de la suscripcion anual. Afecta a crear partida y a unirse a una en curso. Quien la compra desbloquea tambien el juego de un jugador."
+    },
+    "mp.paywall.triggerGames": {
+      "label": "Partidas antes de cobrar",
+      "help": "Cuantas partidas de multijugador puede jugar alguien antes de que aparezca el muro. Se cuentan por dispositivo y no se reinician al cerrar la app. En 0 el muro salta desde la primera vez, sin dejar probar el modo."
+    },
+    "mp.retry.enabled": {
+      "label": "Permitir volver a entrar",
+      "help": "Kill-switch de la funcion entera. Al apagarlo desaparecen el boton, la espera que da tiempo a usarlo y el candado: morir vuelve a significar quedarse de espectador hasta el final."
+    },
+    "mp.retry.maxAttempts": {
+      "label": "Reintentos por partida",
+      "help": "Cuantas veces puede reaparecer cada jugador en la misma partida. Se cuenta por partida y por participante, y no se puede regatear saliendo y volviendo a entrar. El 0 es valido y equivale a desactivar la funcion."
+    },
+    "mp.retry.paywall.enabled": {
+      "label": "Candado activo",
+      "help": "Interruptor maestro del candado del boton. Cada plataforma lo hereda salvo que se diga lo contrario abajo."
+    },
+    "mp.retry.paywall.platforms.ios": {
+      "label": "Candado en iOS",
+      "help": "Pone el candado en iOS. ⚠️ Solo tiene sentido si el producto ya esta dado de alta en la App Store: si no, el jugador se encuentra un boton bloqueado que no hay forma de desbloquear."
+    },
+    "mp.retry.paywall.platforms.android": {
+      "label": "Candado en Android",
+      "help": "Pone el candado en Android. Mismo aviso: el producto tiene que existir ya en Google Play."
+    },
+    "profiling.enabled": {
+      "label": "Medicion activa",
+      "help": "Enciende la medicion de rendimiento en produccion. Apagarlo detiene toda la recogida al momento, que es lo que se hace si la propia medicion esta molestando."
+    },
+    "profiling.cohortPercent": {
+      "label": "Porcentaje del parque",
+      "help": "A que fraccion de jugadores se le mide. Medir cuesta rendimiento a quien lo sufre, asi que no se mide a todo el mundo: con una parte pequeña ya salen las tendencias."
+    },
+    "profiling.signals.fps": {
+      "label": "Fotogramas por segundo",
+      "help": "Mide la fluidez. Es la señal que mejor se corresponde con lo que el jugador percibe como «va mal»."
+    },
+    "profiling.signals.memory": {
+      "label": "Memoria",
+      "help": "Mide el consumo de memoria a lo largo de la sesion. Sirve para detectar fugas antes de que acaben cerrando la app."
+    },
+    "profiling.signals.longTasks": {
+      "label": "Tareas largas",
+      "help": "Detecta trozos de trabajo que bloquean el hilo principal. Mientras duran, el juego no responde al dedo."
+    },
+    "profiling.signals.entities": {
+      "label": "Entidades",
+      "help": "Cuenta cuantos elementos hay en escena. Ayuda a relacionar una caida de fluidez con «habia demasiadas cosas en pantalla»."
+    },
+    "profiling.signals.systems": {
+      "label": "Sistemas",
+      "help": "Mide cuanto tarda cada sistema del juego en su turno. Es lo que dice QUE parte concreta se esta comiendo el tiempo del fotograma."
+    },
+    "profiling.signals.events": {
+      "label": "Eventos",
+      "help": "Mide el trafico de eventos internos. Una tormenta de eventos suele estar detras de un tiron que no se explica por el dibujado."
+    },
+    "profiling.thresholds.frameMs.warn": {
+      "label": "Aviso",
+      "help": "Milisegundos por fotograma a partir de los cuales se avisa. Referencia: 16,7 ms son 60 por segundo."
+    },
+    "profiling.thresholds.frameMs.critical": {
+      "label": "Critico",
+      "help": "Milisegundos por fotograma que ya significan tirones visibles. Por encima de 33 ms el juego se ve a saltos."
+    },
+    "profiling.thresholds.longTaskMs.warn": {
+      "label": "Aviso",
+      "help": "Duracion de una tarea a partir de la cual se avisa."
+    },
+    "profiling.thresholds.longTaskMs.critical": {
+      "label": "Critico",
+      "help": "Duracion que ya se nota como un bloqueo: el juego deja de responder durante ese tiempo."
+    },
+    "profiling.thresholds.memoryGrowthMb.warn": {
+      "label": "Aviso",
+      "help": "Megabytes de crecimiento a partir de los cuales se sospecha una fuga."
+    },
+    "profiling.thresholds.memoryGrowthMb.critical": {
+      "label": "Critico",
+      "help": "Crecimiento que acaba en cierre de la app en dispositivos con poca memoria."
+    },
+    "ads.banners": {
+      "label": "Campañas",
+      "help": "Se evalua de arriba abajo y gana la PRIMERA aplicable. El orden es una decision, no una casualidad."
+    },
+    "ads.banners.images": {
+      "label": "Imagenes",
+      "help": "Variantes de la creatividad por orientacion, tamaño e idioma."
+    },
+    "ads.banners.miniBanner.images": {
+      "label": "Imagenes del mini-banner",
+      "help": "Creatividades propias de la barra. Lista vacia = reutiliza la del anuncio grande."
+    },
+    "ads.banners.preRollVideo.sources": {
+      "label": "Variantes de video",
+      "help": "Fuentes por orientacion, tamaño, idioma y formato."
+    },
+    "analytics.providers": {
+      "label": "Destinos",
+      "help": "Un bloque por destino. Ids validos: `posthog` y `gamefw`."
+    },
+    "paywall.triggers": {
+      "label": "Momentos en que aparece",
+      "help": "Puntos de la progresion en los que se interpone el muro."
+    },
+    "freewall.triggers": {
+      "label": "Momentos en que aparece",
+      "help": "Puntos de la progresion en los que se enseña el aviso."
+    }
+  }
+}

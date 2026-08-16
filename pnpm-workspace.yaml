@@ -1,0 +1,13 @@
+# Este repo es su PROPIA raiz de pnpm, aunque viva dentro de `my-game-fw`
+# como submodulo.
+#
+# Sin este fichero, pnpm sube hasta el `pnpm-workspace.yaml` del padre y trata
+# a este repo como parte de aquel workspace: `pnpm install` acaba instalando
+# ARRIBA y aqui no aparece ningun `node_modules`, asi que el dashboard no
+# arranca y no hay ningun error que explique por que. Con el, un `pnpm
+# install` a secas hace lo esperado.
+
+# `vite` trae `esbuild`, que compila un binario en su postinstall. pnpm 10 lo
+# bloquea salvo que se declare aqui.
+onlyBuiltDependencies:
+  - esbuild

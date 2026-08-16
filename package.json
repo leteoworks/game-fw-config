@@ -2,12 +2,17 @@
   "name": "game-fw-config",
   "version": "1.0.0",
   "private": true,
-  "description": "Remote config (analytics, feature flags) para juegos del framework. Servido via jsDelivr CDN.",
+  "description": "Remote config (analytics, feature flags) para juegos del framework. Servido por el Worker gamefw-remote-config (ADR-038).",
   "type": "module",
   "scripts": {
-    "validate": "node scripts/validate.mjs"
+    "validate": "node scripts/validate.mjs",
+    "dashboard": "node dashboard/server/index.mjs",
+    "test": "node --test dashboard/src/lib/*.test.mjs dashboard/server/*.test.mjs"
   },
   "devDependencies": {
-    "ajv": "^8.17.1"
+    "@vitejs/plugin-vue": "^5.2.1",
+    "ajv": "^8.17.1",
+    "vite": "^6.0.7",
+    "vue": "^3.5.13"
   }
 }
