@@ -217,7 +217,7 @@
     "showToEntitled": false,
     "banners": [
       {
-        "id": "s04-mock-a",
+        "id": "s05-mock-a",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -229,11 +229,11 @@
         "url": "https://example.com/promo",
         "images": [
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg?s=04",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg?s=05",
             "orientation": "portrait"
           },
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg?s=04",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg?s=05",
             "orientation": "landscape"
           }
         ],
@@ -250,11 +250,11 @@
           }
         },
         "miniBanner": {
-          "heightPercent": 40,
-          "closeXWidthPercent": 50,
+          "heightPercent": 1,
+          "closeXWidthPercent": 0,
           "images": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg?s=04"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg?s=05"
             }
           ]
         }
