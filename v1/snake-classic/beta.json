@@ -213,7 +213,7 @@
     }
   },
   "ads": {
-    "showToEntitled": true,
+    "showToEntitled": false,
     "banners": [
       {
         "id": "s00-mock-a",
