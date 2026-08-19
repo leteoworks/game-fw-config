@@ -112,6 +112,8 @@
         "ads.autoclose",
         "ads.dismiss",
         "ads.abandon",
+        "ads.close_fallback",
+        "ads.press_stuck",
         "ads.video_impression",
         "ads.video_complete",
         "ads.video_skip",
