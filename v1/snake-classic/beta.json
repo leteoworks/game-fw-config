@@ -217,7 +217,7 @@
     "showToEntitled": false,
     "banners": [
       {
-        "id": "s07-mock-a",
+        "id": "s08-mock-a",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -229,16 +229,11 @@
         "url": "https://example.com/promo",
         "images": [
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg?s=07",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait.svg?s=08",
             "orientation": "portrait"
           },
           {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-portrait-hd.svg?s=07",
-            "orientation": "portrait",
-            "minWidth": 800
-          },
-          {
-            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg?s=07",
+            "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/full-landscape.svg?s=08",
             "orientation": "landscape"
           }
         ],
@@ -252,14 +247,15 @@
           "label": {
             "en": "Close",
             "es": "Cerrar"
-          }
+          },
+          "unlockAfterMs": 5000
         },
         "miniBanner": {
           "heightPercent": 12,
           "closeXWidthPercent": 15,
           "images": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg?s=07"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/mini-wide.svg?s=08"
             }
           ]
         }
