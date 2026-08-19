@@ -110,6 +110,29 @@ for (const schemaFile of readdirSync(schemasDir)) {
       console.log(`OK   ${gameId}/${configFile}`);
     }
 
+    // Guard de ids repetidos: el schema no puede verlo (cada campaña
+    // es valida por separado). Y el cliente persiste el cooldown y el
+    // cierre por sesion POR id, asi que dos campañas con el mismo id
+    // se heredan las marcas la una a la otra: la segunda puede no
+    // llegar a verse nunca sin que nada falle. Pasa con solo duplicar
+    // una campaña en el formulario y olvidar renombrarla.
+    const vistos = new Set();
+    for (const banner of (data.ads?.banners ?? [])) {
+      const id = banner?.id;
+      if (typeof id !== 'string') continue;
+      if (vistos.has(id)) {
+        failed = true;
+        console.error(
+          `FAIL ${gameId}/${configFile}: dos campañas con el mismo id `
+          + `«${id}»\n`
+          + '  El cooldown y el cierre por sesion se guardan por id: la '
+          + 'segunda heredaria\n  las marcas de la primera y podria no '
+          + 'mostrarse nunca.\n  → dale un id propio a cada campaña.',
+        );
+      }
+      vistos.add(id);
+    }
+
     // Guard de creatividades: el schema no puede comprobarlo (una URL
     // de otro dominio es un string perfectamente valido).
     for (const { url, at } of adsAssetUrls(data.ads)) {

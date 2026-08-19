@@ -144,6 +144,38 @@ const total = computed(
   () => activas.value.reduce((n, f) => n + (f.peso || 0), 0),
 );
 
+/**
+ * Tramos VACIOS o invertidos: la campaña no la vera nadie.
+ *
+ * El juego los respeta a proposito (equivocarse hacia "nadie" es mas
+ * barato que hacia "todo el parque"), asi que el aviso tiene que
+ * estar aqui o el fallo seria mudo: una campaña configurada, guardada
+ * y publicada que simplemente no aparece.
+ */
+const vacios = computed(
+  () => filas.value.filter((f) => f.activa && f.ancho <= 0),
+);
+
+/**
+ * Ids repetidos. El cooldown y el cierre por sesion se guardan POR id,
+ * asi que dos campañas con el mismo se heredan las marcas y la segunda
+ * puede no verse nunca. Se cuela con solo duplicar una campaña y
+ * olvidar renombrarla, que es exactamente lo que invita a hacer un
+ * formulario con boton de duplicar.
+ */
+const repetidos = computed(() => {
+  const cuenta = new Map();
+  for (const f of filas.value) {
+    cuenta.set(f.id, (cuenta.get(f.id) ?? 0) + 1);
+  }
+  return [...cuenta.entries()]
+    .filter(([, n]) => n > 1)
+    .map(([id, n]) => ({ id, n }));
+});
+
+/** Las que pasan del tope y por tanto NO llegan al juego. */
+const sobrantes = computed(() => Math.max(0, filas.value.length - 20));
+
 function cambiarPolitica(valor) {
   emit('set', { path: 'ads.pick', value: valor });
 }
@@ -215,8 +247,24 @@ function cambiarPolitica(valor) {
       </div>
     </div>
 
-    <ul v-if="huecos.length || solapes.length || tapadas.length"
+    <ul v-if="huecos.length || solapes.length || tapadas.length
+              || vacios.length || repetidos.length || sobrantes"
         class="campanas__avisos">
+      <li v-if="sobrantes" class="aviso malo">
+        Hay <strong>{{ filas.length }} campañas</strong> y el juego solo
+        lee las <strong>20 primeras</strong>: las {{ sobrantes }} últimas
+        no llegan al dispositivo.
+      </li>
+      <li v-for="v in vacios" :key="'v' + v.indice" class="aviso malo">
+        <strong>{{ v.id }}</strong> tiene un tramo vacío
+        ({{ v.desde }}–{{ v.hasta }}): no la verá nadie. Si querías todo
+        el parque, borra el tramo en vez de dejarlo a cero.
+      </li>
+      <li v-for="r in repetidos" :key="'r' + r.id" class="aviso malo">
+        El id <strong>{{ r.id }}</strong> se repite {{ r.n }} veces. El
+        cooldown y el cierre por sesión se guardan por id: la segunda
+        heredaría las marcas de la primera y puede no verse nunca.
+      </li>
       <li v-for="(h, i) in huecos" :key="'h' + i" class="aviso">
         <strong>{{ (h.hasta - h.desde).toFixed(0) }} % del parque</strong>
         ({{ h.desde }}–{{ h.hasta }}) no tiene ninguna campaña activa: esa
