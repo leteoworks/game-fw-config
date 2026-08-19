@@ -1758,6 +1758,35 @@
               "showCountdown": {
                 "type": "boolean",
                 "description": "¿Enseñar la cuenta atras del autocierre? Default true. Solo silencia la del AUTOCIERRE: la que explica por que un boton esta bloqueado se enseña siempre."
+              },
+              "audience": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "fromPercent",
+                  "toPercent"
+                ],
+                "description": "Tramo estanco del parque `[desde, hasta)`. Cada jugador ocupa un punto fijo del eje 0-100, asi que tramos que NO se solapan = compartimentos (cada uno ve siempre la misma campaña) y tramos solapados = publico compartido, donde decide la politica de reparto. ⚠️ Sin identidad estable (primer arranque) una campaña con tramo no entra.",
+                "properties": {
+                  "fromPercent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Inicio del tramo, incluido."
+                  },
+                  "toPercent": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Fin del tramo, EXCLUIDO."
+                  }
+                }
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000,
+                "description": "Peso relativo cuando varias campañas compiten por el mismo jugador. Solo cuenta con las politicas `weighted` y `sticky`; con `order` manda el orden de la lista. Default 1."
               }
             }
           },
@@ -1766,6 +1795,20 @@
         "showToEntitled": {
           "type": "boolean",
           "description": "¿Los usuarios con compra/entitlement ven ads? Default false (el comprador no ve ads)."
+        },
+        "pick": {
+          "enum": [
+            "order",
+            "weighted",
+            "sticky"
+          ],
+          "description": "Como se elige la campaña cuando VARIAS aplican al mismo jugador. `order` (default): gana la primera de la lista. `weighted`: sorteo en cada arranque segun el peso (el mismo jugador va rotando). `sticky`: sorteo por identidad, asi que cada jugador cae siempre en la misma, repartidos por peso."
+        },
+        "audienceSalt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "description": "Nombre del eje sobre el que se calculan los tramos de parque y el sorteo `sticky`. Cambiarlo REBARAJA a todo el mundo: es la palanca para volver a sortear cuando una campaña ya se quemo con su publico."
         }
       }
     }

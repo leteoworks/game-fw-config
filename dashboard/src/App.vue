@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 
 import { api } from './api.mjs';
+import AdsCampaignsPanel from './components/AdsCampaignsPanel.vue';
 import ConsolePanel from './components/ConsolePanel.vue';
 import FieldGroup from './components/FieldGroup.vue';
 import { buildFormModel, deletePath, writePath } from './lib/schema-form.mjs';
@@ -257,6 +258,17 @@ watch([juego, canal], cargar);
 
     <main class="contenido">
       <p v-if="cargando" class="tenue">Cargando…</p>
+      <!--
+        Vista de conjunto de las campañas, ANTES del formulario: con
+        varias simultaneas, lo que hay que revisar no es un campo suelto
+        sino si el reparto del parque tiene sentido (huecos, solapes,
+        campañas tapadas). El detalle se sigue editando abajo.
+      -->
+      <AdsCampaignsPanel
+        v-if="!cargando && seccionActiva === 'ads' && datos"
+        :datos="datos"
+        @set="alFijar"
+      />
       <FieldGroup
         v-else-if="seccion"
         :key="`${juego}-${canal}-${seccion.key}`"

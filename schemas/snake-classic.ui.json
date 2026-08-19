@@ -7,7 +7,7 @@
     },
     "ads.banners": {
       "label": "Campañas",
-      "help": "Lista ORDENADA de campañas. Se evalua de arriba abajo y gana la PRIMERA que sea aplicable al dispositivo, version, idioma y cohorte del jugador; el resto ni se miran. Por eso el orden es una decision de producto, no una casualidad: para dar prioridad a una campaña, subela."
+      "help": "Hasta 20 campañas SIMULTANEAS. Cada una es independiente: sus imagenes, su video, sus botones, su publico y sus tiempos. Quien decide cual ve cada jugador son dos cosas distintas: el tramo de parque de cada campaña (quien es candidata) y la politica de reparto de arriba (cual de las candidatas gana). Con la politica por defecto, `orden`, gana la primera aplicable de la lista — por eso el orden es una decision de producto, no una casualidad."
     },
     "ads.banners.images": {
       "label": "Imagenes del anuncio a pantalla completa",
@@ -617,6 +617,54 @@
     "freewall.triggers": {
       "label": "Momentos en que aparece",
       "help": "Puntos de la progresion en los que se enseña el aviso."
+    },
+    "ads.pick": {
+      "label": "Como se reparten los jugadores",
+      "help": "Que hacer cuando VARIAS campañas aplican al mismo jugador. «Orden»: gana la primera de la lista (previsible; es el comportamiento de siempre). «Sorteo por peso»: se sortea en cada arranque, asi que el mismo jugador va viendo campañas distintas. «Fijo por jugador»: tambien reparte por peso, pero cada jugador cae siempre en la misma — compartimentos sin tener que calcular tramos a mano."
+    },
+    "ads.audienceSalt": {
+      "label": "Semilla del reparto",
+      "help": "Nombre del sorteo. Cambiarlo REBARAJA a todo el parque: quien veia la campaña A puede pasar a la B. Uselo cuando una campaña ya se ha quemado con su publico y quiera empezar el reparto de cero; si no, dejelo como esta."
+    },
+    "ads.banners.audience": {
+      "label": "Tramo de parque",
+      "help": "A que porcion de jugadores va dirigida, como un tramo del 0 al 100. Tramos que no se pisan = compartimentos estancos: cada jugador ve siempre la misma campaña y nunca las otras (p.ej. 0-33 / 33-66 / 66-100). Tramos que se pisan = publico compartido, y entonces decide la politica de reparto. Dejarlo vacio = toda la gente."
+    },
+    "ads.banners.audience.fromPercent": {
+      "label": "Desde (%)",
+      "help": "Inicio del tramo, incluido."
+    },
+    "ads.banners.audience.toPercent": {
+      "label": "Hasta (%)",
+      "help": "Fin del tramo, EXCLUIDO: 33 aqui y 33 en el «desde» de la siguiente encajan sin solaparse ni dejar hueco."
+    },
+    "ads.banners.weight": {
+      "label": "Peso en el reparto",
+      "help": "Cuanta parte se lleva frente a las otras campañas que compiten por el mismo jugador: con pesos 3 y 1, la primera se lleva tres de cada cuatro. Solo cuenta si el reparto es por sorteo o fijo por jugador. 0 = no se elige nunca."
+    },
+    "ads.banners.showCountdown": {
+      "label": "Enseñar la cuenta atras",
+      "help": "Muestra en una esquina los segundos que le quedan al anuncio antes de cerrarse solo. Apagarlo NO quita el autocierre, solo el aviso. La cuenta atras que explica por que un boton aun no responde se enseña siempre."
+    },
+    "ads.banners.viewButton.unlockAfterMs": {
+      "label": "Se puede pulsar tras",
+      "help": "El boton se pinta desde el principio pero no responde hasta pasado este tiempo, con la cuenta atras explicando cuanto falta. Sirve para pedir unos segundos de atencion antes de ofrecer el enlace. Maximo 15 s, y si no cabe dentro de la duracion del anuncio el juego lo ignora."
+    },
+    "ads.banners.closeButton.unlockAfterMs": {
+      "label": "Se puede pulsar tras",
+      "help": "Igual que en el boton «ver», pero reteniendo el cierre: el jugador ve el anuncio ese tiempo antes de poder quitarlo. Maximo 15 s, y en escritorio la tecla Escape siempre puede cerrar — el bloqueo es un empujon, no una jaula."
+    },
+    "ads.banners.preRollVideo.skipLabel": {
+      "label": "Texto del boton «saltar»",
+      "help": "Texto por idioma del boton que salta el video. Si se deja vacio, el juego pone el suyo (traducido a 13 idiomas)."
+    },
+    "ads.banners.preRollVideo.unmuteLabel": {
+      "label": "Texto de «activar sonido»",
+      "help": "Texto por idioma del boton que quita el silencio al video. Vacio = el del juego."
+    },
+    "ads.banners.preRollVideo.muteLabel": {
+      "label": "Texto de «silenciar»",
+      "help": "Texto por idioma del boton que silencia. Vacio = el del juego."
     }
   }
 }
