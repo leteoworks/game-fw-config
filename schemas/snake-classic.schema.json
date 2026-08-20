@@ -1819,6 +1819,64 @@
           "description": "Nombre del eje sobre el que se calculan los tramos de parque y el sorteo `sticky`. Cambiarlo REBARAJA a todo el mundo: es la palanca para volver a sortear cuando una campaña ya se quemo con su publico."
         }
       }
+    },
+    "appUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Subarbol opcional del aviso de version nueva en la tienda (boton \"Actualizar\" en la home). Solo tiene efecto en builds nativas iOS/Android. Se publica con `pnpm publish:app-update`. Documentacion: docs/architecture/app-update/app-update-module.md.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Kill-switch. Ausente o false = no se ofrece actualizar a nadie."
+        },
+        "mode": {
+          "enum": [
+            "soft",
+            "hard"
+          ],
+          "description": "Tipo de release: soft = recomendada; hard = obligatoria (marca la decision como required y prefiere el flujo inmediato de Play). Ausente = soft."
+        },
+        "latestVersion": {
+          "type": "string",
+          "description": "Version publicada en la tienda (semver). Es contra lo que se compara la instalada cuando la tienda no contesta."
+        },
+        "minSupportedVersion": {
+          "type": "string",
+          "description": "Suelo soportado. Con mode=hard, quien este por debajo recibe required=true. Ausente con mode=hard = toda version anterior es obligatoria."
+        },
+        "platforms": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "ios",
+              "android"
+            ]
+          },
+          "description": "Plataformas donde aplica. Ausente = las dos. Lista vacia = ninguna (apagado por plataforma)."
+        },
+        "storeUrl": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Override de la URL de ficha por plataforma. Solo se admiten https://, market:// e itms-apps://.",
+          "properties": {
+            "ios": {
+              "type": "string"
+            },
+            "android": {
+              "type": "string"
+            }
+          }
+        },
+        "checkStore": {
+          "type": "boolean",
+          "description": "¿Preguntar a la tienda (Play In-App Updates / App Store)? Ausente = true. Apagarlo deja decidir solo a latestVersion."
+        },
+        "inAppUpdate": {
+          "type": "boolean",
+          "description": "¿Permitir actualizar sin salir del juego (solo Android)? Ausente = true. Apagarlo fuerza a abrir la ficha de la tienda."
+        }
+      }
     }
   }
 }

@@ -200,6 +200,14 @@
     "freewall.overrides.*.frequency": {
       "label": "Con que frecuencia",
       "help": "Cada cuanto se repite el aviso en esta plataforma. Sin declarar, hereda la frecuencia general."
+    },
+    "appUpdate": {
+      "label": "Aviso de version nueva",
+      "help": "El boton \"Actualizar\" que aparece EL PRIMERO en la home, encima de Play, cuando hay una version mas nueva en la tienda. Solo existe en movil (iOS/Android). Toda la seccion es opcional: sin ella, ningun jugador ve nada. Publicar aqui llega a las apps ya instaladas en segundos, sin sacar una release nueva."
+    },
+    "appUpdate.storeUrl": {
+      "label": "Ficha de la tienda",
+      "help": "A donde se lleva al jugador cuando no se puede actualizar sin salir del juego. Vacio = se construye sola con el identificador de la app. Solo hace falta tocarlo para mandar a una ficha distinta o a una pagina propia."
     }
   },
   "fields": {
@@ -665,6 +673,46 @@
     "ads.banners.preRollVideo.muteLabel": {
       "label": "Texto de «silenciar»",
       "help": "Texto por idioma del boton que silencia. Vacio = el del juego."
+    },
+    "appUpdate.enabled": {
+      "label": "Aviso activo",
+      "help": "Enciende el boton. Apagarlo lo retira de todas las apps al momento, que es lo que se hace si una version publicada resulta estar rota."
+    },
+    "appUpdate.mode": {
+      "label": "Tipo de release",
+      "help": "«Recomendada» ofrece el boton y nada mas. «Obligatoria» ademas marca la actualizacion como requerida y, en Android, usa el modo de Play que tapa el juego mientras actualiza. Ante la duda, recomendada."
+    },
+    "appUpdate.latestVersion": {
+      "label": "Version publicada",
+      "help": "El numero que ya esta en la tienda. Quien tenga uno menor vera el boton. Es lo que hace que el aviso funcione tambien en iOS y en moviles donde no se puede preguntar a la tienda."
+    },
+    "appUpdate.minSupportedVersion": {
+      "label": "Version minima soportada",
+      "help": "El suelo por debajo del cual la actualizacion se considera obligatoria. Solo se mira si el tipo de release es «obligatoria». Dejarlo vacio ahi significa que cualquier version anterior lo es."
+    },
+    "appUpdate.platforms": {
+      "label": "Plataformas",
+      "help": "Donde aplica el aviso. Vacio significa NINGUNA, no todas: sirve para apagarlo en una plataforma sin apagar la otra, por ejemplo cuando la version ya salio en Android y en iOS sigue en revision."
+    },
+    "appUpdate.storeUrl.ios": {
+      "label": "Ficha de iOS",
+      "help": "URL completa de la ficha de App Store. Vacio = se construye con el App Store ID que declara el juego."
+    },
+    "appUpdate.storeUrl.android": {
+      "label": "Ficha de Android",
+      "help": "URL completa de la ficha de Play. Vacio = se construye con el identificador de la app."
+    },
+    "appUpdate.checkStore": {
+      "label": "Preguntar a la tienda",
+      "help": "Ademas de comparar numeros, preguntarle a la tienda si ESTE movil ya tiene la actualizacion disponible. Es lo unico que sabe la verdad cuando una version se despliega poco a poco. Apagarlo solo si el propio sondeo diera problemas."
+    },
+    "appUpdate.inAppUpdate": {
+      "label": "Actualizar sin salir del juego",
+      "help": "En Android, dejar que Play actualice el juego alli mismo en vez de abrir la ficha. Apagarlo manda a todo el mundo a la tienda, que es el camino normal en iOS de todas formas."
+    },
+    "ads.banners.preRollVideo.startTimeoutMs": {
+      "label": "Espera maxima a que arranque el video",
+      "help": "Cuanto se espera a que el video empiece a reproducirse antes de darlo por perdido y pasar directo al anuncio. Existe porque un video que no arranca deja al jugador mirando una pantalla en negro sin saber que hacer."
     }
   }
 }

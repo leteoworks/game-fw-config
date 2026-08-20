@@ -121,6 +121,14 @@
         "ads.video_error",
         "ads.video_stall",
         "ads.gate_skipped",
+        "app.update.shown",
+        "app.update.clicked",
+        "app.update.in_app_started",
+        "app.update.in_app_completed",
+        "app.update.in_app_cancelled",
+        "app.update.in_app_failed",
+        "app.update.store_opened",
+        "app.update.probe_failed",
         "mp.room.created",
         "mp.entry.opened",
         "mp.entry.resolved",
@@ -215,5 +223,15 @@
       "entities": true,
       "events": true
     }
+  },
+  "appUpdate": {
+    "enabled": false,
+    "mode": "soft",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "checkStore": true,
+    "inAppUpdate": true
   }
 }
