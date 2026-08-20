@@ -220,7 +220,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s29-preroll-tope",
+        "id": "s30-preroll-roto",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -264,11 +264,15 @@
         "preRollVideo": {
           "sources": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-long.mp4",
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-noexiste.mp4",
+              "type": "video/mp4"
+            },
+            {
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-broken.mp4",
               "type": "video/mp4"
             }
           ],
-          "maxDurationMs": 5000,
+          "maxDurationMs": 30000,
           "skippableAfterMs": null,
           "allowAudio": false
         }
