@@ -220,7 +220,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s25-mock-a",
+        "id": "s26-video-sin-imagen",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -230,11 +230,7 @@
         "ttlMs": 0,
         "cooldownMs": null,
         "url": "https://example.com/promo",
-        "images": [
-          {
-            "url": "/assets/mock-ads/no-existe.svg"
-          }
-        ],
+        "images": [],
         "viewButton": {
           "label": {
             "en": "Learn more",
@@ -255,6 +251,16 @@
               "url": "/assets/mock-ads/mini-wide.png"
             }
           ]
+        },
+        "preRollVideo": {
+          "sources": [
+            {
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-portrait.mp4",
+              "type": "video/mp4"
+            }
+          ],
+          "maxDurationMs": 10000,
+          "skippableAfterMs": 2000
         }
       }
     ]
