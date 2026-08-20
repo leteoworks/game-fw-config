@@ -217,7 +217,7 @@
   },
   "ads": {
     "showToEntitled": false,
-    "pick": "sticky",
+    "pick": "order",
     "banners": [
       {
         "id": "s23-mock-a-ios",
