@@ -220,7 +220,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s27-preroll",
+        "id": "s28-preroll-saltar",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -275,8 +275,20 @@
             }
           ],
           "maxDurationMs": 30000,
-          "skippableAfterMs": null,
-          "allowAudio": false
+          "skippableAfterMs": 2000,
+          "allowAudio": true,
+          "skipLabel": {
+            "es": "Saltar anuncio",
+            "en": "Skip ad"
+          },
+          "unmuteLabel": {
+            "es": "Con sonido",
+            "en": "Sound on"
+          },
+          "muteLabel": {
+            "es": "Sin sonido",
+            "en": "Sound off"
+          }
         }
       }
     ]
