@@ -221,7 +221,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s30-preroll-roto",
+        "id": "s31-solo-apaisado",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -265,18 +265,19 @@
         "preRollVideo": {
           "sources": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-noexiste.mp4",
-              "type": "video/mp4"
-            },
-            {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-broken.mp4",
-              "type": "video/mp4"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-landscape.mp4",
+              "type": "video/mp4",
+              "orientation": "landscape"
             }
           ],
           "maxDurationMs": 30000,
-          "skippableAfterMs": null,
+          "startTimeoutMs": 5000,
+          "skippableAfterMs": 0,
           "allowAudio": false,
-          "startTimeoutMs": 3000
+          "skipLabel": {
+            "es": "Saltar anuncio",
+            "en": "Skip ad"
+          }
         }
       }
     ]
