@@ -220,11 +220,11 @@
     "pick": "sticky",
     "banners": [
       {
-        "id": "s19-mock-a",
+        "id": "s19b-mock-a",
         "enabled": true,
         "platforms": [],
-        "minVersion": "9.9.9",
-        "maxVersion": null,
+        "minVersion": "1.0.125",
+        "maxVersion": "1.0.125",
         "cohortPercent": 100,
         "placement": "post-splash",
         "ttlMs": 0,
