@@ -221,7 +221,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s31-solo-apaisado",
+        "id": "s32-textos-huerfanos",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -265,18 +265,22 @@
         "preRollVideo": {
           "sources": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-landscape.mp4",
-              "type": "video/mp4",
-              "orientation": "landscape"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-portrait.mp4",
+              "type": "video/mp4"
             }
           ],
           "maxDurationMs": 30000,
           "startTimeoutMs": 5000,
           "skippableAfterMs": 0,
-          "allowAudio": false,
+          "allowAudio": true,
           "skipLabel": {
-            "es": "Saltar anuncio",
-            "en": "Skip ad"
+            "es": "SALTAR (de la campana)"
+          },
+          "unmuteLabel": {
+            "es": "SONIDO (de la campana)"
+          },
+          "muteLabel": {
+            "es": "SILENCIO (de la campana)"
           }
         }
       }
