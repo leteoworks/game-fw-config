@@ -220,7 +220,7 @@
     "pick": "order",
     "banners": [
       {
-        "id": "s28-preroll-saltar",
+        "id": "s29-preroll-tope",
         "enabled": true,
         "platforms": [],
         "minVersion": null,
@@ -264,31 +264,13 @@
         "preRollVideo": {
           "sources": [
             {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-portrait.mp4",
-              "type": "video/mp4",
-              "orientation": "portrait"
-            },
-            {
-              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-landscape.mp4",
-              "type": "video/mp4",
-              "orientation": "landscape"
+              "url": "https://gamefw-remote-config.acamposruiz.workers.dev/v1/assets/mock-ads/preroll-long.mp4",
+              "type": "video/mp4"
             }
           ],
-          "maxDurationMs": 30000,
-          "skippableAfterMs": 2000,
-          "allowAudio": true,
-          "skipLabel": {
-            "es": "Saltar anuncio",
-            "en": "Skip ad"
-          },
-          "unmuteLabel": {
-            "es": "Con sonido",
-            "en": "Sound on"
-          },
-          "muteLabel": {
-            "es": "Sin sonido",
-            "en": "Sound off"
-          }
+          "maxDurationMs": 5000,
+          "skippableAfterMs": null,
+          "allowAudio": false
         }
       }
     ]
