@@ -1661,6 +1661,14 @@
                     "minimum": 0,
                     "description": "Muestra 'Saltar' tras N ms (0 = desde el inicio). null = sin boton. Un valor >= maxDurationMs se coacciona a null."
                   },
+                  "startTimeoutMs": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 1000,
+                    "description": "Plazo para el PRIMER FOTOGRAMA. Si el video no ha arrancado a los N ms se abandona y se pasa al anuncio de imagen. Distinto del tope: el tope mide reproduccion y un video que no arranca no reproduce nada. null = el del modulo (5000). Nunca por encima del tope."
+                  },
                   "allowAudio": {
                     "type": "boolean",
                     "description": "Ofrecer boton de sonido. El video SIEMPRE arranca muteado (requisito de autoplay). Default false."

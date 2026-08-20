@@ -119,6 +119,7 @@
         "ads.video_skip",
         "ads.video_cap",
         "ads.video_error",
+        "ads.video_stall",
         "ads.gate_skipped",
         "mp.room.created",
         "mp.entry.opened",
@@ -274,7 +275,8 @@
           ],
           "maxDurationMs": 30000,
           "skippableAfterMs": null,
-          "allowAudio": false
+          "allowAudio": false,
+          "startTimeoutMs": 3000
         }
       }
     ]
