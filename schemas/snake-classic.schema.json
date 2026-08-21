@@ -2557,6 +2557,48 @@
           "description": "Por defecto el comprador no ve anuncios. Activalo para que los vea igualmente.",
           "type": "boolean"
         },
+        "frequency": {
+          "title": "Frecuencia global",
+          "description": "Limites ENTRE campañas (el cooldown de cada campaña sigue aparte): cuantos anuncios al dia y cada cuanto, por dispositivo.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "maxPerDay": {
+              "default": null,
+              "title": "Anuncios maximos al dia",
+              "description": "Tope de impresiones a pantalla completa en 24 h por dispositivo, contando TODAS las campañas. Vacio = sin tope. Con tres campañas activas y sin esto, tres arranques seguidos son tres anuncios.",
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "minGapMs": {
+              "default": null,
+              "title": "Separacion minima",
+              "description": "Tiempo minimo entre dos anuncios de cualquier campaña en el mismo dispositivo. Vacio = sin minimo.",
+              "x-ui": {
+                "widget": "duration"
+              },
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
         "banners": {
           "title": "Campañas",
           "description": "Hasta 20 simultaneas. El orden importa con la politica `order`.",
@@ -2933,6 +2975,21 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "maxImpressionsPerDevice": {
+                "default": null,
+                "title": "Impresiones maximas por dispositivo",
+                "description": "Cuantas veces puede verse esta campaña en un mismo dispositivo, en total. Vacio = sin tope. 0 = nunca (equivale a apagarla).",
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "weight": {
                 "default": 1,

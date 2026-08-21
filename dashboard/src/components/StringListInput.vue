@@ -17,6 +17,13 @@ import { computed, ref } from 'vue';
  * Cuando el schema declara un `enum` para los elementos (p.ej. `platforms`),
  * se ofrecen como casillas en vez de texto libre: no se puede escribir un
  * valor que el validador vaya a rechazar.
+ *
+ * Y cuando ademas son SEGMENTOS del juego (`x-segments`: nombre, titulo y
+ * que significa cumplirlo), cada casilla lleva debajo su explicacion y la
+ * lista termina con la regla que de verdad importa: el jugador tiene que
+ * cumplir TODOS los marcados, y vacio es «sin restriccion» (no «nadie»).
+ * Marcar «nuevos» y «veteranos» a la vez no suma publicos, los cruza — y
+ * esos dos no se cruzan nunca.
  */
 
 const props = defineProps({
@@ -24,11 +31,16 @@ const props = defineProps({
   itemsSchema: { type: Object, default: null },
   nullable: { type: Boolean, default: false },
   placeholder: { type: String, default: 'añadir…' },
+  /** Segmentos nombrados ({ name, title, description }) o null. */
+  segments: { type: Array, default: null },
 });
 const emit = defineEmits(['update:modelValue']);
 
 const lista = computed(() => (Array.isArray(props.modelValue) ? props.modelValue : []));
 const opciones = computed(() => props.itemsSchema?.enum ?? null);
+
+/** Titulo y explicacion de una opcion, si es un segmento conocido. */
+const detalleDe = (op) => props.segments?.find((s) => s?.name === op) ?? null;
 
 const nuevo = ref('');
 const filtro = ref('');
@@ -90,15 +102,28 @@ function aplicarPegado() {
 <template>
   <div class="lista">
     <!-- Conjunto cerrado: casillas, no texto libre. -->
-    <div v-if="opciones" class="opciones">
-      <label v-for="op in opciones" :key="op" class="opcion">
-        <input
-          type="checkbox"
-          :checked="lista.includes(op)"
-          @change="alternar(op)"
-        >
-        <span>{{ op }}</span>
-      </label>
+    <div v-if="opciones" class="cerrado">
+      <div class="opciones" :class="{ detallada: segments }">
+        <label v-for="op in opciones" :key="op" class="opcion">
+          <input
+            type="checkbox"
+            :checked="lista.includes(op)"
+            @change="alternar(op)"
+          >
+          <span v-if="detalleDe(op)" class="opcion-detalle">
+            <span class="opcion-titulo">
+              {{ detalleDe(op).title }}
+              <code class="opcion-nombre">{{ op }}</code>
+            </span>
+            <span class="opcion-descripcion">{{ detalleDe(op).description }}</span>
+          </span>
+          <span v-else>{{ op }}</span>
+        </label>
+      </div>
+      <p v-if="segments" class="nota-segmentos">
+        El jugador tiene que cumplir <strong>TODOS</strong> los marcados.
+        Vacío = sin restricción.
+      </p>
     </div>
 
     <template v-else>
@@ -209,6 +234,26 @@ function aplicarPegado() {
 .opciones { display: flex; flex-wrap: wrap; gap: 12px; }
 .opcion { display: inline-flex; align-items: center; gap: 6px; }
 .opcion input { width: auto; }
+
+/* Segmentos: uno por linea, con su explicacion debajo del titulo. */
+.opciones.detallada { flex-direction: column; gap: 8px; }
+.opciones.detallada .opcion { align-items: flex-start; gap: 9px; }
+.opciones.detallada .opcion input { margin-top: 4px; }
+.opcion-detalle { display: flex; flex-direction: column; gap: 1px; }
+.opcion-titulo { display: flex; align-items: baseline; gap: 8px; font-weight: 600; }
+.opcion-nombre { font-size: 11px; color: var(--texto-debil); font-weight: 400; }
+.opcion-descripcion {
+  font-size: 12px; line-height: 1.45; color: var(--texto-tenue);
+  max-width: 72ch;
+}
+.nota-segmentos {
+  margin: 10px 0 0; padding: 6px 10px;
+  border-left: 2px solid var(--acento);
+  background: var(--panel-alto);
+  border-radius: 0 var(--radio) var(--radio) 0;
+  font-size: 12px; color: var(--texto-tenue);
+}
+.nota-segmentos strong { color: var(--texto); }
 
 .nulo {
   display: flex; align-items: center; gap: 6px;

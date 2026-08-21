@@ -58,6 +58,7 @@ button.peligro:hover:not(:disabled) { border-color: var(--error); color: var(--e
 input[type='text'],
 input[type='number'],
 input[type='url'],
+input[type='datetime-local'],
 select,
 textarea {
   font: inherit;

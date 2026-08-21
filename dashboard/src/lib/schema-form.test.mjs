@@ -22,11 +22,13 @@ import { test } from 'node:test';
 import {
   blankItem,
   buildFormModel,
+  buildItemSubtree,
   deletePath,
   humanizeKey,
   normalizeType,
   readPath,
   resolveWidget,
+  WIDGETS,
   writePath,
   flattenSchema,
 } from './schema-form.mjs';
@@ -137,6 +139,126 @@ test('x-ui.widget gana a todo lo demas', () => {
     resolveWidget('url', { type: 'string', 'x-ui': { widget: 'asset-image' } }),
     'asset-image',
   );
+});
+
+test('x-ui.widget: datetime → selector de fecha y hora', () => {
+  // Un instante ISO es un string cualquiera para el schema; la pista es lo
+  // que evita que el calendario de una campaña se teclee a mano (y sin
+  // zona, que es el error que el juego no puede detectar).
+  assert.equal(
+    resolveWidget('from', { type: 'string', 'x-ui': { widget: 'datetime' } }),
+    'datetime',
+  );
+  assert.ok(WIDGETS.includes('datetime'), 'datetime tiene que ser un widget conocido');
+  // Y la forma «string o null» del schema generado (anyOf) tambien resuelve.
+  assert.equal(
+    resolveWidget('to', {
+      'x-ui': { widget: 'datetime' },
+      anyOf: [
+        { type: 'string', format: 'date-time', 'x-ui': { widget: 'datetime' } },
+        { type: 'null' },
+      ],
+    }),
+    'datetime',
+  );
+});
+
+test('el sobre del schema real: calendario, rampa y ficha usan datetime', () => {
+  const modelo = buildFormModel(schemaReal, { data: {} });
+  const ads = modelo.sections.find((s) => s.key === 'ads');
+  const banners = ads.children.find((c) => c.key === 'banners');
+  const tarjeta = buildItemSubtree({
+    itemsSchema: banners.itemsSchema, basePath: 'ads.banners', index: 0, data: {},
+  });
+  const rollout = tarjeta.children.find((c) => c.key === 'rollout');
+  const schedule = rollout.children.find((c) => c.key === 'schedule');
+  const desde = schedule.children.find((c) => c.key === 'from');
+  assert.equal(desde.widget, 'datetime');
+  assert.equal(desde.nullable, true, 'el calendario admite «sin fecha»');
+
+  const cohort = rollout.children.find((c) => c.key === 'cohort');
+  const ramp = cohort.children.find((c) => c.key === 'ramp');
+  assert.equal(ramp.widget, 'object-list');
+  const escalon = buildItemSubtree({
+    itemsSchema: ramp.itemsSchema, basePath: 'x', index: 0, data: {},
+  });
+  assert.equal(escalon.children.find((c) => c.key === 'at').widget, 'datetime');
+  assert.equal(escalon.children.find((c) => c.key === 'percent').widget, 'percent');
+
+  const meta = rollout.children.find((c) => c.key === 'meta');
+  const updatedAt = meta.children.find((c) => c.key === 'updatedAt');
+  assert.equal(updatedAt.widget, 'datetime');
+  assert.equal(updatedAt.nullable, false);
+});
+
+test('los segmentos llegan al modelo con su titulo y explicacion', () => {
+  // `x-segments` viaja en el schema generado; el control lo pinta bajo cada
+  // casilla. Sin esto, «veterans» es solo una palabra.
+  const modelo = buildFormModel(schemaReal, { data: {} });
+  const ads = modelo.sections.find((s) => s.key === 'ads');
+  const banners = ads.children.find((c) => c.key === 'banners');
+  const tarjeta = buildItemSubtree({
+    itemsSchema: banners.itemsSchema, basePath: 'ads.banners', index: 0, data: {},
+  });
+  const rollout = tarjeta.children.find((c) => c.key === 'rollout');
+  const segments = rollout.children.find((c) => c.key === 'segments');
+  assert.equal(segments.widget, 'string-list');
+  assert.deepEqual(segments.itemsSchema.enum, ['newPlayers', 'veterans', 'mpPlayers']);
+  assert.equal(segments.rolloutRole, 'segments');
+  assert.equal(segments.segments.length, 3);
+  for (const s of segments.segments) {
+    assert.ok(s.name && s.title && s.description, `segmento incompleto: ${s.name}`);
+    assert.ok(segments.itemsSchema.enum.includes(s.name), `${s.name} no esta en el enum`);
+  }
+  // Un campo corriente no lleva nada de esto.
+  const id = tarjeta.children.find((c) => c.key === 'id');
+  assert.equal(id.segments, null);
+  assert.equal(id.rolloutRole, null);
+});
+
+test('una seccion next-boot conserva la marca x-apply en su schema', () => {
+  // Es lo que el grupo usa para avisar de que los cambios entran en el
+  // siguiente arranque y no en caliente.
+  const schema = {
+    properties: {
+      tuning: {
+        type: 'object',
+        'x-apply': 'next-boot',
+        properties: { speed: { type: 'number' } },
+      },
+      ads: { type: 'object', properties: { pick: { type: 'string' } } },
+    },
+  };
+  const modelo = buildFormModel(schema, { data: {} });
+  assert.equal(modelo.sections[0].schema['x-apply'], 'next-boot');
+  assert.equal(modelo.sections[1].schema['x-apply'], undefined);
+});
+
+test('todo widget que resuelve el schema real es uno que la UI sabe pintar', () => {
+  // Una pista `x-ui.widget` nueva en el contrato que el dashboard no conozca
+  // caeria al control de texto sin que nadie lo notara. Esto lo caza.
+  const modelo = buildFormModel(schemaReal, { data: {} });
+  const desconocidos = new Set();
+  const recorrer = (n) => {
+    if (n.kind === 'field') {
+      if (!WIDGETS.includes(n.widget)) desconocidos.add(`${n.path}: ${n.widget}`);
+      if (n.itemsSchema?.properties) {
+        recorrer(buildItemSubtree({
+          itemsSchema: n.itemsSchema, basePath: n.path, index: 0, data: {},
+        }));
+      }
+      if (n.widget === 'object-map' && n.schema?.additionalProperties?.properties) {
+        recorrer(buildItemSubtree({
+          itemsSchema: n.schema.additionalProperties,
+          basePath: n.path,
+          index: 'x',
+          data: {},
+        }));
+      }
+    } else n.children.forEach(recorrer);
+  };
+  modelo.sections.forEach(recorrer);
+  assert.deepEqual([...desconocidos], []);
 });
 
 // ─── Tipos con null ───────────────────────────────────────────────────

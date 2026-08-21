@@ -1,6 +1,11 @@
 <script setup>
 import { computed } from 'vue';
 
+import {
+  describeInstant,
+  isoToLocalInput,
+  localInputToIso,
+} from '../lib/datetime.mjs';
 import AssetInput from './AssetInput.vue';
 import DurationInput from './DurationInput.vue';
 import LocaleMapInput from './LocaleMapInput.vue';
@@ -21,6 +26,13 @@ import StringListInput from './StringListInput.vue';
  *    siempre»: son opuestos.
  * 3. **Este canal ≠ los otros.** Si el valor difiere de otro canal se dice,
  *    porque el error tipico es tocar `beta` creyendo que se toca `prod`.
+ *
+ * Y una cuarta, propia de las fechas: **lo que se guarda es UTC, lo que se
+ * teclea es hora local.** El calendario y la rampa de una campaña se
+ * comparan con la hora del servidor, asi que el JSON lleva siempre un
+ * instante con zona; el control lo enseña y lo pide en la hora del
+ * operador, y debajo imprime las dos lecturas para que «las 14:00» no se
+ * confundan con «las 14:00 Z».
  */
 
 const props = defineProps({
@@ -73,6 +85,29 @@ const resumen = (v) => {
   const texto = JSON.stringify(v);
   return texto.length > 42 ? `${texto.slice(0, 42)}…` : texto;
 };
+
+/** Fecha y hora: las dos lecturas (UTC guardada y local) del valor actual. */
+const instante = computed(() => (
+  f.value.widget === 'datetime' ? describeInstant(valorMostrado.value) : null
+));
+
+/** Hay algo guardado pero no es una fecha: el juego lo ignoraria en silencio. */
+const fechaIlegible = computed(() => (
+  f.value.widget === 'datetime'
+  && typeof valorMostrado.value === 'string'
+  && valorMostrado.value !== ''
+  && instante.value === null
+));
+
+/**
+ * Solo se escribe un instante COMPLETO. Mientras el usuario teclea la
+ * fecha el control entrega '' (o nada legible), y escribir eso dejaria un
+ * campo invalido en el JSON a mitad de camino.
+ */
+function fijarFecha(local) {
+  const iso = localInputToIso(local);
+  if (iso !== null) set(iso);
+}
 </script>
 
 <template>
@@ -215,6 +250,36 @@ const resumen = (v) => {
         </label>
       </div>
 
+      <!-- fecha y hora: ISO en UTC en el JSON, hora local en pantalla -->
+      <div v-else-if="f.widget === 'datetime'" class="fecha">
+        <input
+          type="datetime-local"
+          :value="isoToLocalInput(valorMostrado)"
+          :disabled="valorMostrado === null"
+          @input="fijarFecha($event.target.value)"
+        >
+        <label v-if="f.nullable" class="nulo">
+          <input
+            type="checkbox"
+            :checked="valorMostrado === null"
+            @change="set($event.target.checked ? null : '')"
+          >
+          <span><code>null</code> — sin fecha</span>
+        </label>
+        <p v-if="instante" class="lectura mono">
+          <span>guardado (UTC): <strong>{{ instante.utc }}</strong></span>
+          <span>hora local: <strong>{{ instante.local }}</strong></span>
+        </p>
+        <p v-else-if="fechaIlegible" class="aviso-fecha">
+          ⚠️ Lo guardado («{{ valorMostrado }}») no es una fecha legible: el
+          juego lo ignorará. Elige una fecha para sustituirlo.
+        </p>
+        <p v-else-if="valorMostrado !== null" class="pie debil">
+          Sin fecha todavía. Se guarda en UTC y el juego la compara con la
+          hora del servidor, no con la del dispositivo.
+        </p>
+      </div>
+
       <!-- assets -->
       <AssetInput
         v-else-if="f.widget === 'asset-image' || f.widget === 'asset-video'"
@@ -241,6 +306,7 @@ const resumen = (v) => {
         :model-value="valorMostrado"
         :items-schema="f.itemsSchema"
         :nullable="f.nullable"
+        :segments="f.segments"
         @update:model-value="set"
       />
 
@@ -345,6 +411,19 @@ const resumen = (v) => {
   margin-top: 6px; font-size: 12px; color: var(--texto-tenue);
 }
 .version .nulo input { width: auto; }
+
+.fecha input[type='datetime-local'] { width: auto; min-width: 250px; }
+.fecha .nulo {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px; font-size: 12px; color: var(--texto-tenue);
+}
+.fecha .nulo input { width: auto; }
+.lectura {
+  margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 2px 18px;
+  color: var(--texto-tenue);
+}
+.lectura strong { color: var(--acento); font-weight: 600; }
+.aviso-fecha { margin: 6px 0 0; font-size: 12px; color: var(--aviso); }
 
 .crudo .aviso { margin: 0 0 6px; font-size: 12px; color: var(--aviso); }
 

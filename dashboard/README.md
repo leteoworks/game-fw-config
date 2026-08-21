@@ -43,8 +43,12 @@ dashboard/
 │   ├── assets.mjs     imágenes → repo · vídeo → R2
 │   └── paths.mjs      dónde está el repo de config y el superproyecto
 └── src/
-    ├── lib/schema-form.mjs   schema → modelo de formulario (PURO, con tests)
-    └── components/           un control por tipo de campo
+    ├── lib/schema-form.mjs       schema → modelo de formulario (PURO, con tests)
+    ├── lib/datetime.mjs          UTC (JSON) ↔ hora local (pantalla) (PURO, con tests)
+    ├── lib/campaign-status.mjs   estado de una campaña AHORA: calendario, rampa,
+    │                             alcance real, segmentos, ficha (PURO, con tests)
+    └── components/               un control por tipo de campo, el panel de
+                                  campañas (AdsCampaignsPanel) y la Ayuda (HelpPanel)
 ```
 
 ### El formulario sale del schema, no de una lista
@@ -62,6 +66,45 @@ Los **textos en español** (etiquetas y explicaciones) sí viven aparte, en
 otros motivos que el contrato. La deriva entre ambos la caza un test:
 `ui-coverage.test.mjs` se pone rojo con el nombre del campo delante si el
 schema crece y los textos no.
+
+### Fechas: UTC en el JSON, hora local en pantalla
+
+El calendario de una campaña (`rollout.schedule`), los escalones de su rampa
+(`rollout.cohort.ramp[].at`) y la ficha (`rollout.meta.updatedAt`) llevan en el
+schema la pista `x-ui.widget: 'datetime'`. El control es un
+`<input type="datetime-local">` que habla en la hora del operador; lo que se
+**guarda** es siempre ISO 8601 en UTC (`2026-07-01T12:00:00.000Z`), porque el
+juego compara esos instantes con la hora del **servidor**, no con la del
+dispositivo, y un instante sin zona significa una cosa distinta en cada
+máquina. Debajo del campo se leen las dos horas (la UTC guardada y su
+equivalente local). Un valor incompleto o ilegible **no se escribe**; y ojo,
+`Date` no rechaza «31 de febrero» (lo convierte en el 3 de marzo), así que la
+conversión (`lib/datetime.mjs`) valida el calendario por su cuenta.
+
+### El panel de campañas piensa en «ahora»
+
+`AdsCampaignsPanel` calcula, con la misma semántica que el evaluador del juego
+(`lib/campaign-status.mjs`), el estado de cada campaña en este instante:
+**programada / activa / caducada / siempre** según el calendario, el escalón
+vigente y el siguiente de la rampa, el **porcentaje efectivo**, los segmentos y
+la ficha. El mapa del eje pinta el tramo declarado (contorno) y el **alcance
+real** (sólido): el porcentaje recorta el eje desde el 0 y el tramo se aplica
+encima, así que un tramo 50–100 con la rampa al 10 % no llega a nadie — y el
+panel lo avisa, igual que avisa de calendarios caducados o invertidos, rampas
+que bajan, segmentos que el juego no conoce (leídos del schema, que llega por
+la prop `schema`) y fichas sin nombre o responsable. Si `ops.pauseCampaigns`
+está encendido, sale un banner rojo arriba del panel y otro en la barra.
+
+### Ayuda
+
+La pestaña **Ayuda** (`HelpPanel`) explica, para un operador que no programa,
+qué es cada cosa y cómo se opera una campaña: los botones, el sobre de
+despliegue campo a campo (con las listas reales de variantes, dispositivos y
+segmentos leídas del schema), el orden de evaluación, el reparto entre
+campañas, la sección `ops`, cómo comprobar antes y después de publicar, la
+higiene (`remote-config:audit`, `remote-config:diff`), el modo seguro,
+`next-boot` y los errores típicos. Cada bloque enlaza a la referencia completa
+en el repo principal.
 
 ### Las tres cosas que la UI no deja confundir
 

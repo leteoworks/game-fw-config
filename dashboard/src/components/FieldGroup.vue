@@ -54,6 +54,24 @@ function contarTotal(nodo) {
 const definidos = computed(() => contarDefinidos(props.node));
 const total = computed(() => contarTotal(props.node));
 
+/**
+ * Seccion `next-boot` (ADR-040): el juego CONGELA su valor al completar el
+ * arranque y lo que llegue despues entra en el siguiente. Hay que decirlo
+ * en la cabecera, porque quien publica un cambio aqui y «no lo ve» en el
+ * movil que tiene delante concluiria que no ha llegado — y ha llegado, solo
+ * que espera al proximo arranque.
+ */
+const siguienteArranque = computed(
+  () => props.node.schema?.['x-apply'] === 'next-boot',
+);
+const EXPLICACION_SIGUIENTE_ARRANQUE =
+  'Los cambios de esta sección no entran en caliente. El juego congela su '
+  + 'valor cuando termina de arrancar y aplica lo que llegue después en el '
+  + 'siguiente arranque (para que un parámetro no cambie a mitad de '
+  + 'partida). Para verlo en un dispositivo: cerrar la app del todo y '
+  + 'volver a abrirla. Un kill-switch o una campaña (secciones «live») sí '
+  + 'entran al instante.';
+
 /** Listas de objetos: cada elemento se pinta como una tarjeta. */
 function elementosDe(campo) {
   const lista = readPath(props.data, campo.path);
@@ -147,6 +165,11 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
       </button>
       <h3>{{ node.label }}</h3>
       <span class="conteo mono">{{ definidos }}/{{ total }} definidos</span>
+      <span
+        v-if="siguienteArranque"
+        class="chip siguiente-arranque"
+        :title="EXPLICACION_SIGUIENTE_ARRANQUE"
+      >se aplica al siguiente arranque</span>
       <button
         v-if="!node.present && nivel > 0"
         type="button"
@@ -162,6 +185,13 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
     <p v-if="!node.present && !colapsado" class="nota-ausente">
       Esta sección no existe en el JSON de este canal: el juego usa sus valores
       por defecto para todo lo de aquí dentro.
+    </p>
+
+    <p
+      v-if="siguienteArranque && !colapsado && !node.isItemRoot"
+      class="nota-siguiente"
+    >
+      {{ EXPLICACION_SIGUIENTE_ARRANQUE }}
     </p>
 
     <div v-if="!colapsado || node.isItemRoot" class="cuerpo">
@@ -325,6 +355,22 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
 }
 .conteo { color: var(--texto-debil); }
 .mini { font-size: 11px; padding: 2px 8px; }
+
+.chip {
+  font-size: 11px; padding: 1px 8px; border-radius: 999px;
+  border: 1px solid var(--borde);
+}
+.siguiente-arranque {
+  color: var(--morado); border-color: var(--morado); cursor: help;
+}
+.nota-siguiente {
+  margin: 0 0 12px; padding: 8px 10px;
+  border-left: 2px solid var(--morado);
+  background: #1a1526;
+  border-radius: 0 var(--radio) var(--radio) 0;
+  font-size: 12px; line-height: 1.5; color: var(--texto-tenue);
+  max-width: 82ch;
+}
 
 .descripcion {
   margin: 4px 0 12px;

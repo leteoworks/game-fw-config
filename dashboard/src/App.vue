@@ -5,6 +5,7 @@ import { api } from './api.mjs';
 import AdsCampaignsPanel from './components/AdsCampaignsPanel.vue';
 import ConsolePanel from './components/ConsolePanel.vue';
 import FieldGroup from './components/FieldGroup.vue';
+import HelpPanel from './components/HelpPanel.vue';
 import { buildFormModel, deletePath, writePath } from './lib/schema-form.mjs';
 
 /**
@@ -42,6 +43,23 @@ const opTitulo = ref('');
 const opResultado = ref(null);
 const opOcupada = ref(false);
 const consolaVisible = ref(false);
+
+/**
+ * La ayuda ocupa el sitio del contenido de la seccion (no un modal ni otra
+ * pestaña del navegador): se lee con el contexto del canal y del juego
+ * delante, y volver a la seccion es un clic.
+ */
+const ayudaVisible = ref(false);
+
+function irASeccion(clave) {
+  seccionActiva.value = clave;
+  ayudaVisible.value = false;
+}
+
+/** Pausa global de campañas (`ops.pauseCampaigns`) del canal cargado. */
+const campanasEnPausa = computed(
+  () => datos.value?.ops?.pauseCampaigns === true,
+);
 
 const modelo = computed(() => (schema.value && datos.value
   ? buildFormModel(schema.value, {
@@ -241,47 +259,81 @@ watch([juego, canal], cargar);
       ha escrito nada: los campos culpables salen marcados en rojo.
     </p>
 
+    <!--
+      El boton de panico se ve desde CUALQUIER pestaña: con el puesto, nada
+      de lo que se edite llega a nadie, y quien abra el dashboard sin
+      contexto podria pasarse la tarde afinando campañas paradas.
+    -->
+    <p v-if="campanasEnPausa" class="cinta mala">
+      <strong>TODAS las campañas están en pausa</strong> en el canal
+      <strong>{{ canal }}</strong> (<code>ops.pauseCampaigns</code>): nada llega
+      a ningún jugador hasta que se apague en la pestaña «Operación».
+    </p>
+
     <nav class="pestanas">
       <button
         v-for="s in secciones"
         :key="s.key"
         type="button"
         class="pestana"
-        :class="{ activa: s.key === seccionActiva, ausente: !s.present }"
-        @click="seccionActiva = s.key"
+        :class="{
+          activa: s.key === seccionActiva && !ayudaVisible,
+          ausente: !s.present,
+        }"
+        @click="irASeccion(s.key)"
       >
         {{ s.label }}
         <span class="conteo mono">{{ contarDefinidos(s) }}</span>
         <span v-if="erroresDe(s.key).length" class="punto-error" />
       </button>
+      <button
+        type="button"
+        class="pestana ayuda"
+        :class="{ activa: ayudaVisible }"
+        title="Qué es cada cosa y cómo se opera una campaña"
+        @click="ayudaVisible = !ayudaVisible"
+      >
+        Ayuda
+      </button>
     </nav>
 
     <main class="contenido">
       <p v-if="cargando" class="tenue">Cargando…</p>
-      <!--
-        Vista de conjunto de las campañas, ANTES del formulario: con
-        varias simultaneas, lo que hay que revisar no es un campo suelto
-        sino si el reparto del parque tiene sentido (huecos, solapes,
-        campañas tapadas). El detalle se sigue editando abajo.
-      -->
-      <AdsCampaignsPanel
-        v-if="!cargando && seccionActiva === 'ads' && datos"
-        :datos="datos"
-        @set="alFijar"
+      <HelpPanel
+        v-else-if="ayudaVisible"
+        :schema="schema"
+        :game-id="juego ?? ''"
+        :canal="canal ?? ''"
       />
-      <FieldGroup
-        v-else-if="seccion"
-        :key="`${juego}-${canal}-${seccion.key}`"
-        :node="seccion"
-        :data="datos"
-        :game-id="juego"
-        :assets="assets"
-        :errors="errores"
-        :ui="ui"
-        @set="alFijar"
-        @unset="alQuitar"
-        @assets-changed="refrescarAssets"
-      />
+      <template v-else>
+        <!--
+          Vista de conjunto de las campañas, ANTES del formulario: con
+          varias simultaneas, lo que hay que revisar no es un campo suelto
+          sino si el reparto del parque tiene sentido (huecos, solapes,
+          campañas tapadas, calendario, rampa). El detalle se sigue editando
+          en el formulario de abajo: son dos `v-if` independientes a
+          proposito, no un `v-else`.
+        -->
+        <AdsCampaignsPanel
+          v-if="seccionActiva === 'ads' && datos"
+          :datos="datos"
+          :schema="schema"
+          @set="alFijar"
+        />
+        <FieldGroup
+          v-if="seccion"
+          :key="`${juego}-${canal}-${seccion.key}`"
+          :node="seccion"
+          :data="datos"
+          :game-id="juego"
+          :assets="assets"
+          :errors="errores"
+          :ui="ui"
+          @set="alFijar"
+          @unset="alQuitar"
+          @assets-changed="refrescarAssets"
+        />
+      </template>
     </main>
 
     <aside v-if="consolaVisible" class="panel-consola">
@@ -347,6 +399,7 @@ watch([juego, canal], cargar);
   margin-bottom: -1px;
 }
 .pestana.ausente { opacity: .6; font-style: italic; }
+.pestana.ayuda { margin-left: auto; color: var(--acento); }
 .conteo {
   background: var(--panel-alto); border-radius: 999px;
   padding: 0 6px; font-size: 11px; color: var(--texto-debil);

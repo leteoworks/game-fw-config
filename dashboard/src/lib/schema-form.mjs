@@ -30,6 +30,7 @@ export const WIDGETS = /** @type {const} */ ([
   'textarea',      // string largo
   'url',           // string que es un enlace
   'version',       // string semver (o null)
+  'datetime',      // instante ISO 8601 en UTC (o null); se edita en local
   'number',        // numerico sin rango acotado
   'range',         // numerico con min Y max
   'percent',       // 0..100 con sufijo %
@@ -349,6 +350,14 @@ function buildField({
     minimum: schema.minimum,
     maximum: schema.maximum,
     itemsSchema: schema.items ?? null,
+    // Segmentos NOMBRADOS del juego (`x-segments`: nombre, titulo y que
+    // significa cumplirlo). El `enum` de los elementos solo da los nombres;
+    // sin esto el operador marcaria «veterans» sin saber que son «10
+    // arranques», que es justo lo que decide si la campaña tiene sentido.
+    segments: Array.isArray(schema['x-segments']) ? schema['x-segments'] : null,
+    // Papel del campo dentro del sobre de despliegue (`x-rollout`), para que
+    // el control pueda explicar la semantica (segmentos = cumplir TODOS).
+    rolloutRole: schema['x-rollout'] ?? null,
     schema,
     diffs,
   };
