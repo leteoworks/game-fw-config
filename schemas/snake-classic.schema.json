@@ -1911,6 +1911,31 @@
               "type": "string"
             }
           }
+        },
+        "showPrompt": {
+          "type": "boolean",
+          "description": "Ademas del boton, ¿se planta un MODAL delante del jugador al entrar en la home? Ausente o false = solo el boton, que espera sin interrumpir. Solo se abre en releases soft (con mode=hard manda el muro) y solo si hay texto para el idioma del jugador o su reserva en ingles."
+        },
+        "messages": {
+          "type": "object",
+          "description": "El TEXTO del aviso, por idioma. Lo pinta el MODAL en una release recomendada y el MURO en una obligatoria: nunca coinciden, asi que se escribe una vez. La clave es el codigo de locale (es, en, pt-BR, zh-CN...); se normaliza a minusculas, asi que pt-BR y pt-br son el mismo idioma. Resolucion: exacta, idioma base, variante regional del base y por ultimo ingles; sin nada resoluble, el modal no se abre y el muro usa el texto que el propio juego trae traducido. El title es obligatorio (sin el la entrada se descarta entera); el body es opcional.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "title"
+            ],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Titulo del modal."
+              },
+              "body": {
+                "type": "string",
+                "description": "Descripcion, OPCIONAL. Puede ser larga: el modal la scrollea sin tapar los botones. Los saltos de linea se respetan. Sin ella el bloque de texto ni se pinta."
+              }
+            }
+          }
         }
       }
     }

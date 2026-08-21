@@ -130,6 +130,9 @@
         "app.update.store_opened",
         "app.update.probe_failed",
         "app.update.wall_shown",
+        "app.update.prompt_shown",
+        "app.update.prompt_accepted",
+        "app.update.prompt_dismissed",
         "app.update.skipped",
         "mp.room.created",
         "mp.entry.opened",
@@ -157,7 +160,8 @@
         "name.form.shown",
         "name.form.resolved",
         "ranking.opened",
-        "ranking.session.summary"
+        "ranking.session.summary",
+        "leaderboard.score.mismatch"
       ],
       "blockedEvents": []
     },
@@ -239,6 +243,8 @@
       "percent": 100,
       "hardPercent": 100,
       "salt": "1.0.134"
-    }
+    },
+    "showPrompt": false,
+    "messages": {}
   }
 }

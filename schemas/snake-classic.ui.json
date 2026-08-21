@@ -216,6 +216,10 @@
     "appUpdate.appliesTo": {
       "label": "A que versiones instaladas",
       "help": "Acota la campaña por la version que tiene el jugador. Es otra forma de ir por fases, y a menudo mas util que el porcentaje: permite empezar por los mas atrasados, que son los que mas lo necesitan, o dejar fuera una version concreta que tenga un problema con el propio aviso."
+    },
+    "appUpdate.messages": {
+      "label": "Texto del aviso",
+      "help": "Que lee el jugador, en su idioma. Lo enseña el MODAL si la actualizacion es recomendada, y el MURO si es obligatoria: nunca coinciden, asi que se escribe una sola vez. Sin texto para su idioma (ni el ingles de reserva) el modal no se abre y el muro usa el texto generico del juego. Con rellenar el ingles cubres a todo el mundo."
     }
   },
   "fields": {
@@ -741,6 +745,22 @@
     "appUpdate.appliesTo.maxVersion": {
       "label": "Hasta la version",
       "help": "Solo recibe la campaña quien tenga esta version o una anterior. Vacio = sin limite por arriba. Es el limite util para «avisar primero a los mas atrasados»."
+    },
+    "appUpdate.showPrompt": {
+      "label": "Plantar el modal",
+      "help": "Apagado, solo sale el boton en la home y el jugador decide cuando mirarlo. Encendido, ademas se le planta un modal delante al entrar (una sola vez por sesion), con dos botones: \"No\" lo cierra y \"Si\" actualiza. Es el interruptor que decide si se le interrumpe. En una actualizacion obligatoria da igual: ahi manda el muro."
+    },
+    "appUpdate.messages": {
+      "label": "Texto del aviso",
+      "help": "Una entrada por idioma. La clave es el codigo del idioma (es, en, pt-BR, zh-CN...); da igual mayusculas o minusculas. Si falta el idioma exacto se prueba el idioma base (es-MX usa es), luego cualquier variante del mismo idioma, y por ultimo el ingles."
+    },
+    "appUpdate.messages.title": {
+      "label": "Titulo",
+      "help": "La primera linea del aviso, en grande. Obligatorio."
+    },
+    "appUpdate.messages.body": {
+      "label": "Descripcion",
+      "help": "Que trae la version nueva. Opcional: sin ella queda un aviso de titulo y botones. Puede ser todo lo larga que haga falta (se scrollea sin tapar los botones) y respeta los saltos de linea, asi que se puede escribir como una lista."
     }
   }
 }
