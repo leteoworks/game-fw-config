@@ -121,6 +121,8 @@
         "ads.video_error",
         "ads.video_stall",
         "ads.gate_skipped",
+        "rollout.evaluated",
+        "remote_config.safe_mode.entered",
         "app.update.shown",
         "app.update.clicked",
         "app.update.in_app_started",

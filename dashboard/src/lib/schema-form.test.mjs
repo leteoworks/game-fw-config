@@ -311,12 +311,12 @@ test('la clave se convierte en etiqueta legible', () => {
 
 // ─── El schema REAL entra entero ──────────────────────────────────────
 
-test('el schema real produce las 8 secciones esperadas', () => {
+test('el schema real produce las 9 secciones esperadas', () => {
   const modelo = buildFormModel(schemaReal, { data: {} });
   assert.deepEqual(
     modelo.sections.map((s) => s.key).sort(),
     [
-      'ads', 'analytics', 'appUpdate', 'freewall', 'mp', 'paywall',
+      'ads', 'analytics', 'appUpdate', 'freewall', 'mp', 'ops', 'paywall',
       'profiling', 'wallConflict',
     ],
   );

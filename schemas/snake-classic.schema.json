@@ -14,7 +14,13 @@
       "profiling",
       "ads",
       "appUpdate",
-      "mp"
+      "mp",
+      "ops"
+    ],
+    "segments": [
+      "newPlayers",
+      "veterans",
+      "mpPlayers"
     ]
   },
   "type": "object",
@@ -114,6 +120,8 @@
                 "ads.video_error",
                 "ads.video_stall",
                 "ads.gate_skipped",
+                "rollout.evaluated",
+                "remote_config.safe_mode.entered",
                 "app.update.shown",
                 "app.update.clicked",
                 "app.update.in_app_started",
@@ -305,7 +313,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -415,6 +423,101 @@
                 }
               ]
             },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "x-rollout": "segments",
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64,
+                "enum": [
+                  "newPlayers",
+                  "veterans",
+                  "mpPlayers"
+                ]
+              },
+              "uniqueItems": true,
+              "x-segments": [
+                {
+                  "name": "newPlayers",
+                  "title": "Jugadores nuevos",
+                  "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                },
+                {
+                  "name": "veterans",
+                  "title": "Veteranos",
+                  "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                },
+                {
+                  "name": "mpPlayers",
+                  "title": "Juegan al multijugador",
+                  "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                }
+              ]
+            },
             "cohort": {
               "title": "Cohorte",
               "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -473,6 +576,94 @@
                       "type": "null"
                     }
                   ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
               "additionalProperties": false
@@ -651,6 +842,101 @@
                       }
                     ]
                   },
+                  "schedule": {
+                    "default": null,
+                    "title": "Calendario",
+                    "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "default": null,
+                            "title": "Desde",
+                            "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "to": {
+                            "default": null,
+                            "title": "Hasta",
+                            "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Calendario",
+                        "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "segments": {
+                    "default": [],
+                    "title": "Segmentos",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "x-rollout": "segments",
+                    "maxItems": 16,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "enum": [
+                        "newPlayers",
+                        "veterans",
+                        "mpPlayers"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "x-segments": [
+                      {
+                        "name": "newPlayers",
+                        "title": "Jugadores nuevos",
+                        "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                      },
+                      {
+                        "name": "veterans",
+                        "title": "Veteranos",
+                        "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                      },
+                      {
+                        "name": "mpPlayers",
+                        "title": "Juegan al multijugador",
+                        "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      }
+                    ]
+                  },
                   "cohort": {
                     "title": "Cohorte",
                     "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -709,13 +995,101 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "ramp": {
+                        "default": [],
+                        "title": "Rampa programada",
+                        "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                        "maxItems": 12,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "x-ui": {
+                                "widget": "datetime"
+                              },
+                              "title": "A partir de",
+                              "description": "Instante (UTC) en el que entra en vigor este escalon."
+                            },
+                            "percent": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100,
+                              "title": "Porcentaje",
+                              "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                              "x-ui": {
+                                "widget": "percent"
+                              }
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "percent"
+                          ],
+                          "title": "Escalon",
+                          "description": "Un paso de la rampa: instante y porcentaje.",
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "meta": {
+                    "title": "Ficha de la campaña",
+                    "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Nombre",
+                        "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "owner": {
+                        "title": "Responsable",
+                        "description": "Quien responde por esta campaña (nombre o alias).",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "ticket": {
+                        "title": "Ticket",
+                        "description": "Issue, PR o enlace donde se decidio.",
+                        "x-ui": {
+                          "widget": "url"
+                        },
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "notes": {
+                        "title": "Notas",
+                        "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                        "x-ui": {
+                          "multiline": true
+                        },
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "updatedAt": {
+                        "title": "Ultimo cambio",
+                        "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                       }
                     },
                     "additionalProperties": false
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -883,6 +1257,101 @@
                 }
               ]
             },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "x-rollout": "segments",
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64,
+                "enum": [
+                  "newPlayers",
+                  "veterans",
+                  "mpPlayers"
+                ]
+              },
+              "uniqueItems": true,
+              "x-segments": [
+                {
+                  "name": "newPlayers",
+                  "title": "Jugadores nuevos",
+                  "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                },
+                {
+                  "name": "veterans",
+                  "title": "Veteranos",
+                  "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                },
+                {
+                  "name": "mpPlayers",
+                  "title": "Juegan al multijugador",
+                  "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                }
+              ]
+            },
             "cohort": {
               "title": "Cohorte",
               "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -941,6 +1410,94 @@
                       "type": "null"
                     }
                   ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
               "additionalProperties": false
@@ -1139,6 +1696,101 @@
                       }
                     ]
                   },
+                  "schedule": {
+                    "default": null,
+                    "title": "Calendario",
+                    "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "default": null,
+                            "title": "Desde",
+                            "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "to": {
+                            "default": null,
+                            "title": "Hasta",
+                            "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Calendario",
+                        "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "segments": {
+                    "default": [],
+                    "title": "Segmentos",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "x-rollout": "segments",
+                    "maxItems": 16,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "enum": [
+                        "newPlayers",
+                        "veterans",
+                        "mpPlayers"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "x-segments": [
+                      {
+                        "name": "newPlayers",
+                        "title": "Jugadores nuevos",
+                        "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                      },
+                      {
+                        "name": "veterans",
+                        "title": "Veteranos",
+                        "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                      },
+                      {
+                        "name": "mpPlayers",
+                        "title": "Juegan al multijugador",
+                        "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      }
+                    ]
+                  },
                   "cohort": {
                     "title": "Cohorte",
                     "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -1197,13 +1849,101 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "ramp": {
+                        "default": [],
+                        "title": "Rampa programada",
+                        "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                        "maxItems": 12,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "x-ui": {
+                                "widget": "datetime"
+                              },
+                              "title": "A partir de",
+                              "description": "Instante (UTC) en el que entra en vigor este escalon."
+                            },
+                            "percent": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100,
+                              "title": "Porcentaje",
+                              "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                              "x-ui": {
+                                "widget": "percent"
+                              }
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "percent"
+                          ],
+                          "title": "Escalon",
+                          "description": "Un paso de la rampa: instante y porcentaje.",
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "meta": {
+                    "title": "Ficha de la campaña",
+                    "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Nombre",
+                        "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "owner": {
+                        "title": "Responsable",
+                        "description": "Quien responde por esta campaña (nombre o alias).",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "ticket": {
+                        "title": "Ticket",
+                        "description": "Issue, PR o enlace donde se decidio.",
+                        "x-ui": {
+                          "widget": "url"
+                        },
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "notes": {
+                        "title": "Notas",
+                        "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                        "x-ui": {
+                          "multiline": true
+                        },
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "updatedAt": {
+                        "title": "Ultimo cambio",
+                        "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                       }
                     },
                     "additionalProperties": false
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -1307,7 +2047,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -1417,6 +2157,101 @@
                 }
               ]
             },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "x-rollout": "segments",
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64,
+                "enum": [
+                  "newPlayers",
+                  "veterans",
+                  "mpPlayers"
+                ]
+              },
+              "uniqueItems": true,
+              "x-segments": [
+                {
+                  "name": "newPlayers",
+                  "title": "Jugadores nuevos",
+                  "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                },
+                {
+                  "name": "veterans",
+                  "title": "Veteranos",
+                  "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                },
+                {
+                  "name": "mpPlayers",
+                  "title": "Juegan al multijugador",
+                  "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                }
+              ]
+            },
             "cohort": {
               "title": "Cohorte",
               "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -1475,6 +2310,94 @@
                       "type": "null"
                     }
                   ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
               "additionalProperties": false
@@ -1653,7 +2576,7 @@
               },
               "rollout": {
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "default": {},
                 "type": "object",
                 "properties": {
@@ -1763,6 +2686,101 @@
                       }
                     ]
                   },
+                  "schedule": {
+                    "default": null,
+                    "title": "Calendario",
+                    "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "default": null,
+                            "title": "Desde",
+                            "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "to": {
+                            "default": null,
+                            "title": "Hasta",
+                            "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Calendario",
+                        "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "segments": {
+                    "default": [],
+                    "title": "Segmentos",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "x-rollout": "segments",
+                    "maxItems": 16,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "enum": [
+                        "newPlayers",
+                        "veterans",
+                        "mpPlayers"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "x-segments": [
+                      {
+                        "name": "newPlayers",
+                        "title": "Jugadores nuevos",
+                        "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                      },
+                      {
+                        "name": "veterans",
+                        "title": "Veteranos",
+                        "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                      },
+                      {
+                        "name": "mpPlayers",
+                        "title": "Juegan al multijugador",
+                        "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      }
+                    ]
+                  },
                   "cohort": {
                     "title": "Cohorte",
                     "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -1821,6 +2839,94 @@
                             "type": "null"
                           }
                         ]
+                      },
+                      "ramp": {
+                        "default": [],
+                        "title": "Rampa programada",
+                        "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                        "maxItems": 12,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "x-ui": {
+                                "widget": "datetime"
+                              },
+                              "title": "A partir de",
+                              "description": "Instante (UTC) en el que entra en vigor este escalon."
+                            },
+                            "percent": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100,
+                              "title": "Porcentaje",
+                              "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                              "x-ui": {
+                                "widget": "percent"
+                              }
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "percent"
+                          ],
+                          "title": "Escalon",
+                          "description": "Un paso de la rampa: instante y porcentaje.",
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "meta": {
+                    "title": "Ficha de la campaña",
+                    "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Nombre",
+                        "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "owner": {
+                        "title": "Responsable",
+                        "description": "Quien responde por esta campaña (nombre o alias).",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "ticket": {
+                        "title": "Ticket",
+                        "description": "Issue, PR o enlace donde se decidio.",
+                        "x-ui": {
+                          "widget": "url"
+                        },
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "notes": {
+                        "title": "Notas",
+                        "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                        "x-ui": {
+                          "multiline": true
+                        },
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "updatedAt": {
+                        "title": "Ultimo cambio",
+                        "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                       }
                     },
                     "additionalProperties": false
@@ -2373,7 +3479,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -2483,6 +3589,101 @@
                 }
               ]
             },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "x-rollout": "segments",
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64,
+                "enum": [
+                  "newPlayers",
+                  "veterans",
+                  "mpPlayers"
+                ]
+              },
+              "uniqueItems": true,
+              "x-segments": [
+                {
+                  "name": "newPlayers",
+                  "title": "Jugadores nuevos",
+                  "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                },
+                {
+                  "name": "veterans",
+                  "title": "Veteranos",
+                  "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                },
+                {
+                  "name": "mpPlayers",
+                  "title": "Juegan al multijugador",
+                  "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                }
+              ]
+            },
             "cohort": {
               "title": "Cohorte",
               "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
@@ -2541,6 +3742,94 @@
                       "type": "null"
                     }
                   ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
                 }
               },
               "additionalProperties": false
@@ -2802,6 +4091,39 @@
             }
           },
           "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ops": {
+      "title": "Operacion",
+      "description": "Mandos comunes a todas las campañas: el boton de panico que las pausa todas y la muestra de la telemetria de exposicion.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "pauseCampaigns": {
+          "default": false,
+          "title": "Pausar TODAS las campañas",
+          "description": "Boton de panico. Encendido, ninguna campaña de ninguna seccion llega a nadie (ads, muros, aviso de version, profiling…): cada sobre se evalua como \"pausado\". Apagarlo lo devuelve todo tal cual estaba. No borra nada.",
+          "type": "boolean"
+        },
+        "pauseNote": {
+          "default": "",
+          "title": "Motivo de la pausa",
+          "description": "Por que se pauso y quien lo hizo. Lo lee quien abra el dashboard sin contexto.",
+          "x-ui": {
+            "multiline": true
+          },
+          "type": "string",
+          "maxLength": 500
+        },
+        "exposureSampleRate": {
+          "default": 1,
+          "title": "Muestra de exposicion",
+          "description": "Fraccion de dispositivos (0-1) que envian el evento rollout.evaluated (alcance real de cada campaña). 1 = todos. El muestreo es estable por dispositivo: bajarlo reduce volumen sin sesgar el alcance estimado.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
         }
       },
       "additionalProperties": false
