@@ -129,6 +129,7 @@
         "app.update.in_app_failed",
         "app.update.store_opened",
         "app.update.probe_failed",
+        "app.update.wall_shown",
         "mp.room.created",
         "mp.entry.opened",
         "mp.entry.resolved",

@@ -680,7 +680,7 @@
     },
     "appUpdate.mode": {
       "label": "Tipo de release",
-      "help": "«Recomendada» ofrece el boton y nada mas. «Obligatoria» ademas marca la actualizacion como requerida y, en Android, usa el modo de Play que tapa el juego mientras actualiza. Ante la duda, recomendada."
+      "help": "«Recomendada» saca el boton y deja decidir al jugador. «Obligatoria» ademas TAPA EL JUEGO a quien tenga una version por debajo de la minima soportada: no puede jugar hasta que actualice. Usa «obligatoria» solo si la version vieja esta rota de verdad, y solo cuando la nueva ya este viva en la tienda. Se retira apagando el aviso, y llega en segundos."
     },
     "appUpdate.latestVersion": {
       "label": "Version publicada",
@@ -688,7 +688,7 @@
     },
     "appUpdate.minSupportedVersion": {
       "label": "Version minima soportada",
-      "help": "El suelo por debajo del cual la actualizacion se considera obligatoria. Solo se mira si el tipo de release es «obligatoria». Dejarlo vacio ahi significa que cualquier version anterior lo es."
+      "help": "El suelo por debajo del cual el juego queda TAPADO por el muro. Solo se mira si el tipo de release es «obligatoria»; con «recomendada» se ignora. Dejarlo vacio ahi significa que cualquier version anterior queda bloqueada."
     },
     "appUpdate.platforms": {
       "label": "Plataformas",

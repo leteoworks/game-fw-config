@@ -1834,7 +1834,7 @@
             "soft",
             "hard"
           ],
-          "description": "Tipo de release: soft = recomendada; hard = obligatoria (marca la decision como required y prefiere el flujo inmediato de Play). Ausente = soft."
+          "description": "Tipo de release: soft = recomendada (sale el boton y decide el jugador); hard = OBLIGATORIA (ademas planta un muro que tapa el juego a quien este por debajo de minSupportedVersion). Ausente = soft. El muro no aparece sin conexion ni durante una partida."
         },
         "latestVersion": {
           "type": "string",
