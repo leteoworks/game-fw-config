@@ -71,6 +71,38 @@ function assetUrlAllowed(url) {
   }
 }
 
+/**
+ * Tramos del parque (`rollout.cohort.audience`) vacios o invertidos.
+ *
+ * El contrato pide `desde < hasta`, pero esa regla no cabe en JSON Schema
+ * (solo `0-100` por campo), asi que el ajv de arriba la deja pasar. El
+ * juego la coacciona a "nadie" (fail-closed): la campaña no se enseña y
+ * nada avisa. Mejor pararlo aqui, antes de publicar. Se busca en todo el
+ * documento: el sobre es comun a todas las secciones.
+ */
+function tramosVacios(node, path = '') {
+  if (Array.isArray(node)) {
+    return node.flatMap((item, i) => tramosVacios(item, `${path}[${i}]`));
+  }
+  if (node === null || typeof node !== 'object') return [];
+  const out = [];
+  for (const [key, value] of Object.entries(node)) {
+    const at = path === '' ? key : `${path}.${key}`;
+    if (
+      key === 'audience'
+      && value !== null
+      && typeof value === 'object'
+      && typeof value.from === 'number'
+      && typeof value.to === 'number'
+      && value.from >= value.to
+    ) {
+      out.push({ at, from: value.from, to: value.to });
+    }
+    out.push(...tramosVacios(value, at));
+  }
+  return out;
+}
+
 const schemasDir = 'schemas';
 const configsDir = 'v1';
 
@@ -108,6 +140,17 @@ for (const schemaFile of readdirSync(schemasDir)) {
       );
     } else {
       console.log(`OK   ${gameId}/${configFile}`);
+    }
+
+    for (const tramo of tramosVacios(data)) {
+      failed = true;
+      console.error(
+        `FAIL ${gameId}/${configFile}: tramo vacio o invertido en `
+        + `${tramo.at} (${tramo.from} → ${tramo.to})\n`
+        + '  El juego lo trata como "nadie": la campaña no se enseñaria a '
+        + 'ningun jugador\n  sin que nada avise. → pon desde < hasta, o '
+        + 'apaga la campaña (rollout.enabled: false).',
+      );
     }
 
     // Guard de ids repetidos: el schema no puede verlo (cada campaña

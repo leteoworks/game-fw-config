@@ -440,7 +440,6 @@
                   "maxLength": 64
                 },
                 "audience": {
-                  "default": null,
                   "title": "Tramo del parque",
                   "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                   "anyOf": [
@@ -467,7 +466,7 @@
                         "to"
                       ],
                       "title": "Tramo del parque",
-                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                       "additionalProperties": false
                     },
                     {
@@ -525,7 +524,6 @@
           "description": "Solo para el texto (\"2 de 8 episodios gratis\"). NO decide el gate: mandan los triggers."
         },
         "overrides": {
-          "default": {},
           "title": "Ajustes por variante",
           "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
           "type": "object",
@@ -678,7 +676,6 @@
                         "maxLength": 64
                       },
                       "audience": {
-                        "default": null,
                         "title": "Tramo del parque",
                         "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                         "anyOf": [
@@ -705,7 +702,7 @@
                               "to"
                             ],
                             "title": "Tramo del parque",
-                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                             "additionalProperties": false
                           },
                           {
@@ -911,7 +908,6 @@
                   "maxLength": 64
                 },
                 "audience": {
-                  "default": null,
                   "title": "Tramo del parque",
                   "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                   "anyOf": [
@@ -938,7 +934,7 @@
                         "to"
                       ],
                       "title": "Tramo del parque",
-                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                       "additionalProperties": false
                     },
                     {
@@ -1016,7 +1012,6 @@
           "additionalProperties": false
         },
         "overrides": {
-          "default": {},
           "title": "Ajustes por variante",
           "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
           "type": "object",
@@ -1169,7 +1164,6 @@
                         "maxLength": 64
                       },
                       "audience": {
-                        "default": null,
                         "title": "Tramo del parque",
                         "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                         "anyOf": [
@@ -1196,7 +1190,7 @@
                               "to"
                             ],
                             "title": "Tramo del parque",
-                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                             "additionalProperties": false
                           },
                           {
@@ -1448,7 +1442,6 @@
                   "maxLength": 64
                 },
                 "audience": {
-                  "default": null,
                   "title": "Tramo del parque",
                   "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                   "anyOf": [
@@ -1475,7 +1468,7 @@
                         "to"
                       ],
                       "title": "Tramo del parque",
-                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                       "additionalProperties": false
                     },
                     {
@@ -1795,7 +1788,6 @@
                         "maxLength": 64
                       },
                       "audience": {
-                        "default": null,
                         "title": "Tramo del parque",
                         "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                         "anyOf": [
@@ -1822,7 +1814,7 @@
                               "to"
                             ],
                             "title": "Tramo del parque",
-                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                             "additionalProperties": false
                           },
                           {
@@ -2516,7 +2508,6 @@
                   "maxLength": 64
                 },
                 "audience": {
-                  "default": null,
                   "title": "Tramo del parque",
                   "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
                   "anyOf": [
@@ -2543,7 +2534,7 @@
                         "to"
                       ],
                       "title": "Tramo del parque",
-                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
                       "additionalProperties": false
                     },
                     {
