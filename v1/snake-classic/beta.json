@@ -227,10 +227,10 @@
     }
   },
   "appUpdate": {
-    "enabled": false,
+    "enabled": true,
     "mode": "soft",
+    "latestVersion": "1.0.134",
     "platforms": [
-      "ios",
       "android"
     ],
     "checkStore": true,
@@ -238,7 +238,7 @@
     "rollout": {
       "percent": 100,
       "hardPercent": 100,
-      "salt": ""
+      "salt": "1.0.134"
     }
   }
 }
