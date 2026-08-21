@@ -130,6 +130,7 @@
         "app.update.store_opened",
         "app.update.probe_failed",
         "app.update.wall_shown",
+        "app.update.skipped",
         "mp.room.created",
         "mp.entry.opened",
         "mp.entry.resolved",
