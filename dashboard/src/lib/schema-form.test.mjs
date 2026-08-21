@@ -28,6 +28,7 @@ import {
   readPath,
   resolveWidget,
   writePath,
+  flattenSchema,
 } from './schema-form.mjs';
 
 const RAIZ = join(import.meta.dirname, '..', '..', '..');
@@ -153,7 +154,9 @@ test('un campo nullable llega al modelo marcado como tal', () => {
   const modelo = buildFormModel(schemaReal, { data: {} });
   const ads = modelo.sections.find((s) => s.key === 'ads');
   const banners = ads.children.find((c) => c.key === 'banners');
-  const ttl = banners.itemsSchema.properties.ttlMs;
+  // El schema generado expresa «entero o null» como `anyOf`; el formulario lo
+  // aplana antes de decidir el control, igual que aqui.
+  const ttl = flattenSchema(banners.itemsSchema.properties.ttlMs);
   assert.equal(normalizeType(ttl.type).nullable, true);
 });
 
@@ -308,11 +311,14 @@ test('la clave se convierte en etiqueta legible', () => {
 
 // ─── El schema REAL entra entero ──────────────────────────────────────
 
-test('el schema real produce las 6 secciones esperadas', () => {
+test('el schema real produce las 8 secciones esperadas', () => {
   const modelo = buildFormModel(schemaReal, { data: {} });
   assert.deepEqual(
     modelo.sections.map((s) => s.key).sort(),
-    ['ads', 'analytics', 'freewall', 'mp', 'paywall', 'profiling'],
+    [
+      'ads', 'analytics', 'appUpdate', 'freewall', 'mp', 'paywall',
+      'profiling', 'wallConflict',
+    ],
   );
 });
 

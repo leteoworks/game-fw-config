@@ -82,7 +82,12 @@ for (const gameId of juegosConUi()) {
         ? { ...ui.sections, ...ui.fields }
         : ui.fields;
       const meta = lookupMeta(tabla, n.generic);
-      if (!meta.label || !meta.help) {
+      // Un schema GENERADO desde los contratos del juego trae `title` y
+      // `description` en cada campo; `ui.json` solo matiza. Cubierto = lo
+      // explica uno u otro.
+      const label = meta.label ?? n.schema?.title;
+      const help = meta.help ?? n.schema?.description;
+      if (!label || !help) {
         sinTexto.push(`${n.kind === 'group' ? '[grupo]' : '[campo]'} ${n.generic}`);
       }
     });

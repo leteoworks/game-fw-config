@@ -48,13 +48,15 @@ test('los tres canales publicados validan contra su schema', () => {
 
 test('un valor fuera de rango se rechaza señalando el campo', () => {
   const resultado = validate('snake-classic', {
-    schemaVersion: 1,
-    ads: { banners: [{ id: 'x', cohortPercent: 500 }] },
+    schemaVersion: 2,
+    ads: { banners: [{ id: 'x', rollout: { cohort: { percent: 500 } } }] },
   });
   assert.equal(resultado.ok, false);
   // La ruta llega con puntos para que la UI pueda resaltar el campo culpable.
   assert.ok(
-    resultado.errors.some((e) => e.path === 'ads.banners.0.cohortPercent'),
+    resultado.errors.some(
+      (e) => e.path === 'ads.banners.0.rollout.cohort.percent',
+    ),
     `esperaba la ruta del campo, hubo: ${JSON.stringify(resultado.errors)}`,
   );
 });

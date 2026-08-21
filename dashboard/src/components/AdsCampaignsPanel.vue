@@ -8,7 +8,7 @@ import { computed } from 'vue';
  *
  * El formulario generado del schema es exacto pero no da la vista de
  * conjunto, y con hasta 20 campañas simultaneas la pregunta operativa
- * no es "que dice el campo `toPercent` de la campaña 7" sino "¿queda
+ * no es "que dice el campo `hasta` del tramo de la campaña 7" sino "¿queda
  * gente sin ningun anuncio?" y "¿hay dos campañas peleandose por el
  * mismo publico?". Eso no se ve leyendo una lista de formularios: se ve
  * en un dibujo del eje del parque.
@@ -50,9 +50,10 @@ const POLITICAS = [
 
 /** Tramo efectivo de una campaña (sin tramo declarado = todo el parque). */
 function tramo(campana) {
-  const a = campana?.audience;
-  if (!a || typeof a.fromPercent !== 'number') return { desde: 0, hasta: 100 };
-  return { desde: a.fromPercent, hasta: a.toPercent };
+  // Contrato v2: el tramo vive en el SOBRE comun (`rollout.cohort.audience`).
+  const a = campana?.rollout?.cohort?.audience;
+  if (!a || typeof a.from !== 'number') return { desde: 0, hasta: 100 };
+  return { desde: a.from, hasta: a.to };
 }
 
 /** Color estable por posicion, para que el mapa y la lista concuerden. */
@@ -67,7 +68,7 @@ const filas = computed(() => campanas.value.map((c, i) => {
   return {
     indice: i,
     id: c?.id ?? '(sin id)',
-    activa: c?.enabled === true,
+    activa: c?.rollout?.enabled === true,
     desde: t.desde,
     hasta: t.hasta,
     ancho: Math.max(0, t.hasta - t.desde),

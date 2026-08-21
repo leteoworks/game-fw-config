@@ -330,7 +330,10 @@ function buildField({
     generic,
     // El orden manda: la etiqueta en espanol del fichero de UI gana a la
     // clave humanizada, que es solo el ultimo recurso.
-    label: meta.label ?? schema['x-ui']?.label ?? humanizeKey(key),
+    // Tras el texto de UI y la pista `x-ui`, el `title` del contrato: los
+    // schemas GENERADOS desde los contratos zod del juego traen titulo y
+    // descripcion de cada campo, y `ui.json` queda para matizar.
+    label: meta.label ?? schema['x-ui']?.label ?? schema.title ?? humanizeKey(key),
     // `help` es la explicacion DETALLADA en espanol (que hace el campo en el
     // juego); `description` es la del contrato, mas seca. Se enseñan las dos
     // cuando existen, porque dicen cosas distintas.
@@ -393,9 +396,12 @@ function buildNode({
     path,
     generic,
     isItemRoot,
-    label: meta.label ?? humanizeKey(key),
+    label: meta.label ?? schema.title ?? humanizeKey(key),
     description: meta.help ?? schema.description ?? null,
     contractNote: meta.help && schema.description ? schema.description : null,
+    // El esquema del grupo, para que la cobertura de textos pueda mirar si el
+    // contrato ya lo explica (los schemas generados traen title/description).
+    schema,
     // Un grupo entero puede estar ausente del JSON (p.ej. `ads` en prod):
     // la UI lo dice y ofrece crearlo, en vez de pintar campos vacios que
     // parecerian definidos.

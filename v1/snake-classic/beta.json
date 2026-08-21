@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "analytics": {
     "eventPolicy": {
       "allowedEvents": [
@@ -185,7 +185,9 @@
     }
   },
   "paywall": {
-    "enabled": false,
+    "rollout": {
+      "enabled": false
+    },
     "triggers": [
       {
         "episodeIndex": 1,
@@ -195,7 +197,14 @@
     "freeEpisodeLimit": 2
   },
   "freewall": {
-    "enabled": false,
+    "rollout": {
+      "enabled": true,
+      "variants": [
+        "ios",
+        "android",
+        "electron-mac-appstore"
+      ]
+    },
     "triggers": [
       {
         "episodeIndex": 1,
@@ -205,22 +214,15 @@
     "frequency": {
       "mode": "cooldown",
       "cooldownDays": 7
-    },
-    "overrides": {
-      "ios": {
-        "enabled": true
-      },
-      "android": {
-        "enabled": true
-      },
-      "electron-mac-appstore": {
-        "enabled": true
-      }
     }
   },
   "profiling": {
-    "enabled": true,
-    "cohortPercent": 100,
+    "rollout": {
+      "enabled": true,
+      "cohort": {
+        "percent": 100
+      }
+    },
     "signals": {
       "fps": true,
       "longTasks": true,
@@ -231,20 +233,22 @@
     }
   },
   "appUpdate": {
-    "enabled": true,
+    "rollout": {
+      "enabled": true,
+      "variants": [
+        "android"
+      ],
+      "cohort": {
+        "percent": 100,
+        "salt": "1.0.134"
+      }
+    },
     "mode": "soft",
     "latestVersion": "1.0.134",
-    "platforms": [
-      "android"
-    ],
     "checkStore": true,
     "inAppUpdate": true,
-    "rollout": {
-      "percent": 100,
-      "hardPercent": 100,
-      "salt": "1.0.134"
-    },
     "showPrompt": false,
-    "messages": {}
+    "messages": {},
+    "hardPercent": 100
   }
 }

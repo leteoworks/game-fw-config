@@ -1,632 +1,1003 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://game-fw-config/snake-classic.schema.json",
-  "title": "Snake Classic — Remote analytics config",
+  "$id": "https://gamefw.dev/remote-config/snake-classic.schema.json",
+  "title": "Remote config de snake-classic",
+  "description": "GENERADO desde los contratos zod del repo principal (pnpm gen:remote-config-schema). NO editar a mano: el guard lint:remote-config-schema falla si difiere del generado.",
+  "x-generated": {
+    "gameId": "snake-classic",
+    "schemaVersion": 2,
+    "sections": [
+      "analytics",
+      "paywall",
+      "freewall",
+      "wallConflict",
+      "profiling",
+      "ads",
+      "appUpdate",
+      "mp"
+    ]
+  },
   "type": "object",
-  "required": [
-    "schemaVersion"
-  ],
-  "additionalProperties": false,
   "properties": {
     "schemaVersion": {
-      "const": 1
+      "type": "number",
+      "const": 2,
+      "title": "Version del contrato",
+      "description": "La version del contrato con la que se escribio este fichero. El juego solo aplica ficheros de su misma version."
     },
     "analytics": {
+      "title": "Analitica",
+      "description": "Politica de eventos del juego y kill-switch/cola de cada destino. El destino que alimenta Grafana es `gamefw`.",
+      "default": {},
       "type": "object",
-      "additionalProperties": false,
       "properties": {
         "eventPolicy": {
+          "title": "Politica de eventos",
+          "description": "Que eventos salen del juego, igual para todos los destinos (ADR-030).",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
           "properties": {
-            "blockedEvents": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
             "allowedEvents": {
-              "oneOf": [
+              "default": [
+                "run.started",
+                "run.ended",
+                "play.session.summary",
+                "device.profile",
+                "$exception",
+                "error.handled",
+                "signal.health",
+                "error.occurred",
+                "error.resource_failed",
+                "error.network",
+                "performance.degraded",
+                "locale.detection.mismatch",
+                "remote.config.applied",
+                "remote.config.fetched",
+                "remote.config.rejected",
+                "app.booted",
+                "screen.viewed",
+                "screen.exited",
+                "first.action.after.boot",
+                "run.input.breakdown",
+                "modal.opened",
+                "modal.closed",
+                "performance.fps",
+                "performance.load",
+                "migration.completed",
+                "migration.failed",
+                "paywall.shown",
+                "paywall.dismissed",
+                "freewall.shown",
+                "freewall.continued",
+                "paywall.purchase.started",
+                "paywall.purchase.completed",
+                "paywall.purchase.failed",
+                "paywall.purchase.cancelled",
+                "paywall.restore.started",
+                "paywall.restore.completed",
+                "paywall.restore.failed",
+                "death.detail",
+                "level.started",
+                "level.completed",
+                "record.broken",
+                "progress.milestone",
+                "speed.increased",
+                "food.eaten",
+                "run.restarted",
+                "powerup.collected",
+                "powerup.expired",
+                "extra.life.used",
+                "auto.snake.session",
+                "crash.recovery.detected",
+                "crash.recovery.resumed",
+                "tutorial.dismissed",
+                "music.toggled",
+                "bonus.level.entered",
+                "bonus.level.played",
+                "control.mode.chosen",
+                "orientation.chosen",
+                "settings.changed",
+                "profiling.hotspot",
+                "ads.impression",
+                "ads.view",
+                "ads.mini_click",
+                "ads.close",
+                "ads.autoclose",
+                "ads.dismiss",
+                "ads.abandon",
+                "ads.close_fallback",
+                "ads.press_stuck",
+                "ads.video_impression",
+                "ads.video_complete",
+                "ads.video_skip",
+                "ads.video_cap",
+                "ads.video_error",
+                "ads.video_stall",
+                "ads.gate_skipped",
+                "app.update.shown",
+                "app.update.clicked",
+                "app.update.in_app_started",
+                "app.update.in_app_completed",
+                "app.update.in_app_cancelled",
+                "app.update.in_app_failed",
+                "app.update.store_opened",
+                "app.update.probe_failed",
+                "app.update.wall_shown",
+                "app.update.prompt_shown",
+                "app.update.prompt_accepted",
+                "app.update.prompt_dismissed",
+                "app.update.skipped",
+                "mp.room.created",
+                "mp.join.requested",
+                "mp.join.accepted",
+                "mp.join.rejected",
+                "mp.match.started",
+                "mp.join.device",
+                "mp.match.ended",
+                "mp.death",
+                "mp.room.create.failed",
+                "mp.join.failed",
+                "mp.notify.toggled",
+                "mp.deeplink.new.room",
+                "mp.deeplink.new_room",
+                "mp.retry.requested",
+                "mp.retry.granted",
+                "mp.retry.denied",
+                "user.error.shown",
+                "session.started",
+                "session.ended",
+                "name.form.shown",
+                "name.form.resolved",
+                "ranking.opened",
+                "ranking.session.summary",
+                "leaderboard.score.mismatch"
+              ],
+              "title": "Eventos permitidos",
+              "description": "Allowlist UNICA del juego (todos los destinos). Ausente = la del bundle; vacia = se silencia TODO; nula = manguera abierta. ⚠️ REEMPLAZA a la del bundle, no la amplia: un evento que no este aqui se descarta sin error.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
                 {
                   "type": "null"
-                },
+                }
+              ]
+            },
+            "blockedEvents": {
+              "title": "Eventos bloqueados",
+              "description": "Blocklist por nombre. Vacia o nula = nada bloqueado.",
+              "default": [],
+              "anyOf": [
                 {
                   "type": "array",
                   "items": {
-                    "type": "string"
+                    "type": "string",
+                    "minLength": 1
                   }
+                },
+                {
+                  "type": "null"
                 }
               ]
             }
-          }
+          },
+          "additionalProperties": false
         },
         "providers": {
+          "title": "Destinos",
+          "description": "Un bloque por destino registrado en el juego (posthog, gamefw…). Un id desconocido se ignora.",
+          "default": {},
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "enabled": {
-                "type": "boolean"
-              },
-              "batching": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                  "flushIntervalMs": {
-                    "type": "integer",
-                    "minimum": 1000,
-                    "maximum": 300000
+          "properties": {
+            "posthog": {
+              "title": "Destino",
+              "description": "Interruptor y cola de un destino de analitica. Solo admite estos dos campos: la politica de eventos NO va por destino.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "title": "Activo",
+                  "description": "Kill-switch de ESTE destino, en caliente y sin release. No cambia que eventos se emiten (eso es la politica de eventos).",
+                  "type": "boolean"
+                },
+                "batching": {
+                  "title": "Cola de envio",
+                  "description": "Como agrupa los eventos este destino.",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "flushIntervalMs": {
+                      "default": 30000,
+                      "title": "Intervalo de envio (ms)",
+                      "description": "Cada cuanto se vacia la cola aunque no este llena. 1 s - 5 min.",
+                      "x-ui": {
+                        "widget": "duration"
+                      },
+                      "type": "number",
+                      "minimum": 1000,
+                      "maximum": 300000
+                    },
+                    "maxBatchSize": {
+                      "default": 50,
+                      "title": "Eventos por lote",
+                      "description": "Umbral que dispara un envio y tamaño maximo por peticion. 1-500.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 500
+                    },
+                    "flushOnPageHide": {
+                      "default": true,
+                      "title": "Vaciar al ocultarse",
+                      "description": "Envio best-effort al cerrar la pestaña o mandar la app a segundo plano, para no perder la cola.",
+                      "type": "boolean"
+                    }
                   },
-                  "maxBatchSize": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 500
-                  },
-                  "flushOnPageHide": {
-                    "type": "boolean"
-                  }
+                  "additionalProperties": false
                 }
-              }
+              },
+              "additionalProperties": false
+            },
+            "gamefw": {
+              "title": "Destino",
+              "description": "Interruptor y cola de un destino de analitica. Solo admite estos dos campos: la politica de eventos NO va por destino.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "default": true,
+                  "title": "Activo",
+                  "description": "Kill-switch de ESTE destino, en caliente y sin release. No cambia que eventos se emiten (eso es la politica de eventos).",
+                  "type": "boolean"
+                },
+                "batching": {
+                  "title": "Cola de envio",
+                  "description": "Como agrupa los eventos este destino.",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "flushIntervalMs": {
+                      "default": 60000,
+                      "title": "Intervalo de envio (ms)",
+                      "description": "Cada cuanto se vacia la cola aunque no este llena. 1 s - 5 min.",
+                      "x-ui": {
+                        "widget": "duration"
+                      },
+                      "type": "number",
+                      "minimum": 1000,
+                      "maximum": 300000
+                    },
+                    "maxBatchSize": {
+                      "default": 200,
+                      "title": "Eventos por lote",
+                      "description": "Umbral que dispara un envio y tamaño maximo por peticion. 1-500.",
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 500
+                    },
+                    "flushOnPageHide": {
+                      "default": true,
+                      "title": "Vaciar al ocultarse",
+                      "description": "Envio best-effort al cerrar la pestaña o mandar la app a segundo plano, para no perder la cola.",
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
             }
-          }
+          },
+          "additionalProperties": false
         }
-      }
+      },
+      "additionalProperties": false
     },
     "paywall": {
+      "title": "Muro de pago",
+      "description": "El paywall del contenido de pago: donde aparece, a quien (solo tiene efecto en iOS y Android, donde hay rail de compra) y el texto de episodios gratuitos. Nace APAGADO: solo aparece por decision remota explicita.",
+      "default": {},
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "enabled": {
-          "type": "boolean"
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "default": null,
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
         },
         "triggers": {
+          "default": [
+            {
+              "episodeIndex": 1,
+              "beforeSceneIndex": 1
+            }
+          ],
           "type": "array",
-          "maxItems": 16,
           "items": {
             "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "episodeIndex",
-              "beforeSceneIndex"
-            ],
             "properties": {
               "episodeIndex": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 99
+                "maximum": 9007199254740991,
+                "title": "Episodio",
+                "description": "Indice del episodio, empezando en 0."
               },
               "beforeSceneIndex": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 99
+                "maximum": 9007199254740991,
+                "title": "Antes de la escena",
+                "description": "Indice de la escena (0 = el episodio entero): el muro se evalua al INTENTAR ENTRAR en ella. Un objetivo igual o posterior a cualquier trigger esta en zona de muro."
               }
-            }
-          }
+            },
+            "required": [
+              "episodeIndex",
+              "beforeSceneIndex"
+            ],
+            "additionalProperties": false
+          },
+          "title": "Puntos de aparicion",
+          "description": "Donde aparece el muro de pago. Lista vacia = nunca (equivale a apagarlo, pero mas declarativo)."
         },
         "freeEpisodeLimit": {
+          "default": 2,
           "type": "integer",
           "minimum": 0,
-          "maximum": 99
-        },
-        "versionRange": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "min": {
-              "type": [
-                "string",
-                "null"
-              ]
-            },
-            "max": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
-          }
-        },
-        "cohortPercent": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100
+          "maximum": 9007199254740991,
+          "title": "Episodios gratuitos",
+          "description": "Solo para el texto (\"2 de 8 episodios gratis\"). NO decide el gate: mandan los triggers."
         },
         "overrides": {
+          "default": {},
+          "title": "Ajustes por variante",
+          "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
           "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "ios": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android",
+              "browser",
+              "electron-windows",
+              "electron-linux",
+              "electron-mac-steam",
+              "electron-mac-appstore"
+            ]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "rollout": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": false,
+                    "title": "Activo",
+                    "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+                    "type": "boolean"
+                  },
+                  "variants": {
+                    "default": null,
+                    "title": "Variantes de distribucion",
+                    "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "ios",
+                            "android",
+                            "browser",
+                            "electron-windows",
+                            "electron-linux",
+                            "electron-mac-steam",
+                            "electron-mac-appstore"
+                          ]
+                        }
                       },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
+                      {
+                        "type": "null"
                       }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                    ]
+                  },
+                  "formFactors": {
+                    "default": null,
+                    "title": "Tipos de dispositivo",
+                    "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "tablet",
+                            "desktop"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "versions": {
+                    "default": null,
+                    "title": "Rango de versiones",
+                    "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "default": null,
+                            "title": "Version minima",
+                            "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "max": {
+                            "default": null,
+                            "title": "Version maxima",
+                            "description": "Inclusive. Vacio = sin maximo.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Rango de versiones",
+                        "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "cohort": {
+                    "title": "Cohorte",
+                    "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "default": 100,
+                        "title": "Porcentaje del parque",
+                        "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                        "x-ui": {
+                          "widget": "percent"
+                        },
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "salt": {
+                        "default": "",
+                        "title": "Sal del sorteo",
+                        "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      "audience": {
+                        "default": null,
+                        "title": "Tramo del parque",
+                        "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Desde",
+                                "description": "Inicio del tramo, inclusive (0-100)."
+                              },
+                              "to": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Hasta",
+                                "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                              }
+                            },
+                            "required": [
+                              "from",
+                              "to"
+                            ],
+                            "title": "Tramo del parque",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
                     },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
+                    "additionalProperties": false
                   }
                 },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
+                "title": "Despliegue",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "additionalProperties": false
+              },
+              "triggers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "episodeIndex": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "title": "Episodio",
+                      "description": "Indice del episodio, empezando en 0."
+                    },
+                    "beforeSceneIndex": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "title": "Antes de la escena",
+                      "description": "Indice de la escena (0 = el episodio entero): el muro se evalua al INTENTAR ENTRAR en ella. Un objetivo igual o posterior a cualquier trigger esta en zona de muro."
+                    }
+                  },
+                  "required": [
+                    "episodeIndex",
+                    "beforeSceneIndex"
+                  ],
+                  "additionalProperties": false
+                },
+                "title": "Puntos de aparicion",
+                "description": "Donde aparece el muro de pago. Lista vacia = nunca (equivale a apagarlo, pero mas declarativo)."
+              },
+              "freeEpisodeLimit": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991,
+                "title": "Episodios gratuitos",
+                "description": "Solo para el texto (\"2 de 8 episodios gratis\"). NO decide el gate: mandan los triggers."
               }
             },
-            "android": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "browser": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-windows": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-linux": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-mac-steam": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-mac-appstore": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "freeEpisodeLimit": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum": 99
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            }
+            "additionalProperties": false
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "freewall": {
+      "title": "Aviso gratuito (freewall)",
+      "description": "El hermano amable del muro de pago: un aviso informativo en el MISMO punto, mientras el paywall esta apagado. No bloquea nunca y quien ya pago no lo ve. Nace ENCENDIDO.",
+      "default": {},
       "type": "object",
-      "additionalProperties": false,
       "properties": {
-        "enabled": {
-          "type": "boolean"
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": [
+                "ios",
+                "android",
+                "electron-mac-appstore"
+              ],
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "default": null,
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
         },
         "triggers": {
+          "default": [
+            {
+              "episodeIndex": 1,
+              "beforeSceneIndex": 1
+            }
+          ],
           "type": "array",
-          "maxItems": 16,
           "items": {
             "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "episodeIndex",
-              "beforeSceneIndex"
-            ],
             "properties": {
               "episodeIndex": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 99
+                "maximum": 9007199254740991,
+                "title": "Episodio",
+                "description": "Indice del episodio, empezando en 0."
               },
               "beforeSceneIndex": {
                 "type": "integer",
                 "minimum": 0,
-                "maximum": 99
+                "maximum": 9007199254740991,
+                "title": "Antes de la escena",
+                "description": "Indice de la escena (0 = el episodio entero): el muro se evalua al INTENTAR ENTRAR en ella. Un objetivo igual o posterior a cualquier trigger esta en zona de muro."
               }
-            }
-          }
+            },
+            "required": [
+              "episodeIndex",
+              "beforeSceneIndex"
+            ],
+            "additionalProperties": false
+          },
+          "title": "Puntos de aparicion",
+          "description": "Donde aparece el aviso gratuito. Lista vacia = nunca (equivale a apagarlo, pero mas declarativo)."
         },
         "frequency": {
+          "title": "Frecuencia",
+          "description": "Cada cuanto se puede volver a enseñar.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
           "properties": {
             "mode": {
+              "default": "cooldown",
+              "title": "Modo",
+              "description": "once = una vez en la vida; session = una vez por sesion; always = siempre; cooldown = como mucho cada N dias.",
+              "type": "string",
               "enum": [
                 "once",
                 "session",
@@ -635,1309 +1006,1819 @@
               ]
             },
             "cooldownDays": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 365
+              "default": 7,
+              "title": "Dias entre avisos",
+              "description": "Solo con modo cooldown.",
+              "type": "number",
+              "minimum": 0
             }
-          }
+          },
+          "additionalProperties": false
         },
-        "versionRange": {
-          "type": [
-            "object",
-            "null"
-          ],
-          "additionalProperties": false,
-          "properties": {
-            "min": {
-              "type": [
-                "string",
-                "null"
-              ]
+        "overrides": {
+          "default": {},
+          "title": "Ajustes por variante",
+          "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android",
+              "browser",
+              "electron-windows",
+              "electron-linux",
+              "electron-mac-steam",
+              "electron-mac-appstore"
+            ]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "rollout": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": true,
+                    "title": "Activo",
+                    "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+                    "type": "boolean"
+                  },
+                  "variants": {
+                    "default": null,
+                    "title": "Variantes de distribucion",
+                    "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "ios",
+                            "android",
+                            "browser",
+                            "electron-windows",
+                            "electron-linux",
+                            "electron-mac-steam",
+                            "electron-mac-appstore"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "formFactors": {
+                    "default": null,
+                    "title": "Tipos de dispositivo",
+                    "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "tablet",
+                            "desktop"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "versions": {
+                    "default": null,
+                    "title": "Rango de versiones",
+                    "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "default": null,
+                            "title": "Version minima",
+                            "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "max": {
+                            "default": null,
+                            "title": "Version maxima",
+                            "description": "Inclusive. Vacio = sin maximo.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Rango de versiones",
+                        "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "cohort": {
+                    "title": "Cohorte",
+                    "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "default": 100,
+                        "title": "Porcentaje del parque",
+                        "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                        "x-ui": {
+                          "widget": "percent"
+                        },
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "salt": {
+                        "default": "",
+                        "title": "Sal del sorteo",
+                        "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      "audience": {
+                        "default": null,
+                        "title": "Tramo del parque",
+                        "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Desde",
+                                "description": "Inicio del tramo, inclusive (0-100)."
+                              },
+                              "to": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Hasta",
+                                "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                              }
+                            },
+                            "required": [
+                              "from",
+                              "to"
+                            ],
+                            "title": "Tramo del parque",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "title": "Despliegue",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "additionalProperties": false
+              },
+              "triggers": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "episodeIndex": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "title": "Episodio",
+                      "description": "Indice del episodio, empezando en 0."
+                    },
+                    "beforeSceneIndex": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991,
+                      "title": "Antes de la escena",
+                      "description": "Indice de la escena (0 = el episodio entero): el muro se evalua al INTENTAR ENTRAR en ella. Un objetivo igual o posterior a cualquier trigger esta en zona de muro."
+                    }
+                  },
+                  "required": [
+                    "episodeIndex",
+                    "beforeSceneIndex"
+                  ],
+                  "additionalProperties": false
+                },
+                "title": "Puntos de aparicion",
+                "description": "Donde aparece el aviso gratuito. Lista vacia = nunca (equivale a apagarlo, pero mas declarativo)."
+              },
+              "frequency": {
+                "title": "Frecuencia",
+                "description": "Cada cuanto se puede volver a enseñar.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "default": "cooldown",
+                    "title": "Modo",
+                    "description": "once = una vez en la vida; session = una vez por sesion; always = siempre; cooldown = como mucho cada N dias.",
+                    "type": "string",
+                    "enum": [
+                      "once",
+                      "session",
+                      "always",
+                      "cooldown"
+                    ]
+                  },
+                  "cooldownDays": {
+                    "default": 7,
+                    "title": "Dias entre avisos",
+                    "description": "Solo con modo cooldown.",
+                    "type": "number",
+                    "minimum": 0
+                  }
+                },
+                "additionalProperties": false
+              }
             },
-            "max": {
-              "type": [
-                "string",
-                "null"
-              ]
-            }
+            "additionalProperties": false
           }
+        }
+      },
+      "additionalProperties": false
+    },
+    "wallConflict": {
+      "title": "Conflicto entre muros",
+      "description": "Arbitro de paywall frente a freewall cuando ambos aplicarian a la vez. Por defecto gana el paywall al 100 % (prioridad historica).",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "winner": {
+          "default": "paywall",
+          "title": "Quien gana",
+          "description": "Si un jugador es elegible para los DOS muros en el mismo punto, cual se enseña (nunca los dos).",
+          "type": "string",
+          "enum": [
+            "paywall",
+            "freewall"
+          ]
         },
-        "cohortPercent": {
+        "winnerProbability": {
+          "default": 100,
+          "title": "Porcentaje que ve al ganador",
+          "description": "Parte del parque a la que se le impone el ganador; al resto se le enseña el otro. Estable por jugador (eje propio, independiente de las cohortes de cada muro). 100 = siempre el ganador.",
+          "x-ui": {
+            "widget": "percent"
+          },
           "type": "number",
           "minimum": 0,
           "maximum": 100
-        },
-        "overrides": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "ios": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "android": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "browser": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-windows": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-linux": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-mac-steam": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            },
-            "electron-mac-appstore": {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "triggers": {
-                  "type": "array",
-                  "maxItems": 16,
-                  "items": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "required": [
-                      "episodeIndex",
-                      "beforeSceneIndex"
-                    ],
-                    "properties": {
-                      "episodeIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      },
-                      "beforeSceneIndex": {
-                        "type": "integer",
-                        "minimum": 0,
-                        "maximum": 99
-                      }
-                    }
-                  }
-                },
-                "frequency": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "mode": {
-                      "enum": [
-                        "once",
-                        "session",
-                        "always",
-                        "cooldown"
-                      ]
-                    },
-                    "cooldownDays": {
-                      "type": "integer",
-                      "minimum": 0,
-                      "maximum": 365
-                    }
-                  }
-                },
-                "versionRange": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "additionalProperties": false,
-                  "properties": {
-                    "min": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    },
-                    "max": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
-                    }
-                  }
-                },
-                "cohortPercent": {
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 100
-                }
-              }
-            }
-          }
         }
-      }
-    },
-    "mp": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Subarbol opcional del modo multijugador (snake.mp.*). Todos los campos son opcionales: el cliente normaliza con `validateMp` y aplica `DEFAULT_MP_FLAGS` a lo ausente. Documentacion: docs/architecture/p2p/verticals/snake-classic/multiplayer-paywall.md y mp-retry-attempts.md.",
-      "properties": {
-        "showButton": {
-          "type": "boolean",
-          "description": "Visibilidad del boton Multijugador en home (default true). Se combina en AND con la disponibilidad de P2P."
-        },
-        "deviceHostFilter": {
-          "type": "boolean",
-          "description": "Filtrar el hall por dispositivo del host (movil<->movil, desktop<->desktop; tablet = puente). Default false = se ven todas las salas."
-        },
-        "paywall": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Muro del multijugador: gatea CREAR y UNIRSE por numero de partidas MP jugadas. Independiente de `mp.retry.paywall`.",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            },
-            "triggerGames": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 99999
-            }
-          }
-        },
-        "retry": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Reintentos del espectador (boton 'Nuevo intento'). Subarbol HERMANO de `paywall`, NO cuelga de el: son dos muros distintos y encender uno no debe armar el otro.",
-          "properties": {
-            "enabled": {
-              "type": "boolean",
-              "description": "Kill-switch de la feature entera (default true). false apaga boton, ventana de gracia y candidatos."
-            },
-            "maxAttempts": {
-              "type": "integer",
-              "minimum": 0,
-              "maximum": 10,
-              "description": "Reintentos por partida y participante (default 3). 0 es VALIDO = feature apagada. El cap 10 replica MP_RETRY_MAX_ATTEMPTS_CAP del cliente."
-            },
-            "paywall": {
-              "type": "object",
-              "additionalProperties": false,
-              "description": "Candado del boton 'Nuevo intento' (suscripcion anual MP). Sin contador de partidas: es otro muro.",
-              "properties": {
-                "enabled": {
-                  "type": "boolean",
-                  "description": "Interruptor MAESTRO del candado (default false). Cada plataforma lo HEREDA salvo que la anule en `platforms`."
-                },
-                "platforms": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "description": "Override POR PLATAFORMA. Ausente = hereda `enabled`. Existe para el lanzamiento ESCALONADO: si el producto solo esta dado de alta en una tienda, encender el maestro dejaria a la otra plataforma con el candado puesto y SIN camino de pago. Solo ios/android: son las unicas con rail de IAP (en browser/electron el muro nunca gatea).",
-                  "properties": {
-                    "ios": {
-                      "type": "boolean"
-                    },
-                    "android": {
-                      "type": "boolean"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+      },
+      "additionalProperties": false
     },
     "profiling": {
+      "title": "Profiling en produccion",
+      "description": "Telemetria de rendimiento en builds publicadas: a que parte del parque se le mide (despliegue), que señales y con que umbrales.",
+      "default": {},
       "type": "object",
-      "additionalProperties": false,
-      "description": "Subarbol opcional para controlar el modulo de profiling en produccion. Documentacion: docs/platform/profiling-production-config.md.",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Kill-switch global. Si false, ningun dispositivo activa los collectors aunque la cohorte le incluya."
-        },
-        "cohortPercent": {
-          "type": "number",
-          "minimum": 0,
-          "maximum": 100,
-          "description": "Porcentaje del parque que participa. Determinista por hash FNV-1a del anonymousId."
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "default": null,
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
         },
         "signals": {
+          "title": "Señales",
+          "description": "Que se mide en los dispositivos de la cohorte. Solo se puede activar lo que el juego haya declarado en su codigo.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "description": "Senales activas. Los collectors hacen feature-detect por plataforma — pasar true no fuerza activacion en plataformas no soportadas (p.ej. longTasks/memory en iOS WKWebView). systems/entities/events requieren ademas que el juego declare gameSignalsConfig en su wiring (lista de sistemas, intervalos de polling, sampling rate de eventos).",
           "properties": {
             "fps": {
+              "default": true,
+              "title": "FPS",
+              "description": "Frames por segundo y caidas.",
               "type": "boolean"
             },
             "longTasks": {
+              "default": false,
+              "title": "Tareas largas",
+              "description": "Bloqueos del hilo principal.",
               "type": "boolean"
             },
             "memory": {
+              "default": false,
+              "title": "Memoria",
+              "description": "Crecimiento del heap.",
               "type": "boolean"
             },
             "systems": {
+              "default": false,
+              "title": "Sistemas",
+              "description": "Coste por sistema del juego.",
               "type": "boolean"
             },
             "entities": {
+              "default": false,
+              "title": "Entidades",
+              "description": "Recuento y picos de entidades.",
               "type": "boolean"
             },
             "events": {
+              "default": false,
+              "title": "Eventos",
+              "description": "Caudal del bus de eventos.",
               "type": "boolean"
             }
-          }
+          },
+          "additionalProperties": false
         },
         "thresholds": {
+          "title": "Umbrales",
+          "description": "Calibracion remota de los umbrales que convierten una medida en un hotspot. Ausente = los del bundle.",
           "type": "object",
-          "additionalProperties": false,
-          "description": "Override remoto de thresholds. Permite calibrar empiricamente sin redeploy.",
           "properties": {
             "frameMs": {
+              "title": "Frame",
+              "description": "Par aviso/critico. Ausente = el umbral calibrado en el bundle.",
               "type": "object",
-              "additionalProperties": false,
               "properties": {
                 "warn": {
+                  "title": "Aviso",
+                  "description": "Umbral de aviso (ms), 4-200.",
                   "type": "number",
                   "minimum": 4,
                   "maximum": 200
                 },
                 "critical": {
+                  "title": "Critico",
+                  "description": "Umbral critico (ms), 4-200. Si es menor que el aviso, manda el critico.",
                   "type": "number",
                   "minimum": 4,
                   "maximum": 200
                 }
-              }
+              },
+              "additionalProperties": false
             },
             "longTaskMs": {
+              "title": "Tarea larga",
+              "description": "Par aviso/critico. Ausente = el umbral calibrado en el bundle.",
               "type": "object",
-              "additionalProperties": false,
               "properties": {
                 "warn": {
+                  "title": "Aviso",
+                  "description": "Umbral de aviso (ms), 16-500.",
                   "type": "number",
                   "minimum": 16,
                   "maximum": 500
                 },
                 "critical": {
+                  "title": "Critico",
+                  "description": "Umbral critico (ms), 16-500. Si es menor que el aviso, manda el critico.",
                   "type": "number",
                   "minimum": 16,
                   "maximum": 500
                 }
-              }
+              },
+              "additionalProperties": false
             },
             "memoryGrowthMb": {
+              "title": "Crecimiento de memoria",
+              "description": "Par aviso/critico. Ausente = el umbral calibrado en el bundle.",
               "type": "object",
-              "additionalProperties": false,
               "properties": {
                 "warn": {
+                  "title": "Aviso",
+                  "description": "Umbral de aviso (MB), 1-100.",
                   "type": "number",
                   "minimum": 1,
                   "maximum": 100
                 },
                 "critical": {
+                  "title": "Critico",
+                  "description": "Umbral critico (MB), 1-100. Si es menor que el aviso, manda el critico.",
                   "type": "number",
                   "minimum": 1,
                   "maximum": 100
                 }
-              }
-            }
-          }
-        }
-      }
-    },
-    "ads": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Subarbol opcional del modulo de publicidad (@modules/ads): interstitial post-splash + mini-banner de home, con pre-roll de video opcional. Todo es opcional: el cliente normaliza con `validateRemoteAds` (clamps defensivos + defaults conservadores; enabled=false y ttlMs=null si faltan). Documentacion: src/modules/ads/README.md y docs/architecture/ads/ads-testing-playbook.md en el repo del framework.",
-      "properties": {
-        "banners": {
-          "type": "array",
-          "maxItems": 32,
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "id"
-            ],
-            "description": "Un banner. El gate elige el PRIMER banner aplicable de la lista (el orden es la prioridad). Un banner sin `id` o mal formado lo descarta el cliente sin tumbar al resto.",
-            "properties": {
-              "id": {
-                "type": "string",
-                "minLength": 1,
-                "description": "Identificador estable: cohorte, persistencia (cooldown / cierre por sesion) y logs. Cambiarlo reinicia esas marcas."
               },
-              "enabled": {
-                "type": "boolean",
-                "description": "Kill-switch del banner. Default conservador: false."
-              },
-              "platforms": {
-                "type": "array",
-                "uniqueItems": true,
-                "items": {
-                  "enum": [
-                    "ios",
-                    "android",
-                    "web",
-                    "electron"
-                  ]
-                },
-                "description": "Plataformas objetivo. Lista vacia o ausente = todas."
-              },
-              "minVersion": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "Version minima de la app (inclusive). null = sin limite."
-              },
-              "maxVersion": {
-                "type": [
-                  "string",
-                  "null"
-                ],
-                "description": "Version maxima de la app (inclusive). null = sin limite."
-              },
-              "cohortPercent": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 100,
-                "description": "Porcentaje del parque (hash FNV-1a del anonymousId). Default 100. Ojo: en post-splash el anonymousId puede no estar resuelto todavia y una cohorte <100 infra-entrega en esa ventana."
-              },
-              "placement": {
-                "enum": [
-                  "post-splash"
-                ],
-                "description": "Unico emplazamiento soportado hoy: tras el splash, antes de la home."
-              },
-              "ttlMs": {
-                "type": [
-                  "number",
-                  "null"
-                ],
-                "minimum": 0,
-                "maximum": 600000,
-                "description": "Vida del fullscreen: null = NO mostrar nunca; 0 = infinito (solo cierre manual); >0 = ms hasta el autocierre. Con 0 y sin closeButton el cliente coacciona a 8000 (anti-soft-lock)."
-              },
-              "cooldownMs": {
-                "type": [
-                  "number",
-                  "null"
-                ],
-                "minimum": 0,
-                "maximum": 2592000000,
-                "description": "Frequency cap: ms minimos entre impresiones del mismo banner, persistido entre sesiones. null o 0 = sin cap."
-              },
-              "url": {
-                "type": "string",
-                "description": "Destino de 'ver' y del click en el mini. Solo se abre si es https:."
-              },
-              "urlByLocale": {
-                "type": "object",
-                "minProperties": 1,
-                "additionalProperties": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "description": "Destino por idioma ({'es': 'https://.../es'}). Cascada: idioma exacto -> idioma base -> ingles -> `url`. A diferencia de los textos NO cae a 'la primera disponible': sin entrada para su idioma ni inglesa, el jugador va al `url` generico."
-              },
-              "images": {
-                "type": "array",
-                "maxItems": 24,
-                "items": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "required": [
-                    "url"
-                  ],
-                  "properties": {
-                    "url": {
-                      "type": "string",
-                      "minLength": 1,
-                      "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
-                    },
-                    "orientation": {
-                      "enum": [
-                        "portrait",
-                        "landscape"
-                      ],
-                      "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
-                    },
-                    "minWidth": {
-                      "type": "number",
-                      "minimum": 0,
-                      "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
-                    },
-                    "minHeight": {
-                      "type": "number",
-                      "minimum": 0,
-                      "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
-                    },
-                    "locales": {
-                      "type": "array",
-                      "maxItems": 24,
-                      "items": {
-                        "type": "string",
-                        "minLength": 1
-                      },
-                      "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
-                    }
-                  }
-                },
-                "description": "Imagenes del fullscreen por orientacion/resolucion. SIN una imagen aplicable no se muestra NADA (ni siquiera el pre-roll de video)."
-              },
-              "viewButton": {
-                "type": [
-                  "object",
-                  "null"
-                ],
-                "additionalProperties": false,
-                "required": [
-                  "label"
-                ],
-                "properties": {
-                  "label": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Texto por codigo de idioma (en, es, pt-BR...). Se resuelve al idioma activo con fallback a `en` y luego al primero disponible."
-                  },
-                  "unlockAfterMs": {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 0,
-                    "maximum": 15000,
-                    "description": "Ms que el boton permanece DESHABILITADO desde que aparece el anuncio (se pinta, pero no responde). Omitir/null = usable desde el primer instante. Tope 15 s: el remoto puede hacer esperar, nunca secuestrar. Si no cabe dentro de `ttlMs` el cliente descarta el bloqueo (un boton que se habilita cuando el anuncio ya se fue no serviria jamas)."
-                  }
-                },
-                "description": "Boton 'ver' (abre la url). Omitir = sin boton. `null` equivale a omitirlo."
-              },
-              "closeButton": {
-                "type": [
-                  "object",
-                  "null"
-                ],
-                "additionalProperties": false,
-                "required": [
-                  "label"
-                ],
-                "properties": {
-                  "label": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Texto por codigo de idioma (en, es, pt-BR...). Se resuelve al idioma activo con fallback a `en` y luego al primero disponible."
-                  },
-                  "unlockAfterMs": {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 0,
-                    "maximum": 15000,
-                    "description": "Ms que el boton permanece DESHABILITADO desde que aparece el anuncio (se pinta, pero no responde). Omitir/null = usable desde el primer instante. Tope 15 s: el remoto puede hacer esperar, nunca secuestrar. Si no cabe dentro de `ttlMs` el cliente descarta el bloqueo (un boton que se habilita cuando el anuncio ya se fue no serviria jamas)."
-                  }
-                },
-                "description": "Boton 'cerrar' (pasa al mini). Omitir = sin boton; con ttlMs 0 fuerza el TTL de rescate. `null` equivale a omitirlo."
-              },
-              "preRollVideo": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "sources"
-                ],
-                "description": "Pre-roll de video OPCIONAL previo al fullscreen. Sin este bloque (o sin variante aplicable al dispositivo) el comportamiento es el clasico.",
-                "properties": {
-                  "sources": {
-                    "type": "array",
-                    "minItems": 1,
-                    "maxItems": 12,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": [
-                        "url"
-                      ],
-                      "properties": {
-                        "url": {
-                          "type": "string",
-                          "minLength": 1,
-                          "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
-                        },
-                        "orientation": {
-                          "enum": [
-                            "portrait",
-                            "landscape"
-                          ],
-                          "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
-                        },
-                        "minWidth": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
-                        },
-                        "minHeight": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
-                        },
-                        "type": {
-                          "type": "string",
-                          "description": "Tipo MIME para el <source> (video/mp4, video/webm). Varias variantes del mismo bucket con distinto MIME = fallback de codec."
-                        },
-                        "locales": {
-                          "type": "array",
-                          "maxItems": 24,
-                          "items": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
-                        }
-                      }
-                    },
-                    "description": "Variantes por orientacion/resolucion (+ codec)."
-                  },
-                  "maxDurationMs": {
-                    "type": "number",
-                    "minimum": 1000,
-                    "maximum": 60000,
-                    "description": "TECHO DE SEGURIDAD (no la duracion): si el video no termina, a los N ms se salta al fullscreen. Default 30000."
-                  },
-                  "skippableAfterMs": {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 0,
-                    "description": "Muestra 'Saltar' tras N ms (0 = desde el inicio). null = sin boton. Un valor >= maxDurationMs se coacciona a null."
-                  },
-                  "startTimeoutMs": {
-                    "type": [
-                      "number",
-                      "null"
-                    ],
-                    "minimum": 1000,
-                    "description": "Plazo para el PRIMER FOTOGRAMA. Si el video no ha arrancado a los N ms se abandona y se pasa al anuncio de imagen. Distinto del tope: el tope mide reproduccion y un video que no arranca no reproduce nada. null = el del modulo (5000). Nunca por encima del tope."
-                  },
-                  "allowAudio": {
-                    "type": "boolean",
-                    "description": "Ofrecer boton de sonido. El video SIEMPRE arranca muteado (requisito de autoplay). Default false."
-                  },
-                  "skipLabel": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Texto de 'Saltar' por codigo de idioma. Omitir = el del propio modulo (13 idiomas)."
-                  },
-                  "unmuteLabel": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Texto de 'activar sonido' por codigo de idioma. Omitir = el del propio modulo (13 idiomas)."
-                  },
-                  "muteLabel": {
-                    "type": "object",
-                    "minProperties": 1,
-                    "additionalProperties": {
-                      "type": "string"
-                    },
-                    "description": "Texto de 'silenciar' por codigo de idioma. Omitir = el del propio modulo (13 idiomas)."
-                  }
-                }
-              },
-              "miniBanner": {
-                "type": "object",
-                "additionalProperties": false,
-                "description": "Barra superior a la que se encoge el fullscreen al cerrarse. Visible en todas las pantallas MENOS gameplay. No es opcional: siempre hay mini (si no tiene imagen propia, reusa la del fullscreen).",
-                "properties": {
-                  "heightPercent": {
-                    "type": "number",
-                    "minimum": 1,
-                    "maximum": 100,
-                    "description": "Alto como % del viewport. Default 12."
-                  },
-                  "closeXWidthPercent": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 50,
-                    "description": "% de ancho reservado a la X. La X SIEMPRE se pinta: 0 = ancho minimo tappable, NO 'sin X'."
-                  },
-                  "images": {
-                    "type": "array",
-                    "maxItems": 24,
-                    "items": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": [
-                        "url"
-                      ],
-                      "properties": {
-                        "url": {
-                          "type": "string",
-                          "minLength": 1,
-                          "description": "URL del asset. Admite absoluta (https), relativa al propio bundle ('/assets/...') o `data:` URI. OJO: la CSP del bundle solo carga imagenes de 'self', `data:` o `blob:` y video de 'self'/`blob:` — un host externo se bloquea en silencio (el banner no llega a montarse)."
-                        },
-                        "orientation": {
-                          "enum": [
-                            "portrait",
-                            "landscape"
-                          ],
-                          "description": "Orientacion de viewport para la que sirve. Ausente = vale para ambas."
-                        },
-                        "minWidth": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Ancho minimo de viewport (px) a partir del cual esta variante es candidata."
-                        },
-                        "minHeight": {
-                          "type": "number",
-                          "minimum": 0,
-                          "description": "Alto minimo de viewport (px) a partir del cual esta variante es candidata."
-                        },
-                        "locales": {
-                          "type": "array",
-                          "maxItems": 24,
-                          "items": {
-                            "type": "string",
-                            "minLength": 1
-                          },
-                          "description": "Idiomas a los que sirve esta variante (['es'], ['pt-BR']). Ausente o vacia = universal. Cascada al elegir: idioma exacto -> idioma base -> INGLES -> universal -> cualquiera; nunca deja al banner sin asset."
-                        }
-                      }
-                    },
-                    "description": "Imagenes propias del mini. Lista vacia = reusa la del fullscreen."
-                  }
-                }
-              },
-              "showCountdown": {
-                "type": "boolean",
-                "description": "¿Enseñar la cuenta atras del autocierre? Default true. Solo silencia la del AUTOCIERRE: la que explica por que un boton esta bloqueado se enseña siempre."
-              },
-              "audience": {
-                "type": "object",
-                "additionalProperties": false,
-                "required": [
-                  "fromPercent",
-                  "toPercent"
-                ],
-                "description": "Tramo estanco del parque `[desde, hasta)`. Cada jugador ocupa un punto fijo del eje 0-100, asi que tramos que NO se solapan = compartimentos (cada uno ve siempre la misma campaña) y tramos solapados = publico compartido, donde decide la politica de reparto. ⚠️ Sin identidad estable (primer arranque) una campaña con tramo no entra.",
-                "properties": {
-                  "fromPercent": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 100,
-                    "description": "Inicio del tramo, incluido."
-                  },
-                  "toPercent": {
-                    "type": "number",
-                    "minimum": 0,
-                    "maximum": 100,
-                    "description": "Fin del tramo, EXCLUIDO."
-                  }
-                }
-              },
-              "weight": {
-                "type": "number",
-                "minimum": 0,
-                "maximum": 1000,
-                "description": "Peso relativo cuando varias campañas compiten por el mismo jugador. Solo cuenta con las politicas `weighted` y `sticky`; con `order` manda el orden de la lista. Default 1."
-              }
+              "additionalProperties": false
             }
           },
-          "description": "Lista ordenada de banners: gana el PRIMERO aplicable."
-        },
-        "showToEntitled": {
-          "type": "boolean",
-          "description": "¿Los usuarios con compra/entitlement ven ads? Default false (el comprador no ve ads)."
-        },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ads": {
+      "title": "Publicidad",
+      "description": "El anuncio a pantalla completa que sale UNA vez tras el splash y el mini-banner en el que se encoge. Sin campañas no hay publicidad de ningun tipo.",
+      "default": {},
+      "type": "object",
+      "properties": {
         "pick": {
+          "default": "order",
+          "title": "Reparto entre campañas",
+          "description": "order = gana la primera aplicable de la lista; weighted = sorteo por peso en cada arranque; sticky = por peso pero fijo por jugador.",
+          "type": "string",
           "enum": [
             "order",
             "weighted",
             "sticky"
-          ],
-          "description": "Como se elige la campaña cuando VARIAS aplican al mismo jugador. `order` (default): gana la primera de la lista. `weighted`: sorteo en cada arranque segun el peso (el mismo jugador va rotando). `sticky`: sorteo por identidad, asi que cada jugador cae siempre en la misma, repartidos por peso."
+          ]
         },
         "audienceSalt": {
+          "default": "",
+          "title": "Sal del reparto",
+          "description": "Rebaraja a TODAS las campañas a la vez (tramos y sorteo sticky). Cambiarla vuelve a sortear el parque entero.",
           "type": "string",
-          "minLength": 1,
-          "maxLength": 64,
-          "description": "Nombre del eje sobre el que se calculan los tramos de parque y el sorteo `sticky`. Cambiarlo REBARAJA a todo el mundo: es la palanca para volver a sortear cuando una campaña ya se quemo con su publico."
+          "maxLength": 64
+        },
+        "showToEntitled": {
+          "default": false,
+          "title": "Mostrar a quien ha pagado",
+          "description": "Por defecto el comprador no ve anuncios. Activalo para que los vea igualmente.",
+          "type": "boolean"
+        },
+        "banners": {
+          "title": "Campañas",
+          "description": "Hasta 20 simultaneas. El orden importa con la politica `order`.",
+          "maxItems": 20,
+          "type": "array",
+          "items": {
+            "title": "Campaña",
+            "description": "Una campaña: a quien (despliegue), que se enseña (imagenes, video, botones) y cuanto tiempo.",
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64,
+                "title": "Identificador",
+                "description": "Estable: cohorte, persistencia (cooldown, cierre por sesion) y diario. Cambiarlo reinicia esas marcas."
+              },
+              "rollout": {
+                "title": "Despliegue",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": false,
+                    "title": "Activo",
+                    "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+                    "type": "boolean"
+                  },
+                  "variants": {
+                    "default": null,
+                    "title": "Variantes de distribucion",
+                    "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "ios",
+                            "android",
+                            "browser",
+                            "electron-windows",
+                            "electron-linux",
+                            "electron-mac-steam",
+                            "electron-mac-appstore"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "formFactors": {
+                    "default": null,
+                    "title": "Tipos de dispositivo",
+                    "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "tablet",
+                            "desktop"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "versions": {
+                    "default": null,
+                    "title": "Rango de versiones",
+                    "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "default": null,
+                            "title": "Version minima",
+                            "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "max": {
+                            "default": null,
+                            "title": "Version maxima",
+                            "description": "Inclusive. Vacio = sin maximo.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Rango de versiones",
+                        "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "cohort": {
+                    "title": "Cohorte",
+                    "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "default": 100,
+                        "title": "Porcentaje del parque",
+                        "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                        "x-ui": {
+                          "widget": "percent"
+                        },
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "salt": {
+                        "default": "",
+                        "title": "Sal del sorteo",
+                        "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      "audience": {
+                        "default": null,
+                        "title": "Tramo del parque",
+                        "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Desde",
+                                "description": "Inicio del tramo, inclusive (0-100)."
+                              },
+                              "to": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Hasta",
+                                "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                              }
+                            },
+                            "required": [
+                              "from",
+                              "to"
+                            ],
+                            "title": "Tramo del parque",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "weight": {
+                "default": 1,
+                "title": "Peso",
+                "description": "Peso relativo cuando VARIAS campañas compiten (politicas `weighted` y `sticky`). Con `order` se ignora.",
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1000
+              },
+              "placement": {
+                "default": "post-splash",
+                "title": "Emplazamiento",
+                "description": "Hoy solo tras el splash, antes de la home.",
+                "type": "string",
+                "const": "post-splash"
+              },
+              "ttlMs": {
+                "default": null,
+                "title": "Duracion del anuncio (ms)",
+                "description": "Vacio = NUNCA se muestra. 0 = sin autocierre (infinito). >0 = se cierra solo a los N ms. ⚠️ `null` y 0 son opuestos.",
+                "x-ui": {
+                  "widget": "duration"
+                },
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 600000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "cooldownMs": {
+                "default": null,
+                "title": "Tiempo entre impresiones (ms)",
+                "description": "Frequency cap: no repetir hasta pasados N ms de la ultima impresion. Vacio = sin limite.",
+                "x-ui": {
+                  "widget": "duration"
+                },
+                "anyOf": [
+                  {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2592000000
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "url": {
+                "default": "",
+                "title": "Enlace",
+                "description": "Destino al pulsar \"ver\" (solo https; otro esquema no se abre).",
+                "x-ui": {
+                  "widget": "url"
+                },
+                "type": "string"
+              },
+              "urlByLocale": {
+                "default": {},
+                "title": "Enlace por idioma",
+                "description": "Destino por idioma; ausente = el enlace generico.",
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "additionalProperties": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "preRollVideo": {
+                "title": "Video previo (pre-roll)",
+                "description": "Opcional. Un video antes del anuncio de imagen. Vacio = sin video.",
+                "anyOf": [
+                  {
+                    "title": "Video previo (pre-roll)",
+                    "description": "Opcional. Un video antes del anuncio de imagen. Sin bloque, el anuncio entra directo a la imagen.",
+                    "type": "object",
+                    "properties": {
+                      "sources": {
+                        "minItems": 1,
+                        "maxItems": 12,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "url": {
+                              "type": "string",
+                              "minLength": 1,
+                              "title": "URL",
+                              "description": "Origen del video (mp4/webm). Va a R2, no al bundle; el host tiene que estar en el CSP del juego.",
+                              "x-ui": {
+                                "widget": "asset-video"
+                              }
+                            },
+                            "orientation": {
+                              "type": "string",
+                              "enum": [
+                                "portrait",
+                                "landscape"
+                              ],
+                              "title": "Orientacion",
+                              "description": "Ausente = vale para las dos."
+                            },
+                            "minWidth": {
+                              "title": "Ancho minimo",
+                              "description": "Solo en pantallas de al menos este ancho (px).",
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "minHeight": {
+                              "title": "Alto minimo",
+                              "description": "Solo en pantallas de al menos este alto (px).",
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "locales": {
+                              "title": "Idiomas",
+                              "description": "Idiomas para los que vale esta variante. Ausente = universal.",
+                              "maxItems": 24,
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "type": {
+                              "title": "Tipo MIME",
+                              "description": "Pista para `<source type>` (video/mp4, video/webm).",
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "url"
+                          ],
+                          "title": "Video",
+                          "description": "Una fuente del pre-roll.",
+                          "additionalProperties": false
+                        },
+                        "title": "Fuentes",
+                        "description": "Variantes por resolucion/orientacion/codec; el dispositivo coge la suya. Sin ninguna aplicable no hay pre-roll."
+                      },
+                      "maxDurationMs": {
+                        "default": 30000,
+                        "title": "Techo de seguridad (ms)",
+                        "description": "NO es la duracion (esa la da el propio video): es el limite que fuerza el salto al anuncio de imagen si el video no termina. 1-60 s.",
+                        "x-ui": {
+                          "widget": "duration"
+                        },
+                        "type": "integer",
+                        "minimum": 1000,
+                        "maximum": 60000
+                      },
+                      "skippableAfterMs": {
+                        "default": null,
+                        "title": "Saltar a los (ms)",
+                        "description": "Cuando aparece el boton \"Saltar\". Vacio = sin boton. Si no llega antes del techo, no se anuncia.",
+                        "x-ui": {
+                          "widget": "duration"
+                        },
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "startTimeoutMs": {
+                        "default": null,
+                        "title": "Plazo del primer fotograma (ms)",
+                        "description": "Si el video no arranca en este plazo se salta al anuncio de imagen (video_stall). Vacio = el del modulo (5 s).",
+                        "x-ui": {
+                          "widget": "duration"
+                        },
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1000,
+                            "maximum": 9007199254740991
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "allowAudio": {
+                        "default": false,
+                        "title": "Permitir audio",
+                        "description": "El video SIEMPRE arranca muteado; esto solo añade un boton para activar el sonido.",
+                        "type": "boolean"
+                      },
+                      "skipLabel": {
+                        "default": null,
+                        "title": "Texto de \"Saltar\"",
+                        "description": "Por idioma. Vacio = la traduccion del modulo.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "additionalProperties": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "title": "Texto por idioma",
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "unmuteLabel": {
+                        "default": null,
+                        "title": "Texto de \"Activar sonido\"",
+                        "description": "Por idioma. Vacio = la traduccion del modulo.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "additionalProperties": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "title": "Texto por idioma",
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "muteLabel": {
+                        "default": null,
+                        "title": "Texto de \"Silenciar\"",
+                        "description": "Por idioma. Vacio = la traduccion del modulo.",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "additionalProperties": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "title": "Texto por idioma",
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "sources"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "images": {
+                "title": "Imagenes del anuncio",
+                "description": "Variantes por orientacion, tamaño e idioma. ⚠️ Sin ninguna que encaje, la campaña no se muestra: deja siempre una universal.",
+                "maxItems": 24,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "minLength": 1,
+                      "title": "URL",
+                      "description": "Origen del fichero. ⚠️ Tiene que estar en un host que admita el CSP del juego (hoy: el propio Worker de remote-config); si no, el navegador lo bloquea SIN ningun error y el anuncio no sale.",
+                      "x-ui": {
+                        "widget": "asset-image"
+                      }
+                    },
+                    "orientation": {
+                      "type": "string",
+                      "enum": [
+                        "portrait",
+                        "landscape"
+                      ],
+                      "title": "Orientacion",
+                      "description": "Ausente = vale para las dos."
+                    },
+                    "minWidth": {
+                      "title": "Ancho minimo",
+                      "description": "Solo en pantallas de al menos este ancho (px).",
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "minHeight": {
+                      "title": "Alto minimo",
+                      "description": "Solo en pantallas de al menos este alto (px).",
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "locales": {
+                      "title": "Idiomas",
+                      "description": "Idiomas para los que vale esta variante. Ausente = universal.",
+                      "maxItems": 24,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "title": "Imagen",
+                  "description": "Una variante de la creatividad.",
+                  "additionalProperties": false
+                }
+              },
+              "viewButton": {
+                "title": "Boton \"ver\"",
+                "description": "Abre el enlace. Vacio = sin boton.",
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "title": "Texto por idioma",
+                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                      },
+                      "unlockAfterMs": {
+                        "title": "Se desbloquea a los (ms)",
+                        "description": "El boton se pinta desde el principio y va deshabilitado hasta que vence. Tope 15 s. Vacio = usable ya.",
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 15000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "title": "Boton",
+                    "description": "Texto por idioma y bloqueo opcional.",
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "closeButton": {
+                "title": "Boton \"cerrar\"",
+                "description": "Encoge el anuncio al mini-banner. ⚠️ Sin el y con duracion infinita, el juego fuerza un autocierre a los 8 s.",
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "additionalProperties": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "title": "Texto por idioma",
+                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                      },
+                      "unlockAfterMs": {
+                        "title": "Se desbloquea a los (ms)",
+                        "description": "El boton se pinta desde el principio y va deshabilitado hasta que vence. Tope 15 s. Vacio = usable ya.",
+                        "default": null,
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 15000
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "label"
+                    ],
+                    "title": "Boton",
+                    "description": "Texto por idioma y bloqueo opcional.",
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "showCountdown": {
+                "default": true,
+                "title": "Cuenta atras visible",
+                "description": "Enseña los segundos que quedan para el autocierre.",
+                "type": "boolean"
+              },
+              "miniBanner": {
+                "title": "Mini-banner",
+                "description": "La barra que queda arriba al cerrar el anuncio grande. Visible en todas las pantallas menos durante la partida.",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "heightPercent": {
+                    "default": 12,
+                    "title": "Alto (% del viewport)",
+                    "description": "Alto de la barra superior.",
+                    "x-ui": {
+                      "widget": "percent"
+                    },
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 100
+                  },
+                  "closeXWidthPercent": {
+                    "default": 15,
+                    "title": "Ancho de la X (%)",
+                    "description": "Columna reservada para la X de cierre. 0 = ancho minimo tappable; la X SIEMPRE se pinta.",
+                    "x-ui": {
+                      "widget": "percent"
+                    },
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 50
+                  },
+                  "images": {
+                    "title": "Imagenes del mini-banner",
+                    "description": "Creatividades propias de la barra (muy apaisada). Vacio = reusa la del anuncio grande, recortada.",
+                    "maxItems": 24,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "url": {
+                          "type": "string",
+                          "minLength": 1,
+                          "title": "URL",
+                          "description": "Origen del fichero. ⚠️ Tiene que estar en un host que admita el CSP del juego (hoy: el propio Worker de remote-config); si no, el navegador lo bloquea SIN ningun error y el anuncio no sale.",
+                          "x-ui": {
+                            "widget": "asset-image"
+                          }
+                        },
+                        "orientation": {
+                          "type": "string",
+                          "enum": [
+                            "portrait",
+                            "landscape"
+                          ],
+                          "title": "Orientacion",
+                          "description": "Ausente = vale para las dos."
+                        },
+                        "minWidth": {
+                          "title": "Ancho minimo",
+                          "description": "Solo en pantallas de al menos este ancho (px).",
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "minHeight": {
+                          "title": "Alto minimo",
+                          "description": "Solo en pantallas de al menos este alto (px).",
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "locales": {
+                          "title": "Idiomas",
+                          "description": "Idiomas para los que vale esta variante. Ausente = universal.",
+                          "maxItems": 24,
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "minLength": 1
+                          }
+                        }
+                      },
+                      "required": [
+                        "url"
+                      ],
+                      "title": "Imagen",
+                      "description": "Una variante de la creatividad.",
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "appUpdate": {
+      "title": "Aviso de version nueva",
+      "description": "El boton \"Actualizar\" de la home (solo builds nativas iOS/Android), el modal opcional y el muro obligatorio. Nace APAGADO.",
+      "default": {},
       "type": "object",
-      "additionalProperties": false,
-      "description": "Subarbol opcional del aviso de version nueva en la tienda (boton \"Actualizar\" en la home). Solo tiene efecto en builds nativas iOS/Android. Se publica con `pnpm publish:app-update`. Documentacion: docs/architecture/app-update/app-update-module.md.",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Kill-switch. Ausente o false = no se ofrece actualizar a nadie."
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones y cohorte. Se evalua en ese orden.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "default": null,
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
         },
         "mode": {
+          "default": "soft",
+          "title": "Modo",
+          "description": "soft = boton (y modal si se enciende). hard = ademas un MURO que tapa el juego a quien este por debajo de la version minima.",
+          "type": "string",
           "enum": [
             "soft",
             "hard"
-          ],
-          "description": "Tipo de release: soft = recomendada (sale el boton y decide el jugador); hard = OBLIGATORIA (ademas planta un muro que tapa el juego a quien este por debajo de minSupportedVersion). Ausente = soft. El muro no aparece sin conexion ni durante una partida."
+          ]
         },
         "latestVersion": {
-          "type": "string",
-          "description": "Version publicada en la tienda (semver). Es contra lo que se compara la instalada cuando la tienda no contesta."
+          "default": null,
+          "title": "Version publicada",
+          "description": "La que hay en la tienda. Si la tienda no contesta, es lo que decide si hay actualizacion. Vacio = solo lo que diga la tienda.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32,
+              "x-ui": {
+                "widget": "version"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "minSupportedVersion": {
-          "type": "string",
-          "description": "Suelo soportado. Con mode=hard, quien este por debajo recibe required=true. Ausente con mode=hard = toda version anterior es obligatoria."
+          "default": null,
+          "title": "Version minima soportada",
+          "description": "Con modo hard, el muro solo a quien este por debajo. Vacio = a todo el que tenga actualizacion pendiente.",
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 32,
+              "x-ui": {
+                "widget": "version"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
-        "platforms": {
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "enum": [
-              "ios",
-              "android"
-            ]
+        "hardPercent": {
+          "default": 100,
+          "title": "Fase del muro (%)",
+          "description": "Parte del parque que recibe el MURO (modo hard). Siempre subconjunto del aviso: mismo eje, misma posicion.",
+          "x-ui": {
+            "widget": "percent"
           },
-          "description": "Plataformas donde aplica. Ausente = las dos. Lista vacia = ninguna (apagado por plataforma)."
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
         },
         "storeUrl": {
+          "title": "URLs de tienda",
+          "description": "Solo https://, market:// o itms-apps://.",
+          "default": {},
           "type": "object",
-          "additionalProperties": false,
-          "description": "Override de la URL de ficha por plataforma. Solo se admiten https://, market:// e itms-apps://.",
           "properties": {
             "ios": {
-              "type": "string"
+              "default": null,
+              "title": "Ficha en App Store",
+              "description": "Vacio = se construye con el id de la app.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(https:\\/\\/|market:\\/\\/|itms-apps:\\/\\/)\\S+$",
+                  "x-ui": {
+                    "widget": "url"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "android": {
-              "type": "string"
+              "default": null,
+              "title": "Ficha en Play",
+              "description": "Vacio = se construye con el package id.",
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(https:\\/\\/|market:\\/\\/|itms-apps:\\/\\/)\\S+$",
+                  "x-ui": {
+                    "widget": "url"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
-          }
+          },
+          "additionalProperties": false
         },
         "checkStore": {
-          "type": "boolean",
-          "description": "¿Preguntar a la tienda (Play In-App Updates / App Store)? Ausente = true. Apagarlo deja decidir solo a latestVersion."
+          "default": true,
+          "title": "Consultar a la tienda",
+          "description": "Interruptor de emergencia. Apagado, no se pregunta a la tienda y manda solo esta config.",
+          "type": "boolean"
         },
         "inAppUpdate": {
-          "type": "boolean",
-          "description": "¿Permitir actualizar sin salir del juego (solo Android)? Ausente = true. Apagarlo fuerza a abrir la ficha de la tienda."
-        },
-        "rollout": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Despliegue por fases. Usa el MISMO sistema de cohortes que el resto del framework (hash FNV-1a sobre el anonymousId, src/core/cohort), el mismo con el que ads reparte su parque. Ausente = toda la gente.",
-          "properties": {
-            "percent": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100,
-              "description": "Porcentaje del parque que recibe el AVISO. Subirlo solo AÑADE gente: nadie que ya lo viera lo pierde."
-            },
-            "hardPercent": {
-              "type": "number",
-              "minimum": 0,
-              "maximum": 100,
-              "description": "Porcentaje que recibe el MURO (solo con mode=hard). Es siempre un subconjunto del aviso: comparten eje, asi que el 10% del muro cae dentro del 25% del aviso."
-            },
-            "salt": {
-              "type": "string",
-              "description": "Eje del sorteo. Cambiarlo REBARAJA a todo el mundo, asi que no se toca a mitad de un despliegue. El script lo pone a la version publicada: constante durante la release y distinto en la siguiente, para que el primer 10% no sea siempre la misma gente."
-            }
-          }
-        },
-        "appliesTo": {
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Que versiones INSTALADAS reciben la campaña. Eje de fases distinto del porcentaje: permite empezar por los mas atrasados, o excluir una version concreta. Ambos limites inclusivos; ausente = todas.",
-          "properties": {
-            "minVersion": {
-              "type": "string"
-            },
-            "maxVersion": {
-              "type": "string"
-            }
-          }
+          "default": true,
+          "title": "Actualizacion dentro de la app",
+          "description": "Interruptor de emergencia del flujo in-app de Play. Apagado, el boton abre la ficha.",
+          "type": "boolean"
         },
         "showPrompt": {
-          "type": "boolean",
-          "description": "Ademas del boton, ¿se planta un MODAL delante del jugador al entrar en la home? Ausente o false = solo el boton, que espera sin interrumpir. Solo se abre en releases soft (con mode=hard manda el muro) y solo si hay texto para el idioma del jugador o su reserva en ingles."
+          "default": false,
+          "title": "Abrir el modal",
+          "description": "Ademas del boton, un modal al entrar en la home (una vez por sesion, solo en soft). Interrumpe: apagado por defecto.",
+          "type": "boolean"
         },
         "messages": {
+          "title": "Textos por idioma",
+          "description": "Titulo y descripcion del aviso por idioma. Cadena de reserva: exacto → base → variante → en.",
+          "default": {},
           "type": "object",
-          "description": "El TEXTO del aviso, por idioma. Lo pinta el MODAL en una release recomendada y el MURO en una obligatoria: nunca coinciden, asi que se escribe una vez. La clave es el codigo de locale (es, en, pt-BR, zh-CN...); se normaliza a minusculas, asi que pt-BR y pt-br son el mismo idioma. Resolucion: exacta, idioma base, variante regional del base y por ultimo ingles; sin nada resoluble, el modal no se abre y el muro usa el texto que el propio juego trae traducido. El title es obligatorio (sin el la entrada se descarta entera); el body es opcional.",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
           "additionalProperties": {
             "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "title"
-            ],
             "properties": {
               "title": {
                 "type": "string",
-                "description": "Titulo del modal."
+                "minLength": 1,
+                "title": "Titulo",
+                "description": "Obligatorio: es lo unico que el jugador lee seguro."
               },
               "body": {
-                "type": "string",
-                "description": "Descripcion, OPCIONAL. Puede ser larga: el modal la scrollea sin tapar los botones. Los saltos de linea se respetan. Sin ella el bloque de texto ni se pinta."
+                "default": "",
+                "title": "Descripcion",
+                "description": "Opcional. Admite varios renglones y puntos de lista; se scrollea dentro de su caja.",
+                "x-ui": {
+                  "multiline": true
+                },
+                "type": "string"
               }
-            }
+            },
+            "required": [
+              "title"
+            ],
+            "title": "Texto del aviso",
+            "description": "Lo que pinta el modal (soft) o el muro (hard).",
+            "additionalProperties": false
           }
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "mp": {
+      "title": "Multijugador",
+      "description": "Flags del modo multijugador online de Snake: boton, filtro por dispositivo, muro de suscripcion y reintentos.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "showButton": {
+          "default": true,
+          "title": "Boton \"Multijugador\" visible",
+          "description": "Ademas hace falta que el P2P este disponible en la build. Apagado = oculto siempre.",
+          "type": "boolean"
+        },
+        "deviceHostFilter": {
+          "default": false,
+          "title": "Filtro de partidas por dispositivo",
+          "description": "movil↔movil, escritorio↔escritorio; la tablet hace de puente.",
+          "type": "boolean"
+        },
+        "paywall": {
+          "title": "Muro de suscripcion",
+          "description": "El paywall del multijugador.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Muro de suscripcion",
+              "description": "Activa el muro del multijugador (suscripcion anual). Independiente del paywall del modo un jugador.",
+              "type": "boolean"
+            },
+            "triggerGames": {
+              "default": 1,
+              "title": "Partidas antes del muro",
+              "description": "El muro salta al crear o unirse cuando el contador durable de partidas jugadas alcanza este numero.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99999
+            }
+          },
+          "additionalProperties": false
+        },
+        "retry": {
+          "title": "Reintentos del espectador",
+          "description": "El boton \"Nuevo intento\" y su candado.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "\"Nuevo intento\" activo",
+              "description": "Kill-switch del boton de reaparecer tras morir (nace encendido).",
+              "type": "boolean"
+            },
+            "maxAttempts": {
+              "default": 3,
+              "title": "Reintentos por partida",
+              "description": "0 = la feature queda apagada.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "paywall": {
+              "title": "Candado de \"Nuevo intento\"",
+              "description": "El tercer muro, con el mismo producto.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "title": "Candado del boton",
+                  "description": "Si el boton exige la suscripcion. Flag HERMANA del muro de suscripcion, no la misma.",
+                  "type": "boolean"
+                },
+                "platforms": {
+                  "title": "Por plataforma",
+                  "description": "Override del candado por tienda. Ausente = hereda el maestro.",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "ios": {
+                      "title": "iOS",
+                      "description": "Candado del boton en iOS. Ausente = hereda el maestro. El producto se da de alta en cada tienda por separado.",
+                      "type": "boolean"
+                    },
+                    "android": {
+                      "title": "Android",
+                      "description": "Candado del boton en Android. Ausente = hereda el maestro. El producto se da de alta en cada tienda por separado.",
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
     }
-  }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": false
 }

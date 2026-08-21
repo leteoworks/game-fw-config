@@ -49,10 +49,6 @@
       "label": "Destinos",
       "help": "Un bloque por cada destino al que se envian los eventos. Los ids que el juego reconoce son `posthog` y `gamefw` (el que alimenta los paneles de Grafana). ⚠️ Un id que no exista se ignora sin avisar, asi que ojo con los typos: `grafana` NO es un destino valido."
     },
-    "analytics.providers.batching": {
-      "label": "Agrupacion de envios",
-      "help": "Los eventos no se mandan de uno en uno sino por lotes. Estos valores deciden cada cuanto se vacia la cola y de que tamaño. Subir mucho el tamaño de lote retrasa la llegada de los datos; bajarlo mucho multiplica las peticiones desde el movil del jugador."
-    },
     "paywall": {
       "label": "Muro de pago",
       "help": "El muro que pide la compra del juego completo en un jugador. Solo actua en iOS y Android; en escritorio y navegador no se muestra nunca. ⚠️ Estado deseado hoy: APAGADO. Encenderlo cobra a jugadores que hoy juegan gratis."
@@ -60,10 +56,6 @@
     "paywall.triggers": {
       "label": "Momentos en que aparece",
       "help": "Puntos concretos de la progresion en los que se interpone el muro. Cada disparador es un episodio y, opcionalmente, la escena antes de la cual saltar."
-    },
-    "paywall.versionRange": {
-      "label": "Versiones afectadas",
-      "help": "Acota el muro a un rango de versiones de la app. Sirve para estrenar un cambio de monetizacion solo en la version nueva sin tocar a quien no ha actualizado."
     },
     "paywall.overrides": {
       "label": "Excepciones por plataforma",
@@ -80,10 +72,6 @@
     "freewall.triggers": {
       "label": "Momentos en que aparece",
       "help": "Puntos de la progresion en los que se enseña el aviso."
-    },
-    "freewall.versionRange": {
-      "label": "Versiones afectadas",
-      "help": "Acota el aviso a un rango de versiones de la app."
     },
     "freewall.overrides": {
       "label": "Excepciones por plataforma",
@@ -133,74 +121,6 @@
       "label": "Crecimiento de memoria",
       "help": "Megabytes que crece la memoria durante la sesion. Un crecimiento sostenido es una fuga: acaba en cierre de la app en moviles con poca memoria."
     },
-    "paywall.overrides.ios": {
-      "label": "iOS",
-      "help": "Configuracion del muro de pago solo para iOS. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.android": {
-      "label": "Android",
-      "help": "Configuracion del muro de pago solo para Android. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.browser": {
-      "label": "navegador",
-      "help": "Configuracion del muro de pago solo para navegador. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.electron-windows": {
-      "label": "Windows (escritorio)",
-      "help": "Configuracion del muro de pago solo para Windows (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.electron-linux": {
-      "label": "Linux (escritorio)",
-      "help": "Configuracion del muro de pago solo para Linux (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.electron-mac-steam": {
-      "label": "macOS via Steam",
-      "help": "Configuracion del muro de pago solo para macOS via Steam. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.electron-mac-appstore": {
-      "label": "macOS via App Store",
-      "help": "Configuracion del muro de pago solo para macOS via App Store. Lo que no se declare aqui se HEREDA de la configuracion general: un bloque vacio significa «como el general», no «apagado»."
-    },
-    "paywall.overrides.*.versionRange": {
-      "label": "Versiones afectadas",
-      "help": "Rango de versiones de la app al que aplica en esta plataforma. Sin declarar, hereda el rango general."
-    },
-    "freewall.overrides.ios": {
-      "label": "iOS",
-      "help": "Configuracion del aviso de compra solo para iOS. Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.android": {
-      "label": "Android",
-      "help": "Configuracion del aviso de compra solo para Android. Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.browser": {
-      "label": "navegador",
-      "help": "Configuracion del aviso de compra solo para navegador. Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.electron-windows": {
-      "label": "Windows (escritorio)",
-      "help": "Configuracion del aviso de compra solo para Windows (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.electron-linux": {
-      "label": "Linux (escritorio)",
-      "help": "Configuracion del aviso de compra solo para Linux (escritorio). Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.electron-mac-steam": {
-      "label": "macOS via Steam",
-      "help": "Configuracion del aviso de compra solo para macOS via Steam. Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.electron-mac-appstore": {
-      "label": "macOS via App Store",
-      "help": "Configuracion del aviso de compra solo para macOS via App Store. Lo que no se declare aqui se HEREDA de la configuracion general."
-    },
-    "freewall.overrides.*.versionRange": {
-      "label": "Versiones afectadas",
-      "help": "Rango de versiones de la app al que aplica en esta plataforma. Sin declarar, hereda el rango general."
-    },
-    "freewall.overrides.*.frequency": {
-      "label": "Con que frecuencia",
-      "help": "Cada cuanto se repite el aviso en esta plataforma. Sin declarar, hereda la frecuencia general."
-    },
     "appUpdate": {
       "label": "Aviso de version nueva",
       "help": "El boton \"Actualizar\" que aparece EL PRIMERO en la home, encima de Play, cuando hay una version mas nueva en la tienda. Solo existe en movil (iOS/Android). Toda la seccion es opcional: sin ella, ningun jugador ve nada. Publicar aqui llega a las apps ya instaladas en segundos, sin sacar una release nueva."
@@ -212,10 +132,6 @@
     "appUpdate.rollout": {
       "label": "Despliegue por fases",
       "help": "A cuanta gente le llega el aviso. Sirve para no impactar a todo el parque de golpe: se empieza por una parte pequeña, se mira que no pase nada raro y se va ampliando. Ampliar solo AÑADE gente — a nadie que ya lo viera se le quita."
-    },
-    "appUpdate.appliesTo": {
-      "label": "A que versiones instaladas",
-      "help": "Acota la campaña por la version que tiene el jugador. Es otra forma de ir por fases, y a menudo mas util que el porcentaje: permite empezar por los mas atrasados, que son los que mas lo necesitan, o dejar fuera una version concreta que tenga un problema con el propio aviso."
     },
     "appUpdate.messages": {
       "label": "Texto del aviso",
@@ -230,26 +146,6 @@
     "ads.banners.id": {
       "label": "Identificador",
       "help": "Nombre estable de la campaña. NO es decorativo: con el se calcula a que jugadores les toca (la cohorte), se recuerda que ya la vieron y se agrupan sus metricas. ⚠️ Cambiarlo equivale a crear una campaña nueva: se reinicia el limite de repeticion y quien la habia cerrado la volvera a ver."
-    },
-    "ads.banners.enabled": {
-      "label": "Campaña activa",
-      "help": "Interruptor de esta campaña. Es la forma de apagar un anuncio al instante sin borrar su configuracion, por ejemplo si la creatividad tiene un error o el anunciante lo pide."
-    },
-    "ads.banners.platforms": {
-      "label": "Plataformas",
-      "help": "Donde se muestra esta campaña. Dejarlo vacio significa TODAS. Sirve para campañas que solo tienen sentido en movil, o para no enseñar publicidad en la version de escritorio de pago."
-    },
-    "ads.banners.minVersion": {
-      "label": "Version minima de la app",
-      "help": "Solo se enseña a partir de esta version (incluida). Util cuando la creatividad usa algo que las versiones antiguas no saben pintar. Sin limite = se muestra en todas."
-    },
-    "ads.banners.maxVersion": {
-      "label": "Version maxima de la app",
-      "help": "Deja de enseñarse por encima de esta version (incluida). Sirve para retirar una campaña de las versiones nuevas sin tocar a las antiguas."
-    },
-    "ads.banners.cohortPercent": {
-      "label": "Porcentaje del parque",
-      "help": "A que fraccion de jugadores le toca esta campaña. El reparto es estable por jugador: a quien le toca, le toca siempre, asi que no vera el anuncio un dia si y otro no. ⚠️ Recuerda que gana la PRIMERA campaña aplicable: una campaña al 100 % arriba de la lista tapa a todas las de abajo."
     },
     "ads.banners.placement": {
       "label": "Emplazamiento",
@@ -374,33 +270,9 @@
       "label": "Eventos bloqueados",
       "help": "Lista negra que se aplica DESPUES de la blanca. Sirve para silenciar un evento concreto que se ha vuelto ruidoso o esta disparandose de mas, sin tener que rehacer la lista de permitidos."
     },
-    "analytics.providers.enabled": {
-      "label": "Destino activo",
-      "help": "Apaga o enciende este destino en caliente, sin publicar una release. Es la palanca para un incidente: un pico de cuota, un endpoint caido o un dashboard lleno de ruido. Apagar un destino NO cambia que eventos emite el juego, solo adonde van."
-    },
-    "analytics.providers.batching.flushIntervalMs": {
-      "label": "Cada cuanto se envia",
-      "help": "Cada cuanto se vacia la cola de eventos. Mas corto = los datos llegan antes pero se hacen mas peticiones desde el movil; mas largo = menos bateria y menos datos, con mas retraso."
-    },
-    "analytics.providers.batching.maxBatchSize": {
-      "label": "Eventos por envio",
-      "help": "Cuantos eventos caben en un envio. ⚠️ Un valor muy bajo genera MUCHISIMOS objetos pequeños en el almacen y puede llegar a atascar el proceso nocturno que consolida los datos, con el efecto visible de paneles vacios aunque los datos crudos esten ahi."
-    },
-    "analytics.providers.batching.flushOnPageHide": {
-      "label": "Enviar al cerrar",
-      "help": "Intenta mandar lo que quede en la cola cuando el jugador cierra la app o la manda a segundo plano. Sin esto se pierden los eventos del final de la sesion, que suelen ser los mas interesantes (por que se fue)."
-    },
-    "paywall.enabled": {
-      "label": "Muro activo",
-      "help": "Interruptor general del muro de pago. ⚠️ Hoy debe estar APAGADO: encenderlo empieza a pedir la compra a jugadores que hasta ahora jugaban gratis. Solo actua en iOS y Android."
-    },
     "paywall.freeEpisodeLimit": {
       "label": "Episodios gratis",
       "help": "Cuantos episodios se pueden jugar sin pagar. El muro aparece al intentar pasar de ahi. Es la palanca principal para ajustar cuanto juego se regala antes de pedir la compra."
-    },
-    "paywall.cohortPercent": {
-      "label": "Porcentaje del parque",
-      "help": "A que fraccion de jugadores se le aplica el muro. Sirve para probar la monetizacion en una parte pequeña antes de extenderla. El reparto es estable: a quien le toca, le toca siempre."
     },
     "paywall.triggers.episodeIndex": {
       "label": "Episodio",
@@ -410,25 +282,9 @@
       "label": "Antes de la escena",
       "help": "Escena concreta del episodio antes de la cual aparece el muro. Permite afinar el momento dentro del episodio en vez de cortar al entrar."
     },
-    "paywall.versionRange.min": {
-      "label": "Version minima",
-      "help": "El muro solo aplica desde esta version de la app. Sin valor = sin limite inferior."
-    },
-    "paywall.versionRange.max": {
-      "label": "Version maxima",
-      "help": "El muro deja de aplicar por encima de esta version. Sin valor = sin limite superior."
-    },
     "paywall.overrides.*.enabled": {
       "label": "Muro activo en esta plataforma",
       "help": "Pisa el interruptor general SOLO en esta plataforma. Es como se cobra en una tienda mientras la otra sigue en revision."
-    },
-    "paywall.overrides.*.freeEpisodeLimit": {
-      "label": "Episodios gratis en esta plataforma",
-      "help": "Cuantos episodios se regalan aqui. Sin declarar, se hereda el valor general."
-    },
-    "paywall.overrides.*.cohortPercent": {
-      "label": "Porcentaje en esta plataforma",
-      "help": "Fraccion de jugadores de esta plataforma a los que aplica. Sin declarar, hereda el general."
     },
     "paywall.overrides.*.triggers": {
       "label": "Momentos en esta plataforma",
@@ -441,22 +297,6 @@
     "paywall.overrides.*.triggers.beforeSceneIndex": {
       "label": "Antes de la escena",
       "help": "Escena antes de la cual aparece el muro en esta plataforma."
-    },
-    "paywall.overrides.*.versionRange.min": {
-      "label": "Version minima",
-      "help": "Limite inferior de version para esta plataforma."
-    },
-    "paywall.overrides.*.versionRange.max": {
-      "label": "Version maxima",
-      "help": "Limite superior de version para esta plataforma."
-    },
-    "freewall.enabled": {
-      "label": "Aviso activo",
-      "help": "Interruptor general del aviso de compra. Hoy esta ENCENDIDO en todos los entornos: recuerda la compra sin bloquear el juego."
-    },
-    "freewall.cohortPercent": {
-      "label": "Porcentaje del parque",
-      "help": "A que fraccion de jugadores se le enseña el aviso."
     },
     "freewall.frequency.mode": {
       "label": "Modo de repeticion",
@@ -474,29 +314,9 @@
       "label": "Antes de la escena",
       "help": "Escena antes de la cual se enseña el aviso."
     },
-    "freewall.versionRange.min": {
-      "label": "Version minima",
-      "help": "El aviso solo aplica desde esta version. Sin valor = sin limite."
-    },
-    "freewall.versionRange.max": {
-      "label": "Version maxima",
-      "help": "El aviso deja de aplicar por encima de esta version. Sin valor = sin limite."
-    },
     "freewall.overrides.*.enabled": {
       "label": "Aviso activo en esta plataforma",
       "help": "Pisa el interruptor general solo aqui."
-    },
-    "freewall.overrides.*.cohortPercent": {
-      "label": "Porcentaje en esta plataforma",
-      "help": "Fraccion de jugadores de esta plataforma. Sin declarar, hereda el general."
-    },
-    "freewall.overrides.*.frequency.mode": {
-      "label": "Modo de repeticion",
-      "help": "Modo propio de esta plataforma."
-    },
-    "freewall.overrides.*.frequency.cooldownDays": {
-      "label": "Dias de descanso",
-      "help": "Descanso propio de esta plataforma."
     },
     "freewall.overrides.*.triggers": {
       "label": "Momentos en esta plataforma",
@@ -509,14 +329,6 @@
     "freewall.overrides.*.triggers.beforeSceneIndex": {
       "label": "Antes de la escena",
       "help": "Escena antes de la cual aparece el aviso en esta plataforma."
-    },
-    "freewall.overrides.*.versionRange.min": {
-      "label": "Version minima",
-      "help": "Limite inferior de version para esta plataforma."
-    },
-    "freewall.overrides.*.versionRange.max": {
-      "label": "Version maxima",
-      "help": "Limite superior de version para esta plataforma."
     },
     "mp.showButton": {
       "label": "Boton de multijugador en la home",
@@ -553,14 +365,6 @@
     "mp.retry.paywall.platforms.android": {
       "label": "Candado en Android",
       "help": "Pone el candado en Android. Mismo aviso: el producto tiene que existir ya en Google Play."
-    },
-    "profiling.enabled": {
-      "label": "Medicion activa",
-      "help": "Enciende la medicion de rendimiento en produccion. Apagarlo detiene toda la recogida al momento, que es lo que se hace si la propia medicion esta molestando."
-    },
-    "profiling.cohortPercent": {
-      "label": "Porcentaje del parque",
-      "help": "A que fraccion de jugadores se le mide. Medir cuesta rendimiento a quien lo sufre, asi que no se mide a todo el mundo: con una parte pequeña ya salen las tendencias."
     },
     "profiling.signals.fps": {
       "label": "Fotogramas por segundo",
@@ -646,18 +450,6 @@
       "label": "Semilla del reparto",
       "help": "Nombre del sorteo. Cambiarlo REBARAJA a todo el parque: quien veia la campaña A puede pasar a la B. Uselo cuando una campaña ya se ha quemado con su publico y quiera empezar el reparto de cero; si no, dejelo como esta."
     },
-    "ads.banners.audience": {
-      "label": "Tramo de parque",
-      "help": "A que porcion de jugadores va dirigida, como un tramo del 0 al 100. Tramos que no se pisan = compartimentos estancos: cada jugador ve siempre la misma campaña y nunca las otras (p.ej. 0-33 / 33-66 / 66-100). Tramos que se pisan = publico compartido, y entonces decide la politica de reparto. Dejarlo vacio = toda la gente."
-    },
-    "ads.banners.audience.fromPercent": {
-      "label": "Desde (%)",
-      "help": "Inicio del tramo, incluido."
-    },
-    "ads.banners.audience.toPercent": {
-      "label": "Hasta (%)",
-      "help": "Fin del tramo, EXCLUIDO: 33 aqui y 33 en el «desde» de la siguiente encajan sin solaparse ni dejar hueco."
-    },
     "ads.banners.weight": {
       "label": "Peso en el reparto",
       "help": "Cuanta parte se lleva frente a las otras campañas que compiten por el mismo jugador: con pesos 3 y 1, la primera se lleva tres de cada cuatro. Solo cuenta si el reparto es por sorteo o fijo por jugador. 0 = no se elige nunca."
@@ -686,10 +478,6 @@
       "label": "Texto de «silenciar»",
       "help": "Texto por idioma del boton que silencia. Vacio = el del juego."
     },
-    "appUpdate.enabled": {
-      "label": "Aviso activo",
-      "help": "Enciende el boton. Apagarlo lo retira de todas las apps al momento, que es lo que se hace si una version publicada resulta estar rota."
-    },
     "appUpdate.mode": {
       "label": "Tipo de release",
       "help": "«Recomendada» saca el boton y deja decidir al jugador. «Obligatoria» ademas TAPA EL JUEGO a quien tenga una version por debajo de la minima soportada: no puede jugar hasta que actualice. Usa «obligatoria» solo si la version vieja esta rota de verdad, y solo cuando la nueva ya este viva en la tienda. Se retira apagando el aviso, y llega en segundos."
@@ -701,10 +489,6 @@
     "appUpdate.minSupportedVersion": {
       "label": "Version minima soportada",
       "help": "El suelo por debajo del cual el juego queda TAPADO por el muro. Solo se mira si el tipo de release es «obligatoria»; con «recomendada» se ignora. Dejarlo vacio ahi significa que cualquier version anterior queda bloqueada."
-    },
-    "appUpdate.platforms": {
-      "label": "Plataformas",
-      "help": "Donde aplica el aviso. Vacio significa NINGUNA, no todas: sirve para apagarlo en una plataforma sin apagar la otra, por ejemplo cuando la version ya salio en Android y en iOS sigue en revision."
     },
     "appUpdate.storeUrl.ios": {
       "label": "Ficha de iOS",
@@ -725,26 +509,6 @@
     "ads.banners.preRollVideo.startTimeoutMs": {
       "label": "Espera maxima a que arranque el video",
       "help": "Cuanto se espera a que el video empiece a reproducirse antes de darlo por perdido y pasar directo al anuncio. Existe porque un video que no arranca deja al jugador mirando una pantalla en negro sin saber que hacer."
-    },
-    "appUpdate.rollout.percent": {
-      "label": "Porcentaje que ve el aviso",
-      "help": "Que fraccion del parque recibe el boton. Cada jugador ocupa un punto fijo del sorteo, asi que ampliar el porcentaje nunca se lo quita a quien ya lo tenia, y nadie entra y sale entre partidas."
-    },
-    "appUpdate.rollout.hardPercent": {
-      "label": "Porcentaje que ve el muro",
-      "help": "Que fraccion recibe la actualizacion OBLIGATORIA (solo si el tipo de release es «obligatoria»). Siempre cae dentro de los que ven el aviso: no se puede amurallar a alguien que no vio el boton. Lo normal es subirlo despues del aviso y mas despacio."
-    },
-    "appUpdate.rollout.salt": {
-      "label": "Eje del sorteo",
-      "help": "Decide QUIEN cae en cada porcentaje. ⚠️ Cambiarlo rebaraja a todo el mundo: gente que ya veia el aviso puede dejar de verlo. No se toca a mitad de un despliegue; se cambia entre una release y la siguiente, para que el primer 10 % no sea siempre la misma gente."
-    },
-    "appUpdate.appliesTo.minVersion": {
-      "label": "Desde la version",
-      "help": "Solo recibe la campaña quien tenga esta version o una posterior. Vacio = sin limite por abajo."
-    },
-    "appUpdate.appliesTo.maxVersion": {
-      "label": "Hasta la version",
-      "help": "Solo recibe la campaña quien tenga esta version o una anterior. Vacio = sin limite por arriba. Es el limite util para «avisar primero a los mas atrasados»."
     },
     "appUpdate.showPrompt": {
       "label": "Plantar el modal",
