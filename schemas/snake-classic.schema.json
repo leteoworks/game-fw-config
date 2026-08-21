@@ -1242,9 +1242,6 @@
                 "description": "Donde aparece el aviso gratuito. Lista vacia = nunca (equivale a apagarlo, pero mas declarativo)."
               },
               "frequency": {
-                "title": "Frecuencia",
-                "description": "Cada cuanto se puede volver a enseñar.",
-                "default": {},
                 "type": "object",
                 "properties": {
                   "mode": {
@@ -1267,6 +1264,8 @@
                     "minimum": 0
                   }
                 },
+                "title": "Frecuencia",
+                "description": "Cada cuanto se puede volver a enseñar.",
                 "additionalProperties": false
               }
             },
