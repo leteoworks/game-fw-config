@@ -1430,7 +1430,7 @@
               "type": "object",
               "properties": {
                 "percent": {
-                  "default": 100,
+                  "default": 0,
                   "title": "Porcentaje del parque",
                   "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
                   "x-ui": {
