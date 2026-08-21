@@ -208,6 +208,14 @@
     "appUpdate.storeUrl": {
       "label": "Ficha de la tienda",
       "help": "A donde se lleva al jugador cuando no se puede actualizar sin salir del juego. Vacio = se construye sola con el identificador de la app. Solo hace falta tocarlo para mandar a una ficha distinta o a una pagina propia."
+    },
+    "appUpdate.rollout": {
+      "label": "Despliegue por fases",
+      "help": "A cuanta gente le llega el aviso. Sirve para no impactar a todo el parque de golpe: se empieza por una parte pequeña, se mira que no pase nada raro y se va ampliando. Ampliar solo AÑADE gente — a nadie que ya lo viera se le quita."
+    },
+    "appUpdate.appliesTo": {
+      "label": "A que versiones instaladas",
+      "help": "Acota la campaña por la version que tiene el jugador. Es otra forma de ir por fases, y a menudo mas util que el porcentaje: permite empezar por los mas atrasados, que son los que mas lo necesitan, o dejar fuera una version concreta que tenga un problema con el propio aviso."
     }
   },
   "fields": {
@@ -713,6 +721,26 @@
     "ads.banners.preRollVideo.startTimeoutMs": {
       "label": "Espera maxima a que arranque el video",
       "help": "Cuanto se espera a que el video empiece a reproducirse antes de darlo por perdido y pasar directo al anuncio. Existe porque un video que no arranca deja al jugador mirando una pantalla en negro sin saber que hacer."
+    },
+    "appUpdate.rollout.percent": {
+      "label": "Porcentaje que ve el aviso",
+      "help": "Que fraccion del parque recibe el boton. Cada jugador ocupa un punto fijo del sorteo, asi que ampliar el porcentaje nunca se lo quita a quien ya lo tenia, y nadie entra y sale entre partidas."
+    },
+    "appUpdate.rollout.hardPercent": {
+      "label": "Porcentaje que ve el muro",
+      "help": "Que fraccion recibe la actualizacion OBLIGATORIA (solo si el tipo de release es «obligatoria»). Siempre cae dentro de los que ven el aviso: no se puede amurallar a alguien que no vio el boton. Lo normal es subirlo despues del aviso y mas despacio."
+    },
+    "appUpdate.rollout.salt": {
+      "label": "Eje del sorteo",
+      "help": "Decide QUIEN cae en cada porcentaje. ⚠️ Cambiarlo rebaraja a todo el mundo: gente que ya veia el aviso puede dejar de verlo. No se toca a mitad de un despliegue; se cambia entre una release y la siguiente, para que el primer 10 % no sea siempre la misma gente."
+    },
+    "appUpdate.appliesTo.minVersion": {
+      "label": "Desde la version",
+      "help": "Solo recibe la campaña quien tenga esta version o una posterior. Vacio = sin limite por abajo."
+    },
+    "appUpdate.appliesTo.maxVersion": {
+      "label": "Hasta la version",
+      "help": "Solo recibe la campaña quien tenga esta version o una anterior. Vacio = sin limite por arriba. Es el limite util para «avisar primero a los mas atrasados»."
     }
   }
 }

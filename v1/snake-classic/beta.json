@@ -234,6 +234,11 @@
       "android"
     ],
     "checkStore": true,
-    "inAppUpdate": true
+    "inAppUpdate": true,
+    "rollout": {
+      "percent": 100,
+      "hardPercent": 100,
+      "salt": ""
+    }
   }
 }

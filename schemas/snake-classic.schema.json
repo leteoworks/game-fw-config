@@ -1875,6 +1875,42 @@
         "inAppUpdate": {
           "type": "boolean",
           "description": "¿Permitir actualizar sin salir del juego (solo Android)? Ausente = true. Apagarlo fuerza a abrir la ficha de la tienda."
+        },
+        "rollout": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Despliegue por fases. Usa el MISMO sistema de cohortes que el resto del framework (hash FNV-1a sobre el anonymousId, src/core/cohort), el mismo con el que ads reparte su parque. Ausente = toda la gente.",
+          "properties": {
+            "percent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Porcentaje del parque que recibe el AVISO. Subirlo solo AÑADE gente: nadie que ya lo viera lo pierde."
+            },
+            "hardPercent": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Porcentaje que recibe el MURO (solo con mode=hard). Es siempre un subconjunto del aviso: comparten eje, asi que el 10% del muro cae dentro del 25% del aviso."
+            },
+            "salt": {
+              "type": "string",
+              "description": "Eje del sorteo. Cambiarlo REBARAJA a todo el mundo, asi que no se toca a mitad de un despliegue. El script lo pone a la version publicada: constante durante la release y distinto en la siguiente, para que el primer 10% no sea siempre la misma gente."
+            }
+          }
+        },
+        "appliesTo": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Que versiones INSTALADAS reciben la campaña. Eje de fases distinto del porcentaje: permite empezar por los mas atrasados, o excluir una version concreta. Ambos limites inclusivos; ausente = todas.",
+          "properties": {
+            "minVersion": {
+              "type": "string"
+            },
+            "maxVersion": {
+              "type": "string"
+            }
+          }
         }
       }
     }
