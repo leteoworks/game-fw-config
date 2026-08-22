@@ -238,6 +238,7 @@
     "rollout": {
       "enabled": true,
       "variants": [
+        "ios",
         "android"
       ],
       "cohort": {
@@ -246,7 +247,7 @@
       },
       "meta": {
         "name": "Aviso de version 1.0.135 (hard)",
-        "updatedAt": "2026-08-22T11:43:41.300Z"
+        "updatedAt": "2026-08-22T11:47:30.131Z"
       }
     },
     "mode": "hard",

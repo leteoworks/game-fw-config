@@ -236,21 +236,27 @@
   },
   "appUpdate": {
     "rollout": {
-      "enabled": false,
+      "enabled": true,
       "variants": [
         "ios",
         "android"
       ],
       "cohort": {
         "percent": 100,
-        "salt": ""
+        "salt": "1.0.135"
+      },
+      "meta": {
+        "name": "Aviso de version 1.0.135 (hard)",
+        "updatedAt": "2026-08-22T11:47:30.128Z"
       }
     },
-    "mode": "soft",
+    "mode": "hard",
+    "latestVersion": "1.0.135",
+    "minSupportedVersion": "1.0.135",
+    "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": false,
-    "messages": {},
-    "hardPercent": 100
+    "messages": {}
   }
 }
