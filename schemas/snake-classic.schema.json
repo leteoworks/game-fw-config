@@ -428,6 +428,7 @@
               "default": [],
               "title": "Idiomas",
               "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
               "maxItems": 32,
               "type": "array",
               "items": {
@@ -440,6 +441,7 @@
               "default": [],
               "title": "Paises",
               "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
               "maxItems": 64,
               "type": "array",
               "items": {
@@ -512,6 +514,7 @@
               "title": "Segmentos",
               "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
               "maxItems": 16,
               "type": "array",
               "items": {
@@ -963,6 +966,7 @@
                     "default": [],
                     "title": "Idiomas",
                     "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "x-invalid-item": "zxx",
                     "maxItems": 32,
                     "type": "array",
                     "items": {
@@ -975,6 +979,7 @@
                     "default": [],
                     "title": "Paises",
                     "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "x-invalid-item": "ZZ",
                     "maxItems": 64,
                     "type": "array",
                     "items": {
@@ -1047,6 +1052,7 @@
                     "title": "Segmentos",
                     "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
+                    "x-invalid-item": "invalidSegment",
                     "maxItems": 16,
                     "type": "array",
                     "items": {
@@ -1494,6 +1500,7 @@
               "default": [],
               "title": "Idiomas",
               "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
               "maxItems": 32,
               "type": "array",
               "items": {
@@ -1506,6 +1513,7 @@
               "default": [],
               "title": "Paises",
               "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
               "maxItems": 64,
               "type": "array",
               "items": {
@@ -1578,6 +1586,7 @@
               "title": "Segmentos",
               "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
               "maxItems": 16,
               "type": "array",
               "items": {
@@ -2049,6 +2058,7 @@
                     "default": [],
                     "title": "Idiomas",
                     "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "x-invalid-item": "zxx",
                     "maxItems": 32,
                     "type": "array",
                     "items": {
@@ -2061,6 +2071,7 @@
                     "default": [],
                     "title": "Paises",
                     "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "x-invalid-item": "ZZ",
                     "maxItems": 64,
                     "type": "array",
                     "items": {
@@ -2133,6 +2144,7 @@
                     "title": "Segmentos",
                     "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
+                    "x-invalid-item": "invalidSegment",
                     "maxItems": 16,
                     "type": "array",
                     "items": {
@@ -2626,6 +2638,7 @@
               "default": [],
               "title": "Idiomas",
               "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
               "maxItems": 32,
               "type": "array",
               "items": {
@@ -2638,6 +2651,7 @@
               "default": [],
               "title": "Paises",
               "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
               "maxItems": 64,
               "type": "array",
               "items": {
@@ -2710,6 +2724,7 @@
               "title": "Segmentos",
               "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
               "maxItems": 16,
               "type": "array",
               "items": {
@@ -3313,6 +3328,7 @@
                     "default": [],
                     "title": "Idiomas",
                     "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "x-invalid-item": "zxx",
                     "maxItems": 32,
                     "type": "array",
                     "items": {
@@ -3325,6 +3341,7 @@
                     "default": [],
                     "title": "Paises",
                     "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "x-invalid-item": "ZZ",
                     "maxItems": 64,
                     "type": "array",
                     "items": {
@@ -3397,6 +3414,7 @@
                     "title": "Segmentos",
                     "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
+                    "x-invalid-item": "invalidSegment",
                     "maxItems": 16,
                     "type": "array",
                     "items": {
@@ -4347,6 +4365,7 @@
               "default": [],
               "title": "Idiomas",
               "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
               "maxItems": 32,
               "type": "array",
               "items": {
@@ -4359,6 +4378,7 @@
               "default": [],
               "title": "Paises",
               "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
               "maxItems": 64,
               "type": "array",
               "items": {
@@ -4431,6 +4451,7 @@
               "title": "Segmentos",
               "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
               "maxItems": 16,
               "type": "array",
               "items": {
