@@ -23,9 +23,13 @@ import {
   blankItem,
   buildFormModel,
   buildItemSubtree,
+  compilePattern,
   deletePath,
   humanizeKey,
+  invalidByPattern,
+  matchesPattern,
   normalizeType,
+  patternHint,
   readPath,
   resolveWidget,
   WIDGETS,
@@ -203,12 +207,19 @@ test('los segmentos llegan al modelo con su titulo y explicacion', () => {
   const rollout = tarjeta.children.find((c) => c.key === 'rollout');
   const segments = rollout.children.find((c) => c.key === 'segments');
   assert.equal(segments.widget, 'string-list');
-  assert.deepEqual(segments.itemsSchema.enum, ['newPlayers', 'veterans', 'mpPlayers']);
+  // El juego puede estrenar segmentos (el schema se regenera): se fija lo
+  // que importa —que los conocidos esten y que enum y descriptores digan
+  // lo mismo—, no cuantos hay.
+  const nombres = segments.itemsSchema.enum;
+  assert.ok(nombres.includes('newPlayers') && nombres.includes('payers'));
   assert.equal(segments.rolloutRole, 'segments');
-  assert.equal(segments.segments.length, 3);
+  assert.deepEqual(
+    segments.segments.map((s) => s.name).sort(),
+    [...nombres].sort(),
+    'cada segmento del enum tiene su descriptor, y solo esos',
+  );
   for (const s of segments.segments) {
     assert.ok(s.name && s.title && s.description, `segmento incompleto: ${s.name}`);
-    assert.ok(segments.itemsSchema.enum.includes(s.name), `${s.name} no esta en el enum`);
   }
   // Un campo corriente no lleva nada de esto.
   const id = tarjeta.children.find((c) => c.key === 'id');
@@ -457,4 +468,49 @@ test('ningun campo del schema real cae en «unsupported»', () => {
   };
   modelo.sections.forEach(recorrer);
   assert.deepEqual(huerfanos, []);
+});
+
+// ─── Patrones de los elementos de una lista ───────────────────────────
+
+test('patternHint: los patrones del schema se explican en cristiano', () => {
+  assert.match(patternHint('^[A-Z]{2}$'), /MAYÚSCULAS/);
+  assert.match(patternHint('^[a-z]{2,3}(-[a-z0-9]{2,8})*$'), /minúsculas/);
+  assert.match(patternHint('^[a-z][a-zA-Z0-9]*$'), /camelCase/);
+  // Uno desconocido sale tal cual: honesto, no inventado.
+  assert.equal(patternHint('^x+$'), 'debe cumplir el patrón ^x+$');
+  assert.equal(patternHint(null), null);
+  assert.equal(patternHint(''), null);
+  assert.equal(patternHint(undefined), null);
+});
+
+test('matchesPattern / invalidByPattern: como el validador; sin patron no juzgan', () => {
+  assert.equal(matchesPattern('ES', '^[A-Z]{2}$'), true);
+  assert.equal(matchesPattern('es', '^[A-Z]{2}$'), false);
+  assert.equal(matchesPattern('ESP', '^[A-Z]{2}$'), false);
+  assert.equal(matchesPattern(7, '^[A-Z]{2}$'), false);
+  assert.equal(matchesPattern('lo que sea', null), true);
+  assert.equal(matchesPattern('lo que sea', undefined), true);
+  // Un patron ilegible no marca nada: marcar TODO en rojo por un error del
+  // schema seria peor que callar.
+  assert.equal(compilePattern('(['), null);
+  assert.equal(matchesPattern('x', '(['), true);
+  assert.deepEqual(invalidByPattern(['ES', 'es', 'MEX'], '^[A-Z]{2}$'), ['es', 'MEX']);
+  assert.deepEqual(invalidByPattern(['a', 'b'], null), []);
+  assert.deepEqual(invalidByPattern(null, '^[A-Z]{2}$'), []);
+});
+
+test('idiomas y paises del sobre real: lista de texto libre con patron y pista', () => {
+  // Es el caso para el que existe la pista: no hay enum (no se puede
+  // ofrecer casillas con 250 paises), asi que el formato se dice debajo y
+  // lo que no lo cumple se marca antes de que el validador lo rechace.
+  const modelo = buildFormModel(schemaReal, { data: {} });
+  const appUpdate = modelo.sections.find((s) => s.key === 'appUpdate');
+  const rollout = appUpdate.children.find((c) => c.key === 'rollout');
+  const countries = rollout.children.find((c) => c.key === 'countries');
+  const locales = rollout.children.find((c) => c.key === 'locales');
+  assert.equal(countries.widget, 'string-list');
+  assert.equal(countries.itemsSchema.enum, undefined);
+  assert.match(patternHint(countries.itemsSchema.pattern), /MAYÚSCULAS/);
+  assert.match(patternHint(locales.itemsSchema.pattern), /minúsculas/);
+  assert.deepEqual(invalidByPattern(['ES', 'mx'], countries.itemsSchema.pattern), ['mx']);
 });

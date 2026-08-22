@@ -16,6 +16,14 @@ import { rolloutVocabulary } from '../lib/campaign-status.mjs';
  * Las listas de variantes, tipos de dispositivo y segmentos se leen del
  * schema cargado (el generado desde el juego), no de un texto fijo: un
  * segmento nuevo en el juego aparece aqui solo.
+ *
+ * Desde ADR-041 cubre tambien idioma y pais (regla del prefijo, mayusculas
+ * y minusculas, y por que sin pais conocido no se entra), los experimentos
+ * A/B (asignacion, cuota esperada, SRM en Grafana, no cambiar la clave a
+ * mitad), las capas de exclusion mutua, la identidad del sorteo, el
+ * holdout global y el endpoint `/evaluate` del Worker. El orden de
+ * evaluacion y la tabla de motivos son los del evaluador del juego
+ * (`@modules/rollout/evaluate.ts`): si alli cambia algo, aqui tambien.
  */
 
 const props = defineProps({
@@ -64,6 +72,10 @@ const ENLACES = {
     href: `${DOCS}ADR-040-campaign-operations.md`,
     texto: 'ADR-040 — operación de campañas',
   },
+  adr041: {
+    href: `${DOCS}ADR-041-experiments-geo-evaluate.md`,
+    texto: 'ADR-041 — experimentos, idioma/país y evaluación en el Worker',
+  },
 };
 
 const profundizar = (...claves) => claves.map((k) => ENLACES[k]);
@@ -72,9 +84,11 @@ const INDICE = [
   { id: 'conceptos', titulo: 'Secciones, campañas y canales' },
   { id: 'botones', titulo: 'Los botones: Guardar, Publicar, Desplegar, Purgar' },
   { id: 'sobre', titulo: 'El sobre de despliegue, campo a campo' },
-  { id: 'orden', titulo: 'En qué orden se decide' },
+  { id: 'orden', titulo: 'En qué orden se decide (y los motivos de rechazo)' },
   { id: 'reparto', titulo: 'Varias campañas a la vez: reparto y tramos' },
-  { id: 'ops', titulo: 'La sección «Operación»: pánico y muestra' },
+  { id: 'experimentos', titulo: 'Experimentos A/B dentro de una campaña' },
+  { id: 'capas', titulo: 'Capas de exclusión mutua y punto del parque' },
+  { id: 'ops', titulo: 'La sección «Operación»: pánico, holdout y muestra' },
   { id: 'comprobar', titulo: 'Comprobar una campaña antes y después' },
   { id: 'higiene', titulo: 'Higiene: auditoría, diferencias entre canales' },
   { id: 'modo-seguro', titulo: 'El modo seguro del juego' },
@@ -252,7 +266,7 @@ const juego = computed(() => props.gameId || 'snake-classic');
       <p>
         Regla práctica: <strong>Guardar → revisar el panel de campañas y los
         avisos → Publicar</strong>. Y después, comprobar en un dispositivo
-        (sección 7).
+        (sección 9).
       </p>
       <p class="profundizar">
         <span>Profundizar:</span>
@@ -305,6 +319,47 @@ const juego = computed(() => props.gameId || 'snake-classic');
         versión que no se pueda leer <em>no restringe</em>: un rango mal
         escrito nunca deja a nadie fuera por accidente.
       </p>
+
+      <h3>Idiomas (<code>locales</code>)</h3>
+      <p>
+        Lista blanca de idiomas del jugador, en <strong>minúsculas</strong> y
+        con formato BCP-47: <code>es</code>, <code>es-es</code>,
+        <code>pt-br</code>. Vacía = todos. <strong>La regla del prefijo:</strong>
+        <code>es</code> vale para cualquier <code>es-*</code> (España, México,
+        Argentina…); <code>es-es</code> solo vale para <code>es-es</code>. Así
+        que para «todos los hispanohablantes» basta <code>es</code>, y para
+        «solo el español de España» hay que escribir <code>es-es</code>. El
+        idioma lo pone el dispositivo (el del sistema o el elegido en el
+        juego). El editor enseña el formato debajo de la lista y marca en
+        rojo lo que no lo cumple (mayúsculas, guiones bajos).
+      </p>
+
+      <h3>Países (<code>countries</code>)</h3>
+      <p>
+        Lista blanca de países en <strong>MAYÚSCULAS</strong> y dos letras
+        (ISO 3166-1 alfa-2): <code>ES</code>, <code>MX</code>,
+        <code>US</code>. Vacía = todos. El país <strong>no lo decide el
+        móvil</strong>: lo determina el servidor de configuración a partir de
+        la conexión, sin geolocalizar al jugador ni pedir permisos, y el juego
+        lo guarda junto con la copia de la configuración. Dos consecuencias:
+      </p>
+      <ul>
+        <li>
+          <strong>Mayúsculas, siempre.</strong> El país que llega del servidor
+          es <code>ES</code>, y se compara tal cual: un <code>es</code>
+          escrito a mano no casaría con nadie, nunca, sin ningún error. El
+          editor lo marca en rojo y el validador lo rechaza al guardar.
+        </li>
+        <li>
+          <strong>Sin país conocido, una lista no vacía no deja entrar.</strong>
+          En el primer arranque sin red (o si el servidor no pudo saberlo) el
+          juego aún no tiene país. Ante la duda, fuera: equivocarse hacia
+          «nadie» es más barato que enseñar a todo el mundo una campaña que
+          era solo para un país (precios, legislación, idioma de la
+          creatividad). Una VPN cambia el país que ve el servidor; es
+          esperable y no se corrige.
+        </li>
+      </ul>
 
       <h3>Calendario (<code>schedule</code>)</h3>
       <p>
@@ -384,6 +439,19 @@ const juego = computed(() => props.gameId || 'snake-classic');
           en cada paso. El porcentaje vigente es el del último escalón cuyo
           instante ya pasó; antes del primero manda el porcentaje de arriba.
         </li>
+        <li>
+          <strong>Capa</strong> (<code>layer</code>): sustituye el eje de la
+          sección por uno compartido con campañas de <em>otras</em>
+          secciones, para que sean excluyentes entre sí (el anuncio de
+          Navidad y el muro de Navidad). Vacío = eje propio de la sección.
+          Sección 7.
+        </li>
+        <li>
+          <strong>Punto del parque por</strong> (<code>bucketBy</code>):
+          <code>device</code>, la identidad anónima del dispositivo (el valor
+          por defecto), o <code>user</code>, la cuenta del jugador, la misma
+          en todos sus dispositivos. Sección 7.
+        </li>
       </ul>
       <p><strong>Ejemplo de rampa 1 → 10 → 50 → 100:</strong></p>
       <pre class="ayuda__ejemplo">cohort:
@@ -406,19 +474,29 @@ const juego = computed(() => props.gameId || 'snake-classic');
         sólido, y avisa cuando el alcance queda vacío.
       </p>
 
+      <h3>Experimento (<code>experiment</code>)</h3>
+      <p>
+        Un A/B dentro de la campaña: a quien <em>entra</em> se le asigna una
+        variante con nombre (<code>control</code>, <code>precioAlto</code>…),
+        estable y ponderada por peso, y la feature enseña una cosa u otra
+        según ese nombre. Vacío = sin experimento. Es independiente del
+        porcentaje y del tramo: esos deciden <em>quién entra</em>; el
+        experimento, <em>qué ve</em> cada uno de los que entran. Sección 6.
+      </p>
+
       <h3>Ficha (<code>meta</code>)</h3>
       <p>
         Nombre, responsable, ticket, notas y fecha del último cambio. El juego
         la ignora por completo; es para las personas: quien abra esto dentro
         de seis meses tiene que saber de quién es cada campaña y por qué
-        existe. La auditoría (sección 8) la usa para detectar campañas
+        existe. La auditoría (sección 10) la usa para detectar campañas
         huérfanas y caducadas. Rellena al menos <em>nombre</em> y
         <em>responsable</em>: el panel lo recuerda si faltan.
       </p>
       <p class="profundizar">
         <span>Profundizar:</span>
         <a
-          v-for="e in profundizar('guide', 'campaigns', 'recipes', 'adr039')"
+          v-for="e in profundizar('guide', 'campaigns', 'recipes', 'adr039', 'adr041')"
           :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
         >{{ e.texto }}</a>
       </p>
@@ -426,12 +504,12 @@ const juego = computed(() => props.gameId || 'snake-classic');
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="orden" class="ayuda__bloque">
-      <h2>4. En qué orden se decide</h2>
+      <h2>4. En qué orden se decide (y los motivos de rechazo)</h2>
       <p>
         El juego comprueba el sobre en este orden y se queda con el
         <strong>primer motivo que rechaza</strong>. Saberlo ayuda a leer el
-        veredicto («rechazada por <code>schedule</code>») en el simulador y en
-        la telemetría:
+        veredicto («rechazada por <code>schedule</code>») en el simulador, en
+        el endpoint <code>/evaluate</code> y en la telemetría:
       </p>
       <ol class="ayuda__orden">
         <li>
@@ -442,18 +520,56 @@ const juego = computed(() => props.gameId || 'snake-classic');
           <strong>Pausa global</strong> (<code>ops.pauseCampaigns</code>) —
           el botón de pánico: todo rechazado como «pausado».
         </li>
+        <li>
+          <strong>Holdout global</strong> (<code>ops.holdoutPercent</code>) —
+          el grupo de control: ese porcentaje del parque queda fuera de
+          todas las campañas, en un eje propio (sección 8).
+        </li>
         <li><strong>Interruptor</strong> (<code>enabled</code>).</li>
         <li><strong>Variantes</strong> de distribución.</li>
         <li><strong>Tipos de dispositivo</strong>.</li>
         <li><strong>Versiones</strong> instaladas.</li>
+        <li><strong>Idiomas</strong> (por prefijo, en minúsculas).</li>
+        <li>
+          <strong>Países</strong> (el que vio el servidor; sin país conocido
+          y lista no vacía, fuera).
+        </li>
         <li><strong>Calendario</strong>, con el reloj corregido por el servidor.</li>
         <li><strong>Segmentos</strong> (todos los marcados).</li>
         <li>
-          <strong>Cohorte</strong>: porcentaje EFECTIVO (la rampa ya aplicada)
-          contra el punto fijo del jugador.
+          <strong>Cohorte</strong>: el porcentaje EFECTIVO (la rampa ya
+          aplicada) contra el punto fijo del jugador, y encima el
+          <strong>tramo</strong> (desde ≥ hasta = nadie). El punto se calcula
+          sobre el eje de la sección —o el de la capa, si la hay— con la
+          identidad del dispositivo o de la cuenta (<code>bucketBy</code>).
         </li>
-        <li><strong>Tramo</strong> del parque (desde ≥ hasta = nadie).</li>
+        <li>
+          <strong>Asignación de variante</strong> del experimento, si lo hay.
+          Ya no rechaza a nadie: decide qué ve quien ha entrado.
+        </li>
       </ol>
+      <p>
+        El motivo que sale en el veredicto, en el simulador, en
+        <code>/evaluate</code> y en la telemetría es una de estas palabras:
+      </p>
+      <table class="ayuda__tabla">
+        <thead><tr><th>Motivo</th><th>Qué lo rechazó</th></tr></thead>
+        <tbody>
+          <tr><td><code>forced</code></td><td>Un override de QA lo forzó «fuera» (solo dev/beta).</td></tr>
+          <tr><td><code>paused</code></td><td>La pausa global de Operación.</td></tr>
+          <tr><td><code>holdout</code></td><td>El jugador está en el grupo de control global.</td></tr>
+          <tr><td><code>disabled</code></td><td>El interruptor de la campaña está apagado.</td></tr>
+          <tr><td><code>variant</code></td><td>Su variante de distribución no está en la lista.</td></tr>
+          <tr><td><code>form_factor</code></td><td>Su tipo de dispositivo no está en la lista.</td></tr>
+          <tr><td><code>version</code></td><td>Su versión instalada queda fuera del rango.</td></tr>
+          <tr><td><code>locale</code></td><td>Su idioma no casa con ninguno de la lista (o no se conoce).</td></tr>
+          <tr><td><code>country</code></td><td>Su país no está en la lista, o el juego aún no lo conoce.</td></tr>
+          <tr><td><code>schedule</code></td><td>Fuera de la ventana del calendario.</td></tr>
+          <tr><td><code>segment</code></td><td>No cumple alguno de los segmentos exigidos (o uno es desconocido).</td></tr>
+          <tr><td><code>cohort</code></td><td>Su punto del parque queda por encima del porcentaje efectivo.</td></tr>
+          <tr><td><code>audience</code></td><td>Su punto cae fuera del tramo (o el tramo está invertido, o no hay identidad estable).</td></tr>
+        </tbody>
+      </table>
       <p>
         La publicidad añade sus propias comprobaciones alrededor del sobre:
         antes, que la campaña sea montable (tiene imagen, su duración no es
@@ -463,13 +579,14 @@ const juego = computed(() => props.gameId || 'snake-classic');
       </p>
       <p>
         Cada evaluación emite el evento de telemetría
-        <code>rollout.evaluated</code> con el motivo, así que el alcance real
-        de una campaña se puede leer después (sección 7).
+        <code>rollout.evaluated</code> con el motivo (y, si hay experimento,
+        la variante asignada y su cuota esperada), así que el alcance real de
+        una campaña se puede leer después (sección 9).
       </p>
       <p class="profundizar">
         <span>Profundizar:</span>
         <a
-          v-for="e in profundizar('design', 'adr040')"
+          v-for="e in profundizar('design', 'adr040', 'adr041')"
           :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
         >{{ e.texto }}</a>
       </p>
@@ -546,8 +663,174 @@ const juego = computed(() => props.gameId || 'snake-classic');
     </section>
 
     <!-- ───────────────────────────────────────────────────────────── -->
+    <section id="experimentos" class="ayuda__bloque">
+      <h2>6. Experimentos A/B dentro de una campaña</h2>
+      <p>
+        Un experimento (<code>experiment</code>) contesta a «¿qué funciona
+        mejor?» sin montar dos campañas: a cada jugador que <em>entra</em> en
+        la campaña se le asigna una <strong>variante</strong> con nombre
+        (<code>control</code>, <code>precioAlto</code>…), y la feature enseña
+        una cosa u otra según ese nombre. Tiene una <strong>clave</strong>
+        (<code>key</code>, en camelCase: <code>precioNavidad26</code>) y una
+        lista de variantes, cada una con su <strong>peso</strong>. La primera
+        suele ser el control.
+      </p>
+
+      <h3>Cómo se asigna</h3>
+      <p>
+        En un <em>segundo eje</em>, independiente del porcentaje de
+        despliegue: que la rampa suba del 10 % al 50 % mete gente nueva pero
+        <strong>no cambia la variante de nadie</strong> que ya estaba. La
+        asignación es estable (el mismo jugador, la misma variante en cada
+        arranque) y ponderada: la <strong>cuota esperada</strong> de cada
+        variante es su peso dividido por la suma de pesos. Dos variantes con
+        peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante
+        definida pero sin nadie; si <strong>todos</strong> los pesos son 0,
+        todo el mundo recibe la primera (quedarse sin variante sería un fallo
+        mudo) y el panel de campañas lo avisa, igual que avisa de dos
+        variantes con el mismo nombre.
+      </p>
+      <pre class="ayuda__ejemplo">experiment:
+  key: precioNavidad26
+  variants:
+    - name: control      weight: 3     ← 75 %
+    - name: precioAlto   weight: 1     ← 25 %</pre>
+
+      <h3>Cómo lo lee la feature</h3>
+      <p>
+        El veredicto de cada evaluación lleva el nombre de la variante (y su
+        cuota esperada); la feature decide con ese nombre qué precio, qué
+        creatividad o qué texto enseña. Quien programa la feature tiene que
+        conocer los nombres, así que <strong>acuerda los nombres antes de
+        publicar</strong>: una variante que la feature no reconozca se
+        comporta como lo que el programador haya dejado por defecto
+        (normalmente, como el control). Sin experimento, la feature recibe
+        una variante nula y hace lo de siempre.
+      </p>
+
+      <h3>No cambies la clave a mitad</h3>
+      <p class="ayuda__aviso">
+        ⚠️ La clave es la «sal» del reparto: cambiarla <strong>reasigna las
+        variantes de todo el parque</strong>, y los datos de antes y de
+        después ya no se pueden juntar. Tocar los pesos a mitad también mueve
+        gente de una variante a otra, y renombrar una variante la cambia para
+        la feature (el nombre es lo que lee). Si hay que medir algo nuevo, es
+        un experimento nuevo con otra clave.
+      </p>
+
+      <h3>Cómo se mide</h3>
+      <p>
+        El evento <code>rollout.evaluated</code> lleva la variante asignada
+        (<code>variant</code>) y su cuota esperada
+        (<code>variant_share</code>). En Grafana, el panel «Campañas» tiene
+        una sección <strong>Experimentos</strong> con el reparto observado por
+        variante y una comprobación de <em>sample ratio mismatch</em> (SRM,
+        chi-cuadrado): si la cuota observada se aleja de la esperada más de lo
+        que explica el azar, el reparto está roto (un cliente viejo que no
+        conoce el experimento, una variante que rompe el arranque, un cambio
+        de clave a mitad) y los resultados no valen, por buenos que parezcan.
+        <strong>Mira el SRM antes de mirar el resultado.</strong>
+      </p>
+
+      <h3>Cómo probar una variante concreta</h3>
+      <p>
+        En una build de desarrollo o beta: Ajustes → 7 toques sobre el número
+        de versión → pestaña <strong>Rollout</strong>, y fuerza la
+        <em>posición</em> (0–100). Con una posición forzada, la fracción del
+        experimento es esa misma posición, así que «posición 12» cae siempre
+        en la misma variante: con pesos 3 y 1, las posiciones 0–74 ven
+        <code>control</code> y 75–99 ven <code>precioAlto</code>. El veredicto
+        de la pestaña dice qué variante ha tocado. Desde el navegador, el
+        endpoint <code>/evaluate</code> del Worker (sección 9) lo cuenta para
+        cualquier identidad.
+      </p>
+      <p class="profundizar">
+        <span>Profundizar:</span>
+        <a
+          v-for="e in profundizar('adr041', 'campaigns')"
+          :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
+        >{{ e.texto }}</a>
+      </p>
+    </section>
+
+    <!-- ───────────────────────────────────────────────────────────── -->
+    <section id="capas" class="ayuda__bloque">
+      <h2>7. Capas de exclusión mutua y punto del parque</h2>
+
+      <h3>El problema</h3>
+      <p>
+        Cada sección tiene su propio eje: el punto de un jugador en
+        Publicidad no tiene nada que ver con su punto en el Muro de pago (a
+        propósito: así dos features no quedan correlacionadas por accidente).
+        Eso está bien hasta que quieres que <em>no coincidan</em>: un anuncio
+        de Navidad y un muro de Navidad, y que nadie vea los dos. Con ejes
+        distintos, el 50 % del anuncio y el 50 % del muro se cruzan: la cuarta
+        parte del parque ve ambos.
+      </p>
+
+      <h3>La capa (<code>cohort.layer</code>)</h3>
+      <p>
+        Poner la misma capa en dos campañas de secciones distintas hace que
+        se sorteen <strong>sobre el mismo eje</strong>. Con tramos que no se
+        solapan, cada jugador cae en una sola:
+      </p>
+      <pre class="ayuda__ejemplo">ads.banners[navidadAnuncio].rollout.cohort:
+  layer: navidad26
+  audience: { from: 0,  to: 50 }     ← mitad baja del eje «navidad26»
+
+paywall.rollout.cohort:
+  layer: navidad26
+  audience: { from: 50, to: 100 }    ← mitad alta del MISMO eje</pre>
+      <p>
+        Quien cae en 0–50 ve el anuncio y nunca el muro; quien cae en 50–100,
+        al revés. Si los tramos se solaparan (0–60 y 50–100), la franja común
+        recibiría las dos y la capa no serviría de nada: el panel de campañas
+        lo avisa, y dice con quién se comparte cada capa buscando en
+        <em>todo</em> el JSON (también en las secciones que no son
+        Publicidad). Una capa que solo usa una campaña no excluye a nadie:
+        solo cambia su eje.
+      </p>
+      <ul>
+        <li>
+          Nombre en camelCase (<code>navidad26</code>), <strong>idéntico</strong>
+          en todas las campañas que la comparten: una letra distinta es otra
+          capa.
+        </li>
+        <li>
+          <strong>La misma sal en todas.</strong> La sal del sobre entra en
+          el sorteo: con sales distintas el eje ya no es el mismo aunque la
+          capa lo sea. Lo más sencillo es dejarla vacía en las dos.
+        </li>
+        <li>
+          El porcentaje y la rampa siguen siendo de cada campaña: la capa
+          solo decide <em>sobre qué eje</em> se mide el punto del jugador.
+        </li>
+      </ul>
+
+      <h3>Punto del parque por dispositivo o por cuenta (<code>cohort.bucketBy</code>)</h3>
+      <p>
+        El punto del parque se calcula a partir de una identidad.
+        <code>device</code> (el valor por defecto) usa la identidad anónima
+        del dispositivo, que siempre existe. <code>user</code> usa la cuenta
+        del jugador: la misma persona cae en el mismo punto en su móvil y en
+        su tablet, que es lo que quieres para un muro de pago o un
+        experimento de precio (si no, podría ver dos precios). Sin sesión
+        iniciada, <code>user</code> cae a <code>device</code>. Solo tiene
+        efecto en juegos con cuentas; en uno que no las tiene (Snake, hoy)
+        equivale siempre a <code>device</code>.
+      </p>
+      <p class="profundizar">
+        <span>Profundizar:</span>
+        <a
+          v-for="e in profundizar('adr041', 'adr039', 'cookbook')"
+          :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
+        >{{ e.texto }}</a>
+      </p>
+    </section>
+
+    <!-- ───────────────────────────────────────────────────────────── -->
     <section id="ops" class="ayuda__bloque">
-      <h2>6. La sección «Operación»: pánico y muestra</h2>
+      <h2>8. La sección «Operación»: pánico, holdout y muestra</h2>
       <ul>
         <li>
           <strong>Pausar TODAS las campañas</strong>
@@ -565,19 +848,35 @@ const juego = computed(() => props.gameId || 'snake-classic');
           panel de campañas lo enseña en rojo arriba del todo.
         </li>
         <li>
+          <strong>Grupo de control global</strong>
+          (<code>holdoutPercent</code>, de 0 a 100): un porcentaje del parque,
+          estable por jugador y en un eje propio, que <strong>no recibe
+          ninguna campaña de ninguna sección</strong> (motivo
+          <code>holdout</code>): ni anuncios, ni muros, ni avisos de versión.
+          Es la línea base para medir lo que las campañas aportan <em>en
+          conjunto</em> (retención, ingresos): ese grupo contra el resto. 0 =
+          sin holdout. <strong>Cambiarlo es empezar una medición nueva:</strong>
+          al subirlo, gente que ya tenía campañas las pierde de golpe (y al
+          bajarlo, gente del control empieza a verlas), así que los datos de
+          antes y de después no se pueden comparar. Fíjalo al empezar a medir
+          y no lo toques hasta terminar. El panel de campañas enseña una
+          cinta mientras está activo.
+        </li>
+        <li>
           <strong>Muestra de exposición</strong>
           (<code>exposureSampleRate</code>, de 0 a 1): qué fracción de
           dispositivos envía el evento <code>rollout.evaluated</code>. 1 =
           todos. El muestreo es estable por dispositivo (el mismo siempre
           dentro o siempre fuera, para todas las secciones), así que bajarlo
           reduce volumen sin sesgar el alcance estimado. Con 0 te quedas
-          ciego: no sabrás a cuánta gente llega nada.
+          ciego: no sabrás a cuánta gente llega nada, ni si un experimento
+          reparte bien.
         </li>
       </ul>
       <p class="profundizar">
         <span>Profundizar:</span>
         <a
-          v-for="e in profundizar('campaigns', 'adr040')"
+          v-for="e in profundizar('campaigns', 'adr040', 'adr041')"
           :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
         >{{ e.texto }}</a>
       </p>
@@ -585,7 +884,7 @@ const juego = computed(() => props.gameId || 'snake-classic');
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="comprobar" class="ayuda__bloque">
-      <h2>7. Comprobar una campaña antes y después de publicar</h2>
+      <h2>9. Comprobar una campaña antes y después de publicar</h2>
 
       <h3>Antes</h3>
       <ol>
@@ -593,17 +892,41 @@ const juego = computed(() => props.gameId || 'snake-classic');
           <strong>El panel de campañas</strong> de la pestaña Publicidad: sin
           avisos rojos (tramo vacío, alcance recortado por el porcentaje,
           calendario caducado o invertido, rampa que baja, segmento
-          desconocido, ids repetidos, campañas de más) y con los huecos que
-          quieras tener, no otros.
+          desconocido, país o idioma mal escrito, variante repetida, ids
+          repetidos, campañas de más) y con los huecos que quieras tener, no
+          otros. Si hay capa compartida, que los tramos sean estancos.
         </li>
         <li>
           <strong>El simulador de QA del juego</strong>, sin publicar nada:
           en una build de desarrollo o beta, Ajustes → 7 toques sobre el
           número de versión → pestaña <strong>«Rollout»</strong>. Ahí se ve el
-          contexto real del dispositivo (posición, variante, versión,
-          segmentos que cumple) y se puede <em>simular</em> otra posición,
-          variante, versión o segmentos, y <em>forzar</em> «dentro» o «fuera»
-          por sección. El veredicto dice por qué una campaña entra o no.
+          contexto real del dispositivo (posición, variante, versión, idioma,
+          país, segmentos que cumple) y se puede <em>simular</em> otra
+          posición, variante, versión, idioma, país o segmentos, y
+          <em>forzar</em> «dentro» o «fuera» por sección. El veredicto dice
+          por qué una campaña entra o no y, si hay experimento, qué variante
+          le toca.
+        </li>
+        <li>
+          <strong>El endpoint <code>/evaluate</code> del Worker</strong>,
+          desde cualquier navegador y sin instalar nada: la misma URL de la
+          que el juego lee el JSON, cambiando <code>.json</code> por
+          <code>/evaluate</code> y añadiendo el contexto como parámetros:
+          <pre class="ayuda__ejemplo">…/v1/{{ juego }}/{{ canal || 'prod' }}/evaluate?id=&lt;anonymousId&gt;&amp;variant=android&amp;formFactor=phone
+    &amp;version=1.0.134&amp;locale=es-es&amp;country=ES&amp;segments=veterans,payers
+    &amp;now=2026-12-24T10:00:00Z</pre>
+          Devuelve el veredicto de <strong>todas</strong> las campañas del
+          canal para ese contexto (permitida o no, motivo, posición,
+          porcentaje efectivo, variante del experimento y su cuota esperada)
+          con el <strong>mismo evaluador</strong> que el juego. Todos los
+          parámetros son opcionales: sin <code>id</code> usa una identidad
+          sintética (y lo dice: <code>syntheticIdentity</code>); sin
+          <code>country</code> usa el país desde el que haces la petición,
+          que es justo lo que verá un móvil de ese país
+          (<code>countrySource</code> dice cuál se usó); sin <code>now</code>,
+          ahora. Es la forma de contestar «¿qué ve este dispositivo?» pegando
+          su <code>anonymousId</code>. Los sobres que no validan salen en
+          <code>invalid</code>.
         </li>
         <li>
           <strong>Desde el repo principal</strong>, para un jugador concreto o
@@ -617,7 +940,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
         </li>
         <li>
           Probar primero en <code>beta</code> con un dispositivo de pruebas,
-          y pasar a <code>prod</code> (sección 8) cuando esté bien.
+          y pasar a <code>prod</code> (sección 10) cuando esté bien.
         </li>
       </ol>
 
@@ -626,10 +949,13 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
         <li>
           <strong>Grafana → panel «Campañas»</strong>: el alcance observado,
           a partir del evento <code>rollout.evaluated</code> (sección, campaña,
-          permitida o no, motivo del rechazo, porcentaje efectivo, posición).
-          Si la campaña preveía un 10 % y el panel enseña un 100 %, el
-          targeting está roto; si enseña 0 %, algo la rechaza (el motivo lo
-          dice). Recuerda que el volumen depende de la muestra de exposición.
+          permitida o no, motivo del rechazo, porcentaje efectivo, posición,
+          variante). Si la campaña preveía un 10 % y el panel enseña un 100 %,
+          el targeting está roto; si enseña 0 %, algo la rechaza (el motivo lo
+          dice). La sección <strong>Experimentos</strong> del mismo panel
+          compara el reparto observado por variante con el esperado (SRM,
+          sección 6). Recuerda que el volumen depende de la muestra de
+          exposición.
         </li>
         <li>
           <strong>En el móvil</strong>: el diario de Ajustes → Ads (builds
@@ -644,7 +970,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
       <p class="profundizar">
         <span>Profundizar:</span>
         <a
-          v-for="e in profundizar('campaigns', 'cookbook', 'runbook')"
+          v-for="e in profundizar('campaigns', 'cookbook', 'runbook', 'adr041')"
           :key="e.href" :href="e.href" target="_blank" rel="noopener noreferrer"
         >{{ e.texto }}</a>
       </p>
@@ -652,7 +978,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="higiene" class="ayuda__bloque">
-      <h2>8. Higiene: auditoría y diferencias entre canales</h2>
+      <h2>10. Higiene: auditoría y diferencias entre canales</h2>
       <p>Tres comandos del repo principal:</p>
       <dl class="ayuda__comandos">
         <dt><code>pnpm remote-config:audit</code></dt>
@@ -696,7 +1022,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="modo-seguro" class="ayuda__bloque">
-      <h2>9. El modo seguro del juego</h2>
+      <h2>11. El modo seguro del juego</h2>
       <p>
         Una configuración que rompe el arranque es el peor caso: el juego se
         cae antes de poder recibir el cambio que lo arregla. Por eso el juego
@@ -716,7 +1042,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
         </li>
         <li>
           Si no sabes qué campo fue, <strong>pausa todas las campañas</strong>
-          (sección 6) y publica: es un snapshot nuevo, sale de la cuarentena
+          (sección 8) y publica: es un snapshot nuevo, sale de la cuarentena
           y deja al juego estable mientras buscas.
         </li>
         <li>
@@ -740,7 +1066,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="next-boot" class="ayuda__bloque">
-      <h2>10. Secciones que se aplican al siguiente arranque</h2>
+      <h2>12. Secciones que se aplican al siguiente arranque</h2>
       <p>
         Por defecto, un cambio publicado entra <em>en caliente</em>: el juego
         lo recibe y lo aplica al momento, que es lo que quieres de un
@@ -769,7 +1095,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="errores" class="ayuda__bloque">
-      <h2>11. Errores típicos</h2>
+      <h2>13. Errores típicos</h2>
       <table class="ayuda__tabla">
         <thead><tr><th>Qué pasa</th><th>Por qué</th><th>Qué hacer</th></tr></thead>
         <tbody>
@@ -852,6 +1178,62 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
             <td>Purgar solo afecta a releases antiguas que leen jsDelivr, y su alias tarda hasta 12 h.</td>
             <td>Publicar ya desplegó el Worker; no hay nada que purgar para las apps actuales.</td>
           </tr>
+          <tr>
+            <td>Una campaña por país no la ve nadie.</td>
+            <td>
+              País en minúsculas (<code>es</code>): el servidor manda
+              <code>ES</code> y no casa. O la prueba es en un primer arranque
+              sin red: sin país conocido, una lista no vacía no deja entrar.
+            </td>
+            <td>
+              Dos letras MAYÚSCULAS (el editor lo marca en rojo). Comprueba con
+              <code>/evaluate?country=ES</code>.
+            </td>
+          </tr>
+          <tr>
+            <td>Quería «solo España» y sale en México.</td>
+            <td>
+              <code>es</code> es el idioma, no el país, y vale para cualquier
+              <code>es-*</code>.
+            </td>
+            <td>
+              Para el país, <code>countries: [ES]</code>; para el español de
+              España, <code>es-es</code>.
+            </td>
+          </tr>
+          <tr>
+            <td>Los resultados del experimento cambiaron de repente.</td>
+            <td>
+              Se cambió la clave (o los pesos, o un nombre) a mitad: reasignó
+              las variantes de todo el parque.
+            </td>
+            <td>
+              No se deshace: clave nueva, medición nueva. Mira el SRM en
+              Grafana antes de fiarte de nada.
+            </td>
+          </tr>
+          <tr>
+            <td>El anuncio y el muro «excluyentes» los ve la misma gente.</td>
+            <td>
+              Ejes distintos (sin capa), o misma capa con tramos que se pisan
+              o con sales distintas.
+            </td>
+            <td>
+              Misma capa, misma sal, tramos estancos (0–50 / 50–100). El panel
+              lo avisa.
+            </td>
+          </tr>
+          <tr>
+            <td>Subí el holdout y gente perdió campañas que tenía.</td>
+            <td>
+              Es lo que hace: el grupo de control se amplía con gente que
+              estaba dentro.
+            </td>
+            <td>
+              Esperable. Fíjalo antes de empezar a medir y no lo toques hasta
+              terminar.
+            </td>
+          </tr>
         </tbody>
       </table>
       <p class="profundizar">
@@ -865,7 +1247,7 @@ pnpm rollout:explain --game={{ juego }} --channel=prod --reach</pre>
 
     <!-- ───────────────────────────────────────────────────────────── -->
     <section id="enlaces" class="ayuda__bloque">
-      <h2>12. Todos los enlaces</h2>
+      <h2>14. Todos los enlaces</h2>
       <ul class="ayuda__enlaces">
         <li v-for="e in Object.values(ENLACES)" :key="e.href">
           <a :href="e.href" target="_blank" rel="noopener noreferrer">{{ e.texto }}</a>

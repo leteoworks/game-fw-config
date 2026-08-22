@@ -46,7 +46,8 @@ dashboard/
     ├── lib/schema-form.mjs       schema → modelo de formulario (PURO, con tests)
     ├── lib/datetime.mjs          UTC (JSON) ↔ hora local (pantalla) (PURO, con tests)
     ├── lib/campaign-status.mjs   estado de una campaña AHORA: calendario, rampa,
-    │                             alcance real, segmentos, ficha (PURO, con tests)
+    │                             alcance real, segmentos, idioma/país, capa,
+    │                             experimento, holdout, ficha (PURO, con tests)
     └── components/               un control por tipo de campo, el panel de
                                   campañas (AdsCampaignsPanel) y la Ayuda (HelpPanel)
 ```
@@ -95,16 +96,40 @@ que bajan, segmentos que el juego no conoce (leídos del schema, que llega por
 la prop `schema`) y fichas sin nombre o responsable. Si `ops.pauseCampaigns`
 está encendido, sale un banner rojo arriba del panel y otro en la barra.
 
+Desde ADR-041 cada fila dice además a qué **idiomas y países** llega
+(«todos» si no restringe), sobre qué **capa** se sortea y con quién la
+comparte (se busca en el JSON entero: secciones, listas y mapas), con qué
+identidad (`bucketBy`) y qué **experimento** lleva, con la cuota esperada de
+cada variante (peso / suma; con todos los pesos a 0, la primera se lleva a
+todo el mundo, como en el juego). Y avisa de lo que el validador no ve o ve
+tarde: países que no son dos MAYÚSCULAS (el servidor manda `ES` y un `es` no
+casaría nunca, en silencio), idiomas que no van en minúsculas, variantes
+repetidas, pesos todos a 0 y capas cuyos tramos se pisan. Con
+`ops.holdoutPercent > 0` sale una cinta azul: ese porcentaje del parque no
+recibe ninguna campaña de ninguna sección.
+
+### Listas con formato (`pattern`)
+
+Los idiomas y países del sobre no tienen `enum` (no se pueden ofrecer 250
+países como casillas), pero sí un `pattern` en el schema. El editor de listas
+(`StringListInput`) enseña el formato esperado debajo de la lista, en
+cristiano (`schema-form.mjs#patternHint`), y marca en rojo lo que no lo
+cumple, con la misma expresión que usa el validador (`new RegExp(pattern)`).
+No corrige nada solo: se marca, y quien edita decide.
+
 ### Ayuda
 
 La pestaña **Ayuda** (`HelpPanel`) explica, para un operador que no programa,
 qué es cada cosa y cómo se opera una campaña: los botones, el sobre de
 despliegue campo a campo (con las listas reales de variantes, dispositivos y
-segmentos leídas del schema), el orden de evaluación, el reparto entre
-campañas, la sección `ops`, cómo comprobar antes y después de publicar, la
-higiene (`remote-config:audit`, `remote-config:diff`), el modo seguro,
-`next-boot` y los errores típicos. Cada bloque enlaza a la referencia completa
-en el repo principal.
+segmentos leídas del schema), el orden de evaluación con la tabla de motivos
+de rechazo, el reparto entre campañas, los experimentos A/B (asignación,
+cuota esperada, SRM en Grafana, no cambiar la clave a mitad), las capas de
+exclusión mutua y `bucketBy`, la sección `ops` (pánico, holdout, muestra),
+cómo comprobar antes y después de publicar (incluido el endpoint `/evaluate`
+del Worker), la higiene (`remote-config:audit`, `remote-config:diff`), el
+modo seguro, `next-boot` y los errores típicos. Cada bloque enlaza a la
+referencia completa en el repo principal.
 
 ### Las tres cosas que la UI no deja confundir
 

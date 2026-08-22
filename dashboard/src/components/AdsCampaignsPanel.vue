@@ -2,7 +2,10 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 
 import {
+  BUCKET_BY_TEXT,
   describeCampaign,
+  globalHoldout,
+  layerSharers,
   rolloutVocabulary,
 } from '../lib/campaign-status.mjs';
 import { formatLocal } from '../lib/datetime.mjs';
@@ -35,6 +38,20 @@ import { formatLocal } from '../lib/datetime.mjs';
  * que viene no cubre a nadie hoy, y pintarla como si cubriera escondería
  * un hueco. Los calculos viven en `lib/campaign-status.mjs`, con tests,
  * y replican la semantica del evaluador del juego.
+ *
+ * ## Lo que añade ADR-041 (idioma, pais, capa, experimento, holdout)
+ *
+ * Por campaña se enseñan los idiomas y paises a los que llega («todos» si
+ * no restringe), la capa de exclusion mutua (y con quien la comparte,
+ * buscando en el JSON ENTERO: el muro, el aviso de version…), la
+ * identidad del sorteo y el experimento con la cuota esperada de cada
+ * variante. Y se avisa de lo que el validador no ve o ve tarde: paises
+ * que no son dos MAYUSCULAS (en el juego un `es` no casaria NUNCA, en
+ * silencio), idiomas que no van en minusculas, variantes repetidas, pesos
+ * todos a 0 (todo el mundo en la primera) y capas cuyos tramos se pisan
+ * (la capa existe para que NO se pisen). Si hay holdout global, una cinta
+ * lo dice arriba: ese porcentaje del parque no recibe nada, en ninguna
+ * seccion, y el mapa de abajo reparte solo el resto.
  */
 
 const props = defineProps({
@@ -73,6 +90,32 @@ const motivoPausa = computed(() => {
 
 /** Lo que el schema sabe del sobre (segmentos reales, sobre todo). */
 const vocabulario = computed(() => rolloutVocabulary(props.schema));
+
+/**
+ * Holdout global (`ops.holdoutPercent`): el grupo de control que no recibe
+ * NINGUNA campaña, de ninguna seccion, en un eje propio. No cambia el mapa
+ * (recorta a todo el mundo por igual) pero si lo que significa el 100 %.
+ */
+const holdout = computed(() => globalHoldout(props.datos));
+
+/** Tramo como texto (`0–50`), o «sin tramo» si cubre todo el eje. */
+const tramoTexto = (a) => (a?.declared ? `${a.from}–${a.to}` : 'sin tramo');
+
+/**
+ * Con quien comparte capa ESTE sobre, y si los tramos se pisan. Dos sobres
+ * de la misma capa solo son excluyentes si sus tramos no se solapan; si se
+ * solapan, la franja comun recibe los dos y la capa no sirve de nada.
+ */
+function companerosDeCapa(capa, indice, tramo) {
+  if (!capa) return [];
+  return layerSharers(props.datos, capa, {
+    exceptPath: `ads.banners.${indice}.rollout`,
+  }).map((e) => {
+    const desde = Math.max(tramo.from, e.audience.from);
+    const hasta = Math.min(tramo.to, e.audience.to);
+    return { ...e, solapa: desde < hasta, desde, hasta };
+  });
+}
 
 const POLITICAS = [
   {
@@ -125,9 +168,21 @@ const filas = computed(() => campanas.value.map((c, i) => {
   const d = describeCampaign(c, {
     now: ahora.value,
     knownSegments: vocabulario.value.segments,
+    localePattern: vocabulario.value.localePattern,
+    countryPattern: vocabulario.value.countryPattern,
   });
   const tramo = d.reach.audience;
+  const companeros = companerosDeCapa(d.layer, i, tramo);
   return {
+    // ADR-041: a quien llega (idioma, pais), sobre que eje y con que
+    // identidad se sortea, y el experimento con su reparto esperado.
+    idiomas: d.locales,
+    paises: d.countries,
+    capa: d.layer,
+    companeros,
+    capaSePisa: companeros.some((e) => e.solapa),
+    identidad: d.bucketBy,
+    experimento: d.experiment,
     indice: i,
     // Una campaña recien añadida tiene `id: ''`: sin esto los avisos
     // empezarian por un hueco («  no tiene nombre…») y no se sabria de cual
@@ -307,12 +362,50 @@ const sinFicha = computed(
 /** Las que pasan del tope y por tanto NO llegan al juego. */
 const sobrantes = computed(() => Math.max(0, filas.value.length - 20));
 
+/**
+ * Paises que no son dos MAYUSCULAS. Es el aviso mas importante de los
+ * nuevos: el validador lo rechaza al guardar, pero un JSON editado a mano
+ * puede colarlo, y en el juego un `es` en minusculas no casa con NADIE
+ * (el servidor manda siempre `ES`), sin ningun error.
+ */
+const paisesMalos = computed(
+  () => filas.value.filter((f) => f.paises.invalid.length > 0),
+);
+
+/** Idiomas que no van en minusculas BCP-47: el validador los rechaza. */
+const idiomasMalos = computed(
+  () => filas.value.filter((f) => f.idiomas.invalid.length > 0),
+);
+
+/** Experimentos con dos variantes del mismo nombre: no se sabra cual gano. */
+const variantesRepetidas = computed(
+  () => filas.value.filter((f) => (f.experimento?.duplicates.length ?? 0) > 0),
+);
+
+/** Experimentos con todos los pesos a 0: todo el mundo en la primera. */
+const pesosACero = computed(
+  () => filas.value.filter((f) => f.experimento?.allZero === true),
+);
+
+/** Capas compartidas con otro sobre del JSON (de esta seccion o de otra). */
+const capasCompartidas = computed(
+  () => filas.value.filter((f) => f.capa && f.companeros.length > 0),
+);
+
+/** Capas que no comparte nadie: no excluyen a nadie, solo cambian el eje. */
+const capasSolas = computed(
+  () => filas.value.filter((f) => f.capa && f.companeros.length === 0),
+);
+
 const hayAvisos = computed(() => (
   huecos.value.length || solapes.value.length || tapadas.value.length
   || vacios.value.length || recortadas.value.length || repetidos.value.length
   || sobrantes.value || caducadas.value.length || invertidas.value.length
   || rampasQueBajan.value.length || segmentosDesconocidos.value.length
-  || sinFicha.value.length
+  || sinFicha.value.length || paisesMalos.value.length
+  || idiomasMalos.value.length || variantesRepetidas.value.length
+  || pesosACero.value.length || capasCompartidas.value.length
+  || capasSolas.value.length
 ));
 
 function cambiarPolitica(valor) {
@@ -325,7 +418,7 @@ function cambiarPolitica(valor) {
     Sin seccion `ads` y sin pausa no hay nada que enseñar: el marco vacio
     pareceria un panel roto.
   -->
-  <section v-if="ads || pausadas" class="campanas">
+  <section v-if="ads || pausadas || holdout.active" class="campanas">
     <!--
       La pausa global va ARRIBA DEL TODO y en rojo: con ella puesta, nada de
       lo que sigue llega a nadie, y quien abra el panel sin contexto podria
@@ -338,6 +431,21 @@ function cambiarPolitica(valor) {
       <span v-if="motivoPausa" class="campanas__pausa-motivo">
         Motivo: «{{ motivoPausa }}»
       </span>
+    </p>
+
+    <!--
+      El holdout no es un fallo (es una medicion en curso), asi que va en
+      azul y no en rojo; pero cambia lo que significa «100 % del parque» en
+      todo lo de abajo, y quien no lo sepa se preguntara por que el alcance
+      observado en Grafana se queda corto.
+    -->
+    <p v-if="holdout.active" class="campanas__holdout">
+      <strong>El {{ holdout.percent }} % del parque no recibe ninguna
+      campaña</strong> (<code>ops.holdoutPercent</code>): es el grupo de
+      control global, estable por jugador y común a todas las secciones. Lo
+      que sigue se reparte entre el {{ 100 - holdout.percent }} % restante;
+      el mapa lo dibuja como si fuera todo el parque. Cambiar ese porcentaje
+      es empezar una medición nueva.
     </p>
 
     <template v-if="ads">
@@ -475,6 +583,54 @@ function cambiarPolitica(valor) {
           juego no conoce: no entrará nadie. Los que existen son
           <code>{{ (vocabulario.segments ?? []).join(', ') }}</code>.
         </li>
+        <li v-for="p in paisesMalos" :key="'pm' + p.indice" class="aviso malo">
+          <strong>{{ p.id }}</strong> tiene países mal escritos
+          (<code>{{ p.paises.invalid.join(', ') }}</code>): deben ser dos
+          letras en MAYÚSCULAS (ES, MX). El validador los rechaza al guardar
+          y, en el juego, un país en minúsculas no casa con nadie nunca.
+        </li>
+        <li v-for="l in idiomasMalos" :key="'lm' + l.indice" class="aviso malo">
+          <strong>{{ l.id }}</strong> tiene idiomas mal escritos
+          (<code>{{ l.idiomas.invalid.join(', ') }}</code>): BCP-47 en
+          minúsculas (es, es-es, pt-br). El validador los rechaza al guardar.
+        </li>
+        <li v-for="v in variantesRepetidas" :key="'vr' + v.indice" class="aviso malo">
+          El experimento de <strong>{{ v.id }}</strong> repite la variante
+          <code>{{ v.experimento.duplicates.join(', ') }}</code>: la feature y
+          la telemetría no sabrán cuál ganó. Renómbrala.
+        </li>
+        <li v-for="z in pesosACero" :key="'pz' + z.indice" class="aviso">
+          El experimento de <strong>{{ z.id }}</strong> tiene todos los pesos
+          a 0: todo el mundo recibe la primera variante
+          (<code>{{ z.experimento.variants[0]?.name || 'sin nombre' }}</code>)
+          y no hay A/B. Pon pesos (1 y 1 son 50/50) o quita el experimento.
+        </li>
+        <li
+          v-for="c in capasCompartidas"
+          :key="'cc' + c.indice"
+          class="aviso"
+          :class="{ suave: !c.capaSePisa }"
+        >
+          <strong>{{ c.id }}</strong> (tramo {{ tramoTexto(c.alcance.audience) }})
+          comparte la capa <strong>{{ c.capa }}</strong> con
+          <template v-for="(e, k) in c.companeros" :key="e.path"><template v-if="k > 0">, </template><code>{{ e.label }}</code> ({{ tramoTexto(e.audience) }})</template>:
+          mismo eje de sorteo.
+          <template v-if="c.capaSePisa">
+            ⚠️ Los tramos se pisan: en la parte común un jugador puede
+            recibir las dos. Para que sean excluyentes, tramos que no se
+            toquen (0–50 / 50–100), y la misma sal en las dos.
+          </template>
+          <template v-else>
+            Tramos estancos: cada jugador cae en una sola (si la sal es la
+            misma en las dos).
+          </template>
+        </li>
+        <li v-for="s in capasSolas" :key="'cs' + s.indice" class="aviso suave">
+          <strong>{{ s.id }}</strong> está en la capa
+          <strong>{{ s.capa }}</strong> pero ninguna otra campaña la usa: hoy
+          no excluye a nadie. Solo cambia su eje de sorteo, así que el mapa
+          de arriba no la compara con exactitud con las demás de Publicidad.
+        </li>
         <li v-for="(h, i) in huecos" :key="'h' + i" class="aviso">
           <strong>{{ (h.hasta - h.desde).toFixed(0) }} % del parque</strong>
           ({{ h.desde }}–{{ h.hasta }}) no tiene ninguna campaña viva ahora:
@@ -501,8 +657,8 @@ function cambiarPolitica(valor) {
         <thead>
           <tr>
             <th>#</th><th>Campaña</th><th>Cuándo</th><th>Público ahora</th>
-            <th>Segmentos</th><th>Peso</th><th>Imágenes</th><th>Vídeo</th>
-            <th>Botones</th>
+            <th>Segmentos · idioma · país</th><th>Experimento</th><th>Peso</th>
+            <th>Imágenes</th><th>Vídeo</th><th>Botones</th>
           </tr>
         </thead>
         <tbody>
@@ -550,15 +706,56 @@ function cambiarPolitica(valor) {
                 </span>
               </div>
               <div class="campanas__detalle">rampa: {{ f.rampaTexto }}</div>
+              <div v-if="f.capa || f.identidad === 'user'" class="campanas__detalle">
+                <template v-if="f.capa">
+                  eje: capa <code>{{ f.capa }}</code><template v-if="f.companeros.length"> (con {{ f.companeros.map((e) => e.label).join(', ') }})</template>
+                </template>
+                <template v-if="f.capa && f.identidad === 'user'"> · </template>
+                <template v-if="f.identidad === 'user'">{{ BUCKET_BY_TEXT.user }}</template>
+              </div>
             </td>
             <td>
-              <span v-if="f.segmentos.length === 0" class="tenue">todos</span>
-              <span
-                v-for="s in f.segmentos"
-                :key="s"
-                class="campanas__chip"
-                :class="{ malo: f.segmentosDesconocidos.includes(s) }"
-              >{{ s }}</span>
+              <div>
+                <span v-if="f.segmentos.length === 0" class="tenue">todos</span>
+                <span
+                  v-for="s in f.segmentos"
+                  :key="s"
+                  class="campanas__chip"
+                  :class="{ malo: f.segmentosDesconocidos.includes(s) }"
+                >{{ s }}</span>
+              </div>
+              <div class="campanas__detalle">
+                idioma:
+                <span v-if="f.idiomas.all" class="tenue">todos</span>
+                <template v-else>
+                  <code
+                    v-for="l in f.idiomas.items"
+                    :key="l"
+                    class="campanas__codigo"
+                    :class="{ malo: f.idiomas.invalid.includes(l) }"
+                  >{{ l }}</code>
+                </template>
+                · país:
+                <span v-if="f.paises.all" class="tenue">todos</span>
+                <template v-else>
+                  <code
+                    v-for="p in f.paises.items"
+                    :key="p"
+                    class="campanas__codigo"
+                    :class="{ malo: f.paises.invalid.includes(p) }"
+                  >{{ p }}</code>
+                </template>
+              </div>
+            </td>
+            <td>
+              <span v-if="!f.experimento" class="tenue">—</span>
+              <template v-else>
+                <div class="mono">{{ f.experimento.key || '(sin clave)' }}</div>
+                <div
+                  class="campanas__detalle"
+                  :class="{ malo: f.experimento.allZero || f.experimento.duplicates.length > 0 }"
+                >{{ f.experimento.text }}</div>
+              </template>
             </td>
             <td class="mono">
               {{ f.peso }}
@@ -594,6 +791,15 @@ function cambiarPolitica(valor) {
   font-size: 0.92rem;
 }
 .campanas__pausa-motivo { display: block; margin-top: 4px; opacity: 0.85; }
+/* Holdout: informativo, no un fallo → acento, no rojo. */
+.campanas__holdout {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--acento, #4c9aff);
+  border-radius: var(--radio, 6px);
+  background: var(--acento-tenue, #1b3a5c);
+  font-size: 0.92rem;
+}
 .campanas__cabecera {
   display: flex;
   align-items: baseline;
@@ -702,6 +908,19 @@ function cambiarPolitica(valor) {
 .campanas__estado.scheduled { color: var(--aviso, #d29922); }
 .campanas__estado.expired { color: var(--error, #b3261e); }
 .campanas__detalle { font-size: 0.76rem; opacity: 0.7; margin-top: 2px; }
+.campanas__detalle.malo { color: var(--error, #b3261e); opacity: 1; }
+/* Idiomas y paises: codigos cortos; en rojo los que el validador rechaza. */
+.campanas__codigo {
+  font-size: 0.72rem;
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--panel-alto, #1c2333);
+  margin-right: 3px;
+}
+.campanas__codigo.malo {
+  color: var(--error, #b3261e);
+  border: 1px solid var(--error, #b3261e);
+}
 .campanas__punto {
   display: inline-block;
   width: 8px;

@@ -517,3 +517,64 @@ export function emptyValueFor(schema) {
     default: return Array.isArray(schema.enum) ? schema.enum[0] : '';
   }
 }
+
+// ─── Patrones (`pattern`) de los elementos de una lista ───────────────
+
+/**
+ * Pistas legibles para los patrones que usa el schema generado.
+ *
+ * Un `pattern` dice exactamente que admite el validador, pero a un operador
+ * `^[A-Z]{2}$` no le dice nada; «dos letras en MAYUSCULAS (ES, MX)» si. Se
+ * traduce por IGUALDAD con el patron, no interpretando la expresion: un
+ * patron que no este aqui sale tal cual, que es honesto. Si el schema
+ * estrena un patron nuevo, se añade una fila; mientras tanto el operador ve
+ * la expresion y el rojo de los valores que no la cumplen.
+ */
+const PATTERN_HINTS = [
+  [
+    '^[A-Z]{2}$',
+    'código de país ISO 3166-1 alfa-2, dos letras en MAYÚSCULAS (ES, MX, US)',
+  ],
+  [
+    '^[a-z]{2,3}(-[a-z0-9]{2,8})*$',
+    'idioma BCP-47 en minúsculas (es, es-es, pt-br); «es» vale para cualquier es-*',
+  ],
+  [
+    '^[a-z][a-zA-Z0-9]*$',
+    'identificador en camelCase: empieza por minúscula, sin espacios ni guiones (precioNavidad26)',
+  ],
+];
+
+/** Texto del formato que exige `pattern`, o `null` si no hay patron. */
+export function patternHint(pattern) {
+  if (typeof pattern !== 'string' || pattern === '') return null;
+  const conocida = PATTERN_HINTS.find(([p]) => p === pattern);
+  return conocida ? conocida[1] : `debe cumplir el patrón ${pattern}`;
+}
+
+/**
+ * Compila el patron como lo hace el validador (`new RegExp(pattern)`), o
+ * `null` si no es una expresion legal. Un patron ilegible no marca nada en
+ * rojo: marcar TODO por un error del schema seria peor que callar.
+ */
+export function compilePattern(pattern) {
+  if (typeof pattern !== 'string' || pattern === '') return null;
+  try {
+    return new RegExp(pattern);
+  } catch {
+    return null;
+  }
+}
+
+/** ¿`value` cumple `pattern`? Sin patron (o con uno ilegible), siempre si. */
+export function matchesPattern(value, pattern) {
+  const re = compilePattern(pattern);
+  if (!re) return true;
+  return typeof value === 'string' && re.test(value);
+}
+
+/** Elementos de `list` que NO cumplen `pattern` (en el orden de la lista). */
+export function invalidByPattern(list, pattern) {
+  if (!Array.isArray(list)) return [];
+  return list.filter((v) => !matchesPattern(v, pattern));
+}

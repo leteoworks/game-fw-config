@@ -1,6 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { invalidByPattern, patternHint } from '../lib/schema-form.mjs';
+
 /**
  * Editor de listas de strings (etiquetas).
  *
@@ -24,6 +26,16 @@ import { computed, ref } from 'vue';
  * cumplir TODOS los marcados, y vacio es «sin restriccion» (no «nadie»).
  * Marcar «nuevos» y «veteranos» a la vez no suma publicos, los cruza — y
  * esos dos no se cruzan nunca.
+ *
+ * Cuando los elementos llevan un `pattern` (los idiomas y paises del sobre,
+ * ADR-041: `^[a-z]{2,3}(-…)*$` y `^[A-Z]{2}$`) no hay enum que ofrecer como
+ * casillas (son 250 paises), asi que el formato se dice DEBAJO de la lista
+ * en cristiano y lo que no lo cumple sale en ROJO antes de guardar, con la
+ * misma expresion que usa el validador (`new RegExp(pattern)`). Importa
+ * porque el fallo seria mudo en el juego: el pais que pone el servidor es
+ * siempre `ES`, y un `es` escrito a mano no casaria con nadie nunca. No se
+ * corrige solo (nada de transformaciones silenciosas): se marca, y quien
+ * edita decide.
  */
 
 const props = defineProps({
@@ -38,6 +50,14 @@ const emit = defineEmits(['update:modelValue']);
 
 const lista = computed(() => (Array.isArray(props.modelValue) ? props.modelValue : []));
 const opciones = computed(() => props.itemsSchema?.enum ?? null);
+
+/** Patron de los elementos (idiomas, paises), si el schema lo trae. */
+const patron = computed(() => (
+  typeof props.itemsSchema?.pattern === 'string' ? props.itemsSchema.pattern : null
+));
+const pista = computed(() => patternHint(patron.value));
+/** Valores que el validador rechazara: se marcan, no se corrigen. */
+const invalidos = computed(() => new Set(invalidByPattern(lista.value, patron.value)));
 
 /** Titulo y explicacion de una opcion, si es un segmento conocido. */
 const detalleDe = (op) => props.segments?.find((s) => s?.name === op) ?? null;
@@ -156,7 +176,8 @@ function aplicarPegado() {
         <li
           v-for="{ v, i } in visibles"
           :key="`${v}-${i}`"
-          :class="{ duplicado: duplicados.has(v) }"
+          :class="{ duplicado: duplicados.has(v), invalido: invalidos.has(v) }"
+          :title="invalidos.has(v) ? `«${v}» no cumple el formato: ${pista}` : undefined"
         >
           <span class="mono">{{ v }}</span>
           <button
@@ -180,6 +201,16 @@ function aplicarPegado() {
         >
         <button type="button" @click="anadir()">Añadir</button>
       </div>
+
+      <p v-if="pista" class="pista">
+        Formato: {{ pista }}.
+      </p>
+
+      <p v-if="invalidos.size" class="aviso malo">
+        ⚠️ No cumplen el formato:
+        <code>{{ [...invalidos].join(', ') }}</code>. El validador los
+        rechazará al guardar; corrígelos aquí (no se corrigen solos).
+      </p>
 
       <p v-if="duplicados.size" class="aviso">
         ⚠️ Hay valores repetidos ({{ [...duplicados].join(', ') }}). No dan
@@ -221,6 +252,9 @@ function aplicarPegado() {
   padding: 3px 6px 3px 10px;
 }
 .etiquetas li.duplicado { border-color: var(--aviso); }
+/* Lo que el validador va a rechazar, en rojo ANTES de pulsar Guardar. */
+.etiquetas li.invalido { border-color: var(--error); }
+.etiquetas li.invalido .mono { color: var(--error); }
 .etiquetas li.vacio { background: none; border: none; padding: 2px 0; }
 
 .quitar {
@@ -262,4 +296,7 @@ function aplicarPegado() {
 .nulo input { width: auto; }
 
 .aviso { margin: 4px 0 0; font-size: 12px; color: var(--aviso); }
+.aviso.malo { color: var(--error); }
+.aviso.malo code { color: inherit; }
+.pista { margin: 6px 0 0; font-size: 12px; color: var(--texto-tenue); }
 </style>
