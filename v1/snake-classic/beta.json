@@ -238,6 +238,7 @@
     "rollout": {
       "enabled": true,
       "variants": [
+        "ios",
         "android"
       ],
       "cohort": {
@@ -245,13 +246,12 @@
         "salt": "1.0.136"
       },
       "meta": {
-        "name": "Aviso de version 1.0.136 (hard)",
-        "updatedAt": "2026-08-22T12:15:55.121Z"
+        "name": "Aviso de version 1.0.136 (soft)",
+        "updatedAt": "2026-08-22T12:19:27.718Z"
       }
     },
-    "mode": "hard",
+    "mode": "soft",
     "latestVersion": "1.0.136",
-    "minSupportedVersion": "1.0.136",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
