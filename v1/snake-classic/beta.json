@@ -247,7 +247,7 @@
       },
       "meta": {
         "name": "Aviso de version 1.0.136 (soft)",
-        "updatedAt": "2026-08-22T12:19:27.718Z"
+        "updatedAt": "2026-08-22T12:37:19.274Z"
       }
     },
     "mode": "soft",
@@ -255,13 +255,13 @@
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
-    "showPrompt": false,
+    "showPrompt": true,
     "messages": {
       "en": {
         "title": "Version 1.0.136 is available",
         "body": "Version 1.0.136 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
       },
-      "zh-cn": {
+      "zh-CN": {
         "title": "新版本 1.0.136 已发布",
         "body": "新版本 1.0.136 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
       }
