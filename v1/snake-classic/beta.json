@@ -242,15 +242,29 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.134"
+        "salt": "1.0.135"
+      },
+      "meta": {
+        "name": "Aviso de version 1.0.135 (hard)",
+        "updatedAt": "2026-08-22T11:43:41.300Z"
       }
     },
-    "mode": "soft",
-    "latestVersion": "1.0.134",
+    "mode": "hard",
+    "latestVersion": "1.0.135",
+    "minSupportedVersion": "1.0.135",
+    "hardPercent": 0,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": false,
-    "messages": {},
-    "hardPercent": 100
+    "messages": {
+      "en": {
+        "title": "Version 1.0.135 is available",
+        "body": "Version 1.0.135 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
+      },
+      "zh-cn": {
+        "title": "新版本 1.0.135 已发布",
+        "body": "新版本 1.0.135 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
+      }
+    }
   }
 }
