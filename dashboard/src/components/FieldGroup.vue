@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 
+import { hayIngles, idiomasSinTexto } from '../lib/locale-coverage.mjs';
 import { blankItem, buildItemSubtree, readPath } from '../lib/schema-form.mjs';
 import FieldControl from './FieldControl.vue';
 
@@ -109,19 +110,56 @@ function moverElemento(campo, desde, hacia) {
 }
 
 /**
- * Mapas de clave libre → objeto (`analytics.providers`).
+ * Mapas de clave libre → objeto. Cada clave se pinta como un sub-grupo con
+ * el schema de `additionalProperties`. Hay dos casos, y los distingue lo
+ * que el schema dice de sus claves:
  *
- * Cada clave se pinta como un sub-grupo con el schema de
- * `additionalProperties`. ⚠️ Las claves NO son libres de verdad aunque el
- * schema lo permita: el juego solo reconoce los ids de destino que registra
- * (`posthog`, `gamefw`), y uno inventado se ignora EN SILENCIO. Por eso se
- * sugieren los conocidos en vez de dejar solo un campo de texto.
+ *  - `x-keys: 'locales'` (los textos del aviso de versión,
+ *    `appUpdate.messages`): las claves son IDIOMAS. El schema trae los del
+ *    juego en `x-locales` (código + nombre), así que se ofrecen de un clic
+ *    y se puede decir cuáles se quedan sin texto — que NO leen el texto
+ *    genérico del juego en su idioma: leen el INGLÉS publicado. Las claves
+ *    siguen libres (una variante regional como `es-mx` es legítima y llega
+ *    a quien tenga `es`).
+ *  - sin marca (`analytics.providers`): ids de destino. ⚠️ NO son libres de
+ *    verdad aunque el schema lo permita: el juego solo reconoce los que
+ *    registra (`posthog`, `gamefw`), y uno inventado se ignora EN SILENCIO.
+ *    Por eso se sugieren los conocidos en vez de dejar solo un campo de
+ *    texto.
  */
 const DESTINOS_CONOCIDOS = ['posthog', 'gamefw'];
 
-function clavesDe(campo) {
+const esPorIdioma = (campo) => (
+  campo.keyKind === 'locales' && Array.isArray(campo.knownKeys)
+);
+
+function mapaDe(campo) {
   const mapa = readPath(props.data, campo.path);
-  return mapa && typeof mapa === 'object' ? Object.keys(mapa) : [];
+  return mapa && typeof mapa === 'object' ? mapa : {};
+}
+
+function clavesDe(campo) {
+  return Object.keys(mapaDe(campo));
+}
+
+/** El nombre nativo del idioma de una clave (`es` → «Español»), si lo hay. */
+function tituloDeClave(campo, clave) {
+  if (!esPorIdioma(campo)) return '';
+  const idioma = campo.knownKeys.find(
+    (l) => String(l.code).toLowerCase() === clave.toLowerCase(),
+  );
+  return idioma ? idioma.title : '';
+}
+
+function sinTextoDe(campo) {
+  return idiomasSinTexto(campo.knownKeys, mapaDe(campo));
+}
+
+function leenQue(campo) {
+  return hayIngles(mapaDe(campo))
+    ? 'leen el inglés'
+    : 'sin inglés de reserva: no ven el modal y el muro enseña el texto '
+      + 'genérico del juego';
 }
 
 function subarbolDe(campo, clave) {
@@ -139,13 +177,27 @@ const nuevaClave = ref('');
 
 function anadirClave(campo, clave) {
   const k = String(clave ?? nuevaClave.value).trim();
-  if (!k || clavesDe(campo).includes(k)) return;
+  // Sin distinguir mayúsculas: el juego normaliza `pt-BR` y `pt-br` a la
+  // misma clave, y dos entradas para el mismo idioma se pisarían sin avisar.
+  const repetida = clavesDe(campo).some(
+    (x) => x.toLowerCase() === k.toLowerCase(),
+  );
+  if (!k || repetida) return;
   emit('set', { path: `${campo.path}.${k}`, value: {} });
   nuevaClave.value = '';
 }
 
+/** `[{ key, title }]` que aún no están en el mapa. */
 function sugerenciasDe(campo) {
-  return DESTINOS_CONOCIDOS.filter((d) => !clavesDe(campo).includes(d));
+  const presentes = new Set(clavesDe(campo).map((k) => k.toLowerCase()));
+  if (esPorIdioma(campo)) {
+    return campo.knownKeys
+      .filter((l) => !presentes.has(String(l.code).toLowerCase()))
+      .map((l) => ({ key: l.code, title: l.title ?? '' }));
+  }
+  return DESTINOS_CONOCIDOS
+    .filter((d) => !presentes.has(d))
+    .map((d) => ({ key: d, title: '' }));
 }
 
 const esListaObjetos = (c) => c.widget === 'object-list';
@@ -262,7 +314,7 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
         </p>
       </div>
 
-      <!-- mapas de clave libre → objeto (destinos de analítica) -->
+      <!-- mapas de clave libre → objeto (textos por idioma, destinos de analítica) -->
       <div v-for="campo in mapasObjetos" :key="campo.path" class="lista-obj">
         <div class="lista-cab">
           <h4>{{ campo.label }}</h4>
@@ -273,6 +325,9 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
         <div v-for="clave in clavesDe(campo)" :key="clave" class="tarjeta">
           <div class="tarjeta-cab">
             <span class="indice mono">{{ clave }}</span>
+            <span v-if="tituloDeClave(campo, clave)" class="debil nombre">
+              {{ tituloDeClave(campo, clave) }}
+            </span>
             <button
               type="button" class="mini peligro"
               @click="emit('unset', { path: `${campo.path}.${clave}` })"
@@ -293,26 +348,58 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
         </div>
 
         <p v-if="clavesDe(campo).length === 0" class="debil vacio">
-          Sin destinos configurados: todos usan sus valores por defecto.
+          <template v-if="esPorIdioma(campo)">
+            Sin texto en ningún idioma: el modal no se abre y el muro
+            enseña el texto genérico del juego.
+          </template>
+          <template v-else>
+            Sin destinos configurados: todos usan sus valores por defecto.
+          </template>
+        </p>
+
+        <!--
+          Lo que la lista de claves no dice: el idioma que falta NO cae al
+          texto genérico del juego, cae al inglés publicado.
+        -->
+        <p
+          v-if="esPorIdioma(campo) && clavesDe(campo).length > 0"
+          class="cobertura"
+          :class="{ debil: sinTextoDe(campo).length === 0 }"
+        >
+          <template v-if="sinTextoDe(campo).length === 0">
+            ✓ Los {{ campo.knownKeys.length }} idiomas del juego tienen
+            texto propio.
+          </template>
+          <template v-else>
+            ⚠️ Sin texto propio ({{ leenQue(campo) }}):
+            {{ sinTextoDe(campo).map((l) => l.code).join(', ') }}.
+          </template>
         </p>
 
         <div class="anadir-clave">
           <button
-            v-for="d in sugerenciasDe(campo)"
-            :key="d"
+            v-for="s in sugerenciasDe(campo)"
+            :key="s.key"
             type="button"
             class="mini"
-            @click="anadirClave(campo, d)"
-          >+ {{ d }}</button>
+            :title="s.title"
+            @click="anadirClave(campo, s.key)"
+          >+ {{ s.key }}<span v-if="s.title" class="nombre"> · {{ s.title }}</span></button>
           <input
             v-model="nuevaClave"
             type="text"
             class="clave"
-            placeholder="otro id…"
+            :placeholder="esPorIdioma(campo) ? 'otro (es-mx)…' : 'otro id…'"
             @keydown.enter.prevent="anadirClave(campo)"
           >
           <span class="debil aviso-clave">
-            ⚠️ Un id que el juego no registre se ignora en silencio.
+            <template v-if="esPorIdioma(campo)">
+              Un código fuera de la lista solo lo lee alguien si es variante
+              regional de uno de ellos (es-mx → es); otro no lo lee nadie.
+            </template>
+            <template v-else>
+              ⚠️ Un id que el juego no registre se ignora en silencio.
+            </template>
           </span>
         </div>
       </div>
@@ -412,4 +499,6 @@ const mapasObjetos = computed(() => campos.value.filter(esMapaObjetos));
 .anadir-clave { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .clave { width: 150px; font-size: 12px; padding: 4px 8px; }
 .aviso-clave { font-size: 11px; }
+.cobertura { font-size: 12px; margin: 4px 0 8px; }
+.nombre { font-size: 11px; opacity: .75; }
 </style>

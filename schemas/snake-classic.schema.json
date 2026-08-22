@@ -22,6 +22,21 @@
       "veterans",
       "mpPlayers",
       "payers"
+    ],
+    "locales": [
+      "en",
+      "es",
+      "zh-CN",
+      "ja",
+      "pt-BR",
+      "de",
+      "fr",
+      "ko",
+      "ru",
+      "tr",
+      "pl",
+      "it",
+      "hi"
     ]
   },
   "type": "object",
@@ -3769,7 +3784,7 @@
               "urlByLocale": {
                 "default": {},
                 "title": "Enlace por idioma",
-                "description": "Destino por idioma; ausente = el enlace generico.",
+                "description": "Destino por idioma; ausente = el enlace generico. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
                 "type": "object",
                 "propertyNames": {
                   "type": "string",
@@ -3778,7 +3793,62 @@
                 "additionalProperties": {
                   "type": "string",
                   "minLength": 1
-                }
+                },
+                "x-keys": "locales",
+                "x-locales": [
+                  {
+                    "code": "en",
+                    "title": "English"
+                  },
+                  {
+                    "code": "es",
+                    "title": "Español"
+                  },
+                  {
+                    "code": "zh-CN",
+                    "title": "简体中文"
+                  },
+                  {
+                    "code": "ja",
+                    "title": "日本語"
+                  },
+                  {
+                    "code": "pt-BR",
+                    "title": "Português (Brasil)"
+                  },
+                  {
+                    "code": "de",
+                    "title": "Deutsch"
+                  },
+                  {
+                    "code": "fr",
+                    "title": "Français"
+                  },
+                  {
+                    "code": "ko",
+                    "title": "한국어"
+                  },
+                  {
+                    "code": "ru",
+                    "title": "Русский"
+                  },
+                  {
+                    "code": "tr",
+                    "title": "Türkçe"
+                  },
+                  {
+                    "code": "pl",
+                    "title": "Polski"
+                  },
+                  {
+                    "code": "it",
+                    "title": "Italiano"
+                  },
+                  {
+                    "code": "hi",
+                    "title": "हिन्दी"
+                  }
+                ]
               },
               "preRollVideo": {
                 "title": "Video previo (pre-roll)",
@@ -3922,7 +3992,62 @@
                               "minLength": 1
                             },
                             "title": "Texto por idioma",
-                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+                            "x-keys": "locales",
+                            "x-locales": [
+                              {
+                                "code": "en",
+                                "title": "English"
+                              },
+                              {
+                                "code": "es",
+                                "title": "Español"
+                              },
+                              {
+                                "code": "zh-CN",
+                                "title": "简体中文"
+                              },
+                              {
+                                "code": "ja",
+                                "title": "日本語"
+                              },
+                              {
+                                "code": "pt-BR",
+                                "title": "Português (Brasil)"
+                              },
+                              {
+                                "code": "de",
+                                "title": "Deutsch"
+                              },
+                              {
+                                "code": "fr",
+                                "title": "Français"
+                              },
+                              {
+                                "code": "ko",
+                                "title": "한국어"
+                              },
+                              {
+                                "code": "ru",
+                                "title": "Русский"
+                              },
+                              {
+                                "code": "tr",
+                                "title": "Türkçe"
+                              },
+                              {
+                                "code": "pl",
+                                "title": "Polski"
+                              },
+                              {
+                                "code": "it",
+                                "title": "Italiano"
+                              },
+                              {
+                                "code": "hi",
+                                "title": "हिन्दी"
+                              }
+                            ]
                           },
                           {
                             "type": "null"
@@ -3945,7 +4070,62 @@
                               "minLength": 1
                             },
                             "title": "Texto por idioma",
-                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+                            "x-keys": "locales",
+                            "x-locales": [
+                              {
+                                "code": "en",
+                                "title": "English"
+                              },
+                              {
+                                "code": "es",
+                                "title": "Español"
+                              },
+                              {
+                                "code": "zh-CN",
+                                "title": "简体中文"
+                              },
+                              {
+                                "code": "ja",
+                                "title": "日本語"
+                              },
+                              {
+                                "code": "pt-BR",
+                                "title": "Português (Brasil)"
+                              },
+                              {
+                                "code": "de",
+                                "title": "Deutsch"
+                              },
+                              {
+                                "code": "fr",
+                                "title": "Français"
+                              },
+                              {
+                                "code": "ko",
+                                "title": "한국어"
+                              },
+                              {
+                                "code": "ru",
+                                "title": "Русский"
+                              },
+                              {
+                                "code": "tr",
+                                "title": "Türkçe"
+                              },
+                              {
+                                "code": "pl",
+                                "title": "Polski"
+                              },
+                              {
+                                "code": "it",
+                                "title": "Italiano"
+                              },
+                              {
+                                "code": "hi",
+                                "title": "हिन्दी"
+                              }
+                            ]
                           },
                           {
                             "type": "null"
@@ -3968,7 +4148,62 @@
                               "minLength": 1
                             },
                             "title": "Texto por idioma",
-                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+                            "x-keys": "locales",
+                            "x-locales": [
+                              {
+                                "code": "en",
+                                "title": "English"
+                              },
+                              {
+                                "code": "es",
+                                "title": "Español"
+                              },
+                              {
+                                "code": "zh-CN",
+                                "title": "简体中文"
+                              },
+                              {
+                                "code": "ja",
+                                "title": "日本語"
+                              },
+                              {
+                                "code": "pt-BR",
+                                "title": "Português (Brasil)"
+                              },
+                              {
+                                "code": "de",
+                                "title": "Deutsch"
+                              },
+                              {
+                                "code": "fr",
+                                "title": "Français"
+                              },
+                              {
+                                "code": "ko",
+                                "title": "한국어"
+                              },
+                              {
+                                "code": "ru",
+                                "title": "Русский"
+                              },
+                              {
+                                "code": "tr",
+                                "title": "Türkçe"
+                              },
+                              {
+                                "code": "pl",
+                                "title": "Polski"
+                              },
+                              {
+                                "code": "it",
+                                "title": "Italiano"
+                              },
+                              {
+                                "code": "hi",
+                                "title": "हिन्दी"
+                              }
+                            ]
                           },
                           {
                             "type": "null"
@@ -4061,7 +4296,62 @@
                           "minLength": 1
                         },
                         "title": "Texto por idioma",
-                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+                        "x-keys": "locales",
+                        "x-locales": [
+                          {
+                            "code": "en",
+                            "title": "English"
+                          },
+                          {
+                            "code": "es",
+                            "title": "Español"
+                          },
+                          {
+                            "code": "zh-CN",
+                            "title": "简体中文"
+                          },
+                          {
+                            "code": "ja",
+                            "title": "日本語"
+                          },
+                          {
+                            "code": "pt-BR",
+                            "title": "Português (Brasil)"
+                          },
+                          {
+                            "code": "de",
+                            "title": "Deutsch"
+                          },
+                          {
+                            "code": "fr",
+                            "title": "Français"
+                          },
+                          {
+                            "code": "ko",
+                            "title": "한국어"
+                          },
+                          {
+                            "code": "ru",
+                            "title": "Русский"
+                          },
+                          {
+                            "code": "tr",
+                            "title": "Türkçe"
+                          },
+                          {
+                            "code": "pl",
+                            "title": "Polski"
+                          },
+                          {
+                            "code": "it",
+                            "title": "Italiano"
+                          },
+                          {
+                            "code": "hi",
+                            "title": "हिन्दी"
+                          }
+                        ]
                       },
                       "unlockAfterMs": {
                         "title": "Se desbloquea a los (ms)",
@@ -4109,7 +4399,62 @@
                           "minLength": 1
                         },
                         "title": "Texto por idioma",
-                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles."
+                        "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+                        "x-keys": "locales",
+                        "x-locales": [
+                          {
+                            "code": "en",
+                            "title": "English"
+                          },
+                          {
+                            "code": "es",
+                            "title": "Español"
+                          },
+                          {
+                            "code": "zh-CN",
+                            "title": "简体中文"
+                          },
+                          {
+                            "code": "ja",
+                            "title": "日本語"
+                          },
+                          {
+                            "code": "pt-BR",
+                            "title": "Português (Brasil)"
+                          },
+                          {
+                            "code": "de",
+                            "title": "Deutsch"
+                          },
+                          {
+                            "code": "fr",
+                            "title": "Français"
+                          },
+                          {
+                            "code": "ko",
+                            "title": "한국어"
+                          },
+                          {
+                            "code": "ru",
+                            "title": "Русский"
+                          },
+                          {
+                            "code": "tr",
+                            "title": "Türkçe"
+                          },
+                          {
+                            "code": "pl",
+                            "title": "Polski"
+                          },
+                          {
+                            "code": "it",
+                            "title": "Italiano"
+                          },
+                          {
+                            "code": "hi",
+                            "title": "हिन्दी"
+                          }
+                        ]
                       },
                       "unlockAfterMs": {
                         "title": "Se desbloquea a los (ms)",
@@ -4848,7 +5193,8 @@
         },
         "messages": {
           "title": "Textos por idioma",
-          "description": "Titulo y descripcion del aviso por idioma. Cadena de reserva: exacto → base → variante → en.",
+          "description": "Titulo y descripcion del aviso por idioma. Cadena de reserva: exacto → base → variante → en. Sin texto para su idioma el jugador lee el INGLES publicado, no el texto generico del juego (ese solo sale en el muro cuando tampoco hay ingles). Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+          "x-keys": "locales",
           "default": {},
           "type": "object",
           "propertyNames": {
@@ -4880,7 +5226,61 @@
             "title": "Texto del aviso",
             "description": "Lo que pinta el modal (soft) o el muro (hard).",
             "additionalProperties": false
-          }
+          },
+          "x-locales": [
+            {
+              "code": "en",
+              "title": "English"
+            },
+            {
+              "code": "es",
+              "title": "Español"
+            },
+            {
+              "code": "zh-CN",
+              "title": "简体中文"
+            },
+            {
+              "code": "ja",
+              "title": "日本語"
+            },
+            {
+              "code": "pt-BR",
+              "title": "Português (Brasil)"
+            },
+            {
+              "code": "de",
+              "title": "Deutsch"
+            },
+            {
+              "code": "fr",
+              "title": "Français"
+            },
+            {
+              "code": "ko",
+              "title": "한국어"
+            },
+            {
+              "code": "ru",
+              "title": "Русский"
+            },
+            {
+              "code": "tr",
+              "title": "Türkçe"
+            },
+            {
+              "code": "pl",
+              "title": "Polski"
+            },
+            {
+              "code": "it",
+              "title": "Italiano"
+            },
+            {
+              "code": "hi",
+              "title": "हिन्दी"
+            }
+          ]
         }
       },
       "additionalProperties": false

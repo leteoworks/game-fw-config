@@ -109,6 +109,31 @@ function tramosVacios(node, path = '') {
  * distingue) y pesos todos a 0 (todo el mundo en la primera; se admite pero
  * se avisa en la auditoria, no aqui).
  */
+/**
+ * Claves de `appUpdate.messages` que NINGUN jugador puede leer: su idioma
+ * base no es el de ninguno de los idiomas del juego (`x-locales` del
+ * schema, generados de la lista del framework). El cliente resuelve
+ * exacto → base → variante → ingles, asi que `es-mx` le sirve a quien
+ * tenga `es`, pero `sp` o `esp` no le sirven a nadie — y no hay error que
+ * lo diga: el texto simplemente no aparece. Sin `x-locales` en el schema
+ * no se puede saber y no se dice nada.
+ */
+function idiomasMuertos(data, schema) {
+  const locales = schema?.properties?.appUpdate?.properties?.messages
+    ?.['x-locales'];
+  const messages = data?.appUpdate?.messages;
+  if (!Array.isArray(locales) || locales.length === 0) return [];
+  if (!messages || typeof messages !== 'object') return [];
+  const base = (l) => {
+    const i = l.indexOf('-');
+    return i === -1 ? l : l.slice(0, i);
+  };
+  const bases = new Set(locales.map((l) => base(String(l.code).toLowerCase())));
+  return Object.keys(messages)
+    .filter((k) => !bases.has(base(k.trim().toLowerCase())))
+    .map((clave) => ({ clave, validos: locales.map((l) => l.code) }));
+}
+
 function experimentosRotos(node, path = '') {
   if (Array.isArray(node)) {
     return node.flatMap((item, i) => experimentosRotos(item, `${path}[${i}]`));
@@ -194,6 +219,17 @@ for (const schemaFile of readdirSync(schemasDir)) {
         + '  El juego lo trata como "nadie": la campaña no se enseñaria a '
         + 'ningun jugador\n  sin que nada avise. → pon desde < hasta, o '
         + 'apaga la campaña (rollout.enabled: false).',
+      );
+    }
+
+    for (const { clave, validos } of idiomasMuertos(data, schema)) {
+      failed = true;
+      console.error(
+        `FAIL ${gameId}/${configFile}: appUpdate.messages."${clave}" no es `
+        + 'un idioma de este juego ni variante regional de uno\n'
+        + '  Ningun jugador puede tener ese idioma, asi que ese texto no lo '
+        + 'leeria nadie\n  y nada avisaria. → usa uno de: '
+        + `${validos.join(', ')} (o una variante como es-mx).`,
       );
     }
 

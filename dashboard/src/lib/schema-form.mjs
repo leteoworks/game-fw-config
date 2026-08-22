@@ -358,6 +358,14 @@ function buildField({
     // Papel del campo dentro del sobre de despliegue (`x-rollout`), para que
     // el control pueda explicar la semantica (segmentos = cumplir TODOS).
     rolloutRole: schema['x-rollout'] ?? null,
+    // Mapas "por idioma" (`x-keys: 'locales'`): los idiomas del juego viajan
+    // en `x-locales` (código + nombre nativo), generados desde la lista del
+    // framework. Con ellos el editor ofrece cada idioma de un clic y puede
+    // decir cuáles se quedan sin texto, que es lo que de verdad importa al
+    // rellenar un aviso. Sin marca, las claves son lo que sean (ids de
+    // destino de analítica) y el control no sugiere idiomas.
+    keyKind: typeof schema['x-keys'] === 'string' ? schema['x-keys'] : null,
+    knownKeys: Array.isArray(schema['x-locales']) ? schema['x-locales'] : null,
     schema,
     diffs,
   };

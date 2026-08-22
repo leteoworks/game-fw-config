@@ -227,6 +227,39 @@ test('los segmentos llegan al modelo con su titulo y explicacion', () => {
   assert.equal(id.rolloutRole, null);
 });
 
+test('los mapas por idioma traen los idiomas del juego, con su nombre', () => {
+  // `x-locales` viaja en el schema generado (de la lista del framework).
+  // Sin esto el editor volveria a sugerir una lista a mano y no podria
+  // decir que idiomas se quedan leyendo el ingles.
+  const modelo = buildFormModel(schemaReal, { data: {} });
+  const appUpdate = modelo.sections.find((s) => s.key === 'appUpdate');
+  const messages = appUpdate.children.find((c) => c.key === 'messages');
+  assert.equal(messages.widget, 'object-map');
+  assert.equal(messages.keyKind, 'locales');
+  const codigos = messages.knownKeys.map((l) => l.code);
+  assert.ok(
+    ['es', 'pt-BR', 'zh-CN', 'hi'].every((c) => codigos.includes(c)),
+    `faltan idiomas: ${codigos.join(', ')}`,
+  );
+  for (const l of messages.knownKeys) {
+    assert.ok(l.title, `idioma sin nombre: ${l.code}`);
+  }
+  // Los mapas de texto del anuncio (strings por idioma) llevan los mismos,
+  // tambien los que admiten null (la rama util se aplana).
+  const ads = modelo.sections.find((s) => s.key === 'ads');
+  const banners = ads.children.find((c) => c.key === 'banners');
+  const tarjeta = buildItemSubtree({
+    itemsSchema: banners.itemsSchema, basePath: 'ads.banners', index: 0, data: {},
+  });
+  const url = tarjeta.children.find((c) => c.key === 'urlByLocale');
+  assert.equal(url.widget, 'locale-map');
+  assert.deepEqual(url.knownKeys.map((l) => l.code), codigos);
+  // Un campo corriente no lleva nada de esto.
+  const id = tarjeta.children.find((c) => c.key === 'id');
+  assert.equal(id.keyKind, null);
+  assert.equal(id.knownKeys, null);
+});
+
 test('una seccion next-boot conserva la marca x-apply en su schema', () => {
   // Es lo que el grupo usa para avisar de que los cambios entran en el
   // siguiente arranque y no en caliente.

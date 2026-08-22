@@ -135,7 +135,7 @@
     },
     "appUpdate.messages": {
       "label": "Texto del aviso",
-      "help": "Que lee el jugador, en su idioma. Lo enseña el MODAL si la actualizacion es recomendada, y el MURO si es obligatoria: nunca coinciden, asi que se escribe una sola vez. Sin texto para su idioma (ni el ingles de reserva) el modal no se abre y el muro usa el texto generico del juego. Con rellenar el ingles cubres a todo el mundo."
+      "help": "Que lee el jugador, en su idioma. Lo enseña el MODAL si la actualizacion es recomendada, y el MURO si es obligatoria: nunca coinciden, asi que se escribe una sola vez. Cadena de reserva: su idioma exacto → idioma base → una variante regional → ingles. OJO: sin texto para su idioma el jugador lee el INGLES publicado, no el texto generico del juego; el generico solo sale en el muro cuando tampoco hay ingles (y el modal entonces no se abre). Los botones de abajo son los idiomas del juego: con todos, cada jugador lee el suyo, y el editor dice cuales faltan."
     }
   },
   "fields": {
@@ -516,7 +516,7 @@
     },
     "appUpdate.messages": {
       "label": "Texto del aviso",
-      "help": "Una entrada por idioma. La clave es el codigo del idioma (es, en, pt-BR, zh-CN...); da igual mayusculas o minusculas. Si falta el idioma exacto se prueba el idioma base (es-MX usa es), luego cualquier variante del mismo idioma, y por ultimo el ingles."
+      "help": "Una entrada por idioma. La clave es el codigo del idioma (es, en, pt-BR, zh-CN...); da igual mayusculas o minusculas. Si falta el idioma exacto se prueba el idioma base (es-MX usa es), luego cualquier variante del mismo idioma, y por ultimo el ingles: quien no tenga el suyo lee el ingles, no el texto generico del juego. El editor ofrece los idiomas del juego de un clic y dice cuales se quedan sin texto propio."
     },
     "appUpdate.messages.title": {
       "label": "Titulo",

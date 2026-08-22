@@ -333,6 +333,14 @@ const juego = computed(() => props.gameId || 'snake-classic');
         juego). El editor enseña el formato debajo de la lista y marca en
         rojo lo que no lo cumple (mayúsculas, guiones bajos).
       </p>
+      <p>
+        No confundir con los <strong>textos por idioma</strong> del aviso de
+        versión (<code>appUpdate.messages</code>): esta lista decide <em>a
+        quién</em> llega una campaña; aquel mapa, <em>qué lee</em> cada
+        jugador. Ese editor ofrece los idiomas del juego de un clic y dice
+        cuáles se quedan sin texto propio — que <strong>no</strong> leen el
+        texto genérico del juego en su idioma: leen el inglés publicado.
+      </p>
 
       <h3>Países (<code>countries</code>)</h3>
       <p>

@@ -314,6 +314,7 @@ function fijarFecha(local) {
       <LocaleMapInput
         v-else-if="f.widget === 'locale-map'"
         :model-value="valorMostrado"
+        :suggested="f.knownKeys"
         @update:model-value="set"
       />
 

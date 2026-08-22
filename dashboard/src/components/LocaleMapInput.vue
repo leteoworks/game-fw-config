@@ -15,10 +15,16 @@ import { computed, ref } from 'vue';
 const props = defineProps({
   modelValue: { type: [Object, null], default: undefined },
   placeholder: { type: String, default: '' },
+  /**
+   * Los idiomas del juego (`x-locales` del schema: `[{ code, title }]`),
+   * para ofrecerlos de un clic. Vienen generados de la lista del framework,
+   * así que aquí no hay que mantener ninguna.
+   */
+  suggested: { type: Array, default: null },
 });
 const emit = defineEmits(['update:modelValue']);
 
-/** Idiomas del juego, para ofrecerlos de un clic. */
+/** Reserva para un schema viejo que no traiga `x-locales`. */
 const SUGERIDOS = ['en', 'es', 'pt-BR', 'fr', 'de', 'it', 'ja', 'ko', 'zh'];
 
 const mapa = computed(() => props.modelValue ?? {});
@@ -37,9 +43,16 @@ const faltaFallback = computed(
   () => entradas.value.length > 0 && !('en' in mapa.value),
 );
 
-const disponibles = computed(
-  () => SUGERIDOS.filter((l) => !(l in mapa.value)),
-);
+const sugeridos = computed(() => (
+  Array.isArray(props.suggested) && props.suggested.length > 0
+    ? props.suggested.map((l) => ({ code: String(l.code), title: l.title ?? '' }))
+    : SUGERIDOS.map((code) => ({ code, title: '' }))
+));
+
+const disponibles = computed(() => {
+  const presentes = new Set(Object.keys(mapa.value).map((k) => k.toLowerCase()));
+  return sugeridos.value.filter((l) => !presentes.has(l.code.toLowerCase()));
+});
 
 const nuevoIdioma = ref('');
 
@@ -99,12 +112,13 @@ function anadir(idioma) {
 
     <div class="anadir">
       <button
-        v-for="l in disponibles.slice(0, 6)"
-        :key="l"
+        v-for="l in disponibles"
+        :key="l.code"
         type="button"
         class="sugerido"
-        @click="anadir(l)"
-      >+ {{ l }}</button>
+        :title="l.title"
+        @click="anadir(l.code)"
+      >+ {{ l.code }}</button>
       <input
         v-model="nuevoIdioma"
         type="text"
