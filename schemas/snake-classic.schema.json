@@ -20,7 +20,8 @@
     "segments": [
       "newPlayers",
       "veterans",
-      "mpPlayers"
+      "mpPlayers",
+      "payers"
     ]
   },
   "type": "object",
@@ -313,7 +314,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -423,6 +424,29 @@
                 }
               ]
             },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
             "schedule": {
               "default": null,
               "title": "Calendario",
@@ -486,7 +510,7 @@
             "segments": {
               "default": [],
               "title": "Segmentos",
-              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
               "maxItems": 16,
               "type": "array",
@@ -496,7 +520,8 @@
                 "enum": [
                   "newPlayers",
                   "veterans",
-                  "mpPlayers"
+                  "mpPlayers",
+                  "payers"
                 ]
               },
               "uniqueItems": true,
@@ -515,6 +540,11 @@
                   "name": "mpPlayers",
                   "title": "Juegan al multijugador",
                   "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                },
+                {
+                  "name": "payers",
+                  "title": "Han pagado",
+                  "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                 }
               ]
             },
@@ -577,6 +607,31 @@
                     }
                   ]
                 },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
                 "ramp": {
                   "default": [],
                   "title": "Rampa programada",
@@ -618,6 +673,68 @@
                 }
               },
               "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "meta": {
               "title": "Ficha de la campaña",
@@ -842,6 +959,29 @@
                       }
                     ]
                   },
+                  "locales": {
+                    "default": [],
+                    "title": "Idiomas",
+                    "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+                    }
+                  },
+                  "countries": {
+                    "default": [],
+                    "title": "Paises",
+                    "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "maxItems": 64,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{2}$"
+                    }
+                  },
                   "schedule": {
                     "default": null,
                     "title": "Calendario",
@@ -905,7 +1045,7 @@
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
-                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
                     "maxItems": 16,
                     "type": "array",
@@ -915,7 +1055,8 @@
                       "enum": [
                         "newPlayers",
                         "veterans",
-                        "mpPlayers"
+                        "mpPlayers",
+                        "payers"
                       ]
                     },
                     "uniqueItems": true,
@@ -934,6 +1075,11 @@
                         "name": "mpPlayers",
                         "title": "Juegan al multijugador",
                         "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      },
+                      {
+                        "name": "payers",
+                        "title": "Han pagado",
+                        "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                       }
                     ]
                   },
@@ -996,6 +1142,31 @@
                           }
                         ]
                       },
+                      "layer": {
+                        "default": null,
+                        "title": "Capa (exclusion mutua)",
+                        "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "bucketBy": {
+                        "default": "device",
+                        "title": "Punto del parque por",
+                        "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                        "type": "string",
+                        "enum": [
+                          "device",
+                          "user"
+                        ]
+                      },
                       "ramp": {
                         "default": [],
                         "title": "Rampa programada",
@@ -1037,6 +1208,68 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "experiment": {
+                    "default": null,
+                    "title": "Experimento (A/B)",
+                    "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Clave del experimento",
+                            "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                          },
+                          "variants": {
+                            "minItems": 1,
+                            "maxItems": 10,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "maxLength": 64,
+                                  "pattern": "^[a-z][a-zA-Z0-9]*$",
+                                  "title": "Variante",
+                                  "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                                },
+                                "weight": {
+                                  "default": 1,
+                                  "title": "Peso",
+                                  "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1000
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "title": "Variante",
+                              "description": "Nombre y peso de una variante del experimento.",
+                              "additionalProperties": false
+                            },
+                            "title": "Variantes",
+                            "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "variants"
+                        ],
+                        "title": "Experimento",
+                        "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "meta": {
                     "title": "Ficha de la campaña",
@@ -1089,7 +1322,7 @@
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -1257,6 +1490,29 @@
                 }
               ]
             },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
             "schedule": {
               "default": null,
               "title": "Calendario",
@@ -1320,7 +1576,7 @@
             "segments": {
               "default": [],
               "title": "Segmentos",
-              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
               "maxItems": 16,
               "type": "array",
@@ -1330,7 +1586,8 @@
                 "enum": [
                   "newPlayers",
                   "veterans",
-                  "mpPlayers"
+                  "mpPlayers",
+                  "payers"
                 ]
               },
               "uniqueItems": true,
@@ -1349,6 +1606,11 @@
                   "name": "mpPlayers",
                   "title": "Juegan al multijugador",
                   "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                },
+                {
+                  "name": "payers",
+                  "title": "Han pagado",
+                  "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                 }
               ]
             },
@@ -1411,6 +1673,31 @@
                     }
                   ]
                 },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
                 "ramp": {
                   "default": [],
                   "title": "Rampa programada",
@@ -1452,6 +1739,68 @@
                 }
               },
               "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "meta": {
               "title": "Ficha de la campaña",
@@ -1696,6 +2045,29 @@
                       }
                     ]
                   },
+                  "locales": {
+                    "default": [],
+                    "title": "Idiomas",
+                    "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+                    }
+                  },
+                  "countries": {
+                    "default": [],
+                    "title": "Paises",
+                    "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "maxItems": 64,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{2}$"
+                    }
+                  },
                   "schedule": {
                     "default": null,
                     "title": "Calendario",
@@ -1759,7 +2131,7 @@
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
-                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
                     "maxItems": 16,
                     "type": "array",
@@ -1769,7 +2141,8 @@
                       "enum": [
                         "newPlayers",
                         "veterans",
-                        "mpPlayers"
+                        "mpPlayers",
+                        "payers"
                       ]
                     },
                     "uniqueItems": true,
@@ -1788,6 +2161,11 @@
                         "name": "mpPlayers",
                         "title": "Juegan al multijugador",
                         "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      },
+                      {
+                        "name": "payers",
+                        "title": "Han pagado",
+                        "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                       }
                     ]
                   },
@@ -1850,6 +2228,31 @@
                           }
                         ]
                       },
+                      "layer": {
+                        "default": null,
+                        "title": "Capa (exclusion mutua)",
+                        "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "bucketBy": {
+                        "default": "device",
+                        "title": "Punto del parque por",
+                        "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                        "type": "string",
+                        "enum": [
+                          "device",
+                          "user"
+                        ]
+                      },
                       "ramp": {
                         "default": [],
                         "title": "Rampa programada",
@@ -1891,6 +2294,68 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "experiment": {
+                    "default": null,
+                    "title": "Experimento (A/B)",
+                    "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Clave del experimento",
+                            "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                          },
+                          "variants": {
+                            "minItems": 1,
+                            "maxItems": 10,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "maxLength": 64,
+                                  "pattern": "^[a-z][a-zA-Z0-9]*$",
+                                  "title": "Variante",
+                                  "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                                },
+                                "weight": {
+                                  "default": 1,
+                                  "title": "Peso",
+                                  "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1000
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "title": "Variante",
+                              "description": "Nombre y peso de una variante del experimento.",
+                              "additionalProperties": false
+                            },
+                            "title": "Variantes",
+                            "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "variants"
+                        ],
+                        "title": "Experimento",
+                        "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "meta": {
                     "title": "Ficha de la campaña",
@@ -1943,7 +2408,7 @@
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -2047,7 +2512,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -2157,6 +2622,29 @@
                 }
               ]
             },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
             "schedule": {
               "default": null,
               "title": "Calendario",
@@ -2220,7 +2708,7 @@
             "segments": {
               "default": [],
               "title": "Segmentos",
-              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
               "maxItems": 16,
               "type": "array",
@@ -2230,7 +2718,8 @@
                 "enum": [
                   "newPlayers",
                   "veterans",
-                  "mpPlayers"
+                  "mpPlayers",
+                  "payers"
                 ]
               },
               "uniqueItems": true,
@@ -2249,6 +2738,11 @@
                   "name": "mpPlayers",
                   "title": "Juegan al multijugador",
                   "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                },
+                {
+                  "name": "payers",
+                  "title": "Han pagado",
+                  "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                 }
               ]
             },
@@ -2311,6 +2805,31 @@
                     }
                   ]
                 },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
                 "ramp": {
                   "default": [],
                   "title": "Rampa programada",
@@ -2352,6 +2871,68 @@
                 }
               },
               "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "meta": {
               "title": "Ficha de la campaña",
@@ -2618,7 +3199,7 @@
               },
               "rollout": {
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "default": {},
                 "type": "object",
                 "properties": {
@@ -2728,6 +3309,29 @@
                       }
                     ]
                   },
+                  "locales": {
+                    "default": [],
+                    "title": "Idiomas",
+                    "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+                    }
+                  },
+                  "countries": {
+                    "default": [],
+                    "title": "Paises",
+                    "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "maxItems": 64,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{2}$"
+                    }
+                  },
                   "schedule": {
                     "default": null,
                     "title": "Calendario",
@@ -2791,7 +3395,7 @@
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
-                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
                     "x-rollout": "segments",
                     "maxItems": 16,
                     "type": "array",
@@ -2801,7 +3405,8 @@
                       "enum": [
                         "newPlayers",
                         "veterans",
-                        "mpPlayers"
+                        "mpPlayers",
+                        "payers"
                       ]
                     },
                     "uniqueItems": true,
@@ -2820,6 +3425,11 @@
                         "name": "mpPlayers",
                         "title": "Juegan al multijugador",
                         "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      },
+                      {
+                        "name": "payers",
+                        "title": "Han pagado",
+                        "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                       }
                     ]
                   },
@@ -2882,6 +3492,31 @@
                           }
                         ]
                       },
+                      "layer": {
+                        "default": null,
+                        "title": "Capa (exclusion mutua)",
+                        "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "bucketBy": {
+                        "default": "device",
+                        "title": "Punto del parque por",
+                        "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                        "type": "string",
+                        "enum": [
+                          "device",
+                          "user"
+                        ]
+                      },
                       "ramp": {
                         "default": [],
                         "title": "Rampa programada",
@@ -2923,6 +3558,68 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "experiment": {
+                    "default": null,
+                    "title": "Experimento (A/B)",
+                    "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Clave del experimento",
+                            "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                          },
+                          "variants": {
+                            "minItems": 1,
+                            "maxItems": 10,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "maxLength": 64,
+                                  "pattern": "^[a-z][a-zA-Z0-9]*$",
+                                  "title": "Variante",
+                                  "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                                },
+                                "weight": {
+                                  "default": 1,
+                                  "title": "Peso",
+                                  "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1000
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "title": "Variante",
+                              "description": "Nombre y peso de una variante del experimento.",
+                              "additionalProperties": false
+                            },
+                            "title": "Variantes",
+                            "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "variants"
+                        ],
+                        "title": "Experimento",
+                        "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "meta": {
                     "title": "Ficha de la campaña",
@@ -3536,7 +4233,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, calendario, segmentos y cohorte. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -3646,6 +4343,29 @@
                 }
               ]
             },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
             "schedule": {
               "default": null,
               "title": "Calendario",
@@ -3709,7 +4429,7 @@
             "segments": {
               "default": [],
               "title": "Segmentos",
-              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.).",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
               "x-rollout": "segments",
               "maxItems": 16,
               "type": "array",
@@ -3719,7 +4439,8 @@
                 "enum": [
                   "newPlayers",
                   "veterans",
-                  "mpPlayers"
+                  "mpPlayers",
+                  "payers"
                 ]
               },
               "uniqueItems": true,
@@ -3738,6 +4459,11 @@
                   "name": "mpPlayers",
                   "title": "Juegan al multijugador",
                   "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                },
+                {
+                  "name": "payers",
+                  "title": "Han pagado",
+                  "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
                 }
               ]
             },
@@ -3800,6 +4526,31 @@
                     }
                   ]
                 },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
                 "ramp": {
                   "default": [],
                   "title": "Rampa programada",
@@ -3841,6 +4592,68 @@
                 }
               },
               "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "meta": {
               "title": "Ficha de la campaña",
@@ -4181,6 +4994,17 @@
           "type": "number",
           "minimum": 0,
           "maximum": 1
+        },
+        "holdoutPercent": {
+          "default": 0,
+          "title": "Grupo de control global (holdout)",
+          "description": "Porcentaje del parque, estable por jugador, que NO recibe ninguna campaña de ninguna seccion (motivo \"holdout\"). Es la linea base para medir el efecto conjunto de las campañas. 0 = sin holdout. Subirlo quita campañas a gente que ya las tenia: cambiarlo es empezar una medicion nueva.",
+          "x-ui": {
+            "widget": "percent"
+          },
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
         }
       },
       "additionalProperties": false

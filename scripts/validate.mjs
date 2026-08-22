@@ -103,6 +103,43 @@ function tramosVacios(node, path = '') {
   return out;
 }
 
+/**
+ * Experimentos (`rollout.experiment`) que el schema no puede rechazar: dos
+ * variantes con el mismo nombre (el reparto se rompe y la telemetria no
+ * distingue) y pesos todos a 0 (todo el mundo en la primera; se admite pero
+ * se avisa en la auditoria, no aqui).
+ */
+function experimentosRotos(node, path = '') {
+  if (Array.isArray(node)) {
+    return node.flatMap((item, i) => experimentosRotos(item, `${path}[${i}]`));
+  }
+  if (node === null || typeof node !== 'object') return [];
+  const out = [];
+  for (const [key, value] of Object.entries(node)) {
+    const at = path === '' ? key : `${path}.${key}`;
+    if (
+      key === 'experiment'
+      && value !== null
+      && typeof value === 'object'
+      && Array.isArray(value.variants)
+    ) {
+      const nombres = value.variants
+        .map((v) => (v && typeof v.name === 'string' ? v.name : null))
+        .filter((n) => n !== null);
+      const repetidos = [...new Set(nombres.filter((n, i) => nombres.indexOf(n) !== i))];
+      if (repetidos.length > 0) {
+        out.push({
+          at,
+          motivo: `variantes repetidas (${repetidos.join(', ')}): el reparto `
+            + 'del experimento se rompe. Dale un nombre distinto a cada una.',
+        });
+      }
+    }
+    out.push(...experimentosRotos(value, at));
+  }
+  return out;
+}
+
 const schemasDir = 'schemas';
 const configsDir = 'v1';
 
@@ -140,6 +177,13 @@ for (const schemaFile of readdirSync(schemasDir)) {
       );
     } else {
       console.log(`OK   ${gameId}/${configFile}`);
+    }
+
+    for (const problema of experimentosRotos(data)) {
+      failed = true;
+      console.error(
+        `FAIL ${gameId}/${configFile}: ${problema.at}: ${problema.motivo}`,
+      );
     }
 
     for (const tramo of tramosVacios(data)) {
