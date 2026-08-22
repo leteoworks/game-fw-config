@@ -244,27 +244,27 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.140"
+        "salt": "1.0.141"
       },
       "meta": {
-        "name": "Aviso de version 1.0.140 (soft)",
-        "updatedAt": "2026-08-22T18:43:33.423Z"
+        "name": "Aviso de version 1.0.141 (soft)",
+        "updatedAt": "2026-08-22T19:30:33.689Z"
       }
     },
     "mode": "soft",
-    "latestVersion": "1.0.140",
+    "latestVersion": "1.0.141",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.140 is available",
-        "body": "Version 1.0.140 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
+        "title": "Version 1.0.141 is available",
+        "body": "Version 1.0.141 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
       },
       "zh-cn": {
-        "title": "新版本 1.0.140 已发布",
-        "body": "新版本 1.0.140 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
+        "title": "新版本 1.0.141 已发布",
+        "body": "新版本 1.0.141 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
       }
     }
   }
