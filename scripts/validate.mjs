@@ -1,4 +1,4 @@
-// Valida cada JSON de configs/v1/<game>/<channel>.json
+// Valida cada JSON de v1/games/<game>/<channel>.json
 // contra el schema de schemas/<game>.schema.json.
 // Ejecutado en CI antes de publicar.
 
@@ -166,9 +166,18 @@ function experimentosRotos(node, path = '') {
 }
 
 const schemasDir = 'schemas';
-const configsDir = 'v1';
+// ⚠️ El nivel `games/` llego con la politica canonica de URLs (ago-2026).
+// Mientras esto apunto a `v1/` a secas, la carpeta del juego no existia y el
+// bucle de abajo hacia SKIP... y terminaba imprimiendo "All configs valid".
+// Un visto bueno sobre cero ficheros es peor que un error: parece que valida.
+const configsDir = join('v1', 'games');
+
+/** Ficheros que viven en la carpeta pero NO son un canal de configuracion. */
+const NO_SON_CONFIG = new Set(['copy-template.json']);
 
 let failed = false;
+/** Cuantos ficheros se han validado DE VERDAD. */
+let validados = 0;
 
 for (const schemaFile of readdirSync(schemasDir)) {
   if (!schemaFile.endsWith('.schema.json')) continue;
@@ -182,14 +191,24 @@ for (const schemaFile of readdirSync(schemasDir)) {
   try {
     statSync(gameDir);
   } catch {
-    console.warn(
-      `SKIP ${gameId}: no hay carpeta ${gameDir}`,
+    // Un schema sin su carpeta de configs NO es un aviso: es que alguien
+    // movio una de las dos y la otra se quedo atras. Antes esto era un
+    // `warn` + `continue`, y por eso el fallo del layout paso semanas sin
+    // que nadie lo viera.
+    console.error(
+      `FAIL ${gameId}: hay schema pero no la carpeta ${gameDir}.`,
     );
+    failed = true;
     continue;
   }
 
   for (const configFile of readdirSync(gameDir)) {
     if (!configFile.endsWith('.json')) continue;
+    // Lo que el Worker NO empaqueta tampoco es config: la chuleta del copy
+    // comercial son 65 claves x 13 idiomas para copiar de ahi a mano, no un
+    // canal. Tiene que coincidir con `IGNORED_NAMES` de
+    // `services/remote-config/scripts/build-bundle.mjs` del superproyecto.
+    if (NO_SON_CONFIG.has(configFile)) continue;
     const fullPath = join(gameDir, configFile);
     const data = JSON.parse(
       readFileSync(fullPath, 'utf8'),
@@ -202,6 +221,7 @@ for (const schemaFile of readdirSync(schemasDir)) {
       );
     } else {
       console.log(`OK   ${gameId}/${configFile}`);
+      validados += 1;
     }
 
     for (const problema of experimentosRotos(data)) {
@@ -279,4 +299,14 @@ if (failed) {
   process.exit(1);
 }
 
-console.log('\nAll configs valid.');
+// Decirlo con el NUMERO: "All configs valid" sobre cero ficheros es
+// exactamente lo que este script imprimio durante semanas.
+if (validados === 0) {
+  console.error(
+    '\nNo se ha validado NI UN fichero. O no hay configs, o la ruta'
+    + ` (${configsDir}/<juego>/) dejo de existir.`,
+  );
+  process.exit(1);
+}
+
+console.log(`\nAll configs valid (${validados} fichero(s)).`);
