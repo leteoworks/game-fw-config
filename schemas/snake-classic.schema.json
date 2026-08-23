@@ -5289,7 +5289,7 @@
     },
     "mp": {
       "title": "Multijugador",
-      "description": "Flags del modo multijugador online de Snake: boton, filtro por dispositivo, muro de suscripcion y reintentos.",
+      "description": "Flags del modo multijugador online de Snake: boton, filtro por dispositivo, muro de suscripcion, aforo y reintentos.",
       "default": {},
       "type": "object",
       "properties": {
@@ -5324,6 +5324,29 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 99999
+            }
+          },
+          "additionalProperties": false
+        },
+        "congestion": {
+          "title": "Aforo del multijugador",
+          "description": "El limite de jugadores concurrentes y su interruptor.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Cerrar el multijugador cuando va lleno",
+              "description": "Nace ENCENDIDO. Con el servidor lleno, a quien intente entrar se le explica que el multijugador esta saturado en vez de dejar que se estrelle contra un fallo de conexion. Apagarlo no afecta a quien ya esta jugando.",
+              "type": "boolean"
+            },
+            "maxConcurrentPlayers": {
+              "default": 90,
+              "title": "Jugadores a la vez antes de cerrar",
+              "description": "Suma de TODAS las plataformas (Android, iOS, Steam, escritorio, web). El plan gratuito de Photon corta en 100: el default (90) deja margen para los que estan entrando en ese momento. La puerta se reabre sola al bajar.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100000
             }
           },
           "additionalProperties": false
