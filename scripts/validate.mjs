@@ -30,7 +30,16 @@ const ajv = new Ajv({ allErrors: true, strict: false });
  * `ADS_ALLOWED_ASSET_HOSTS=https://uno,https://dos`.
  */
 const ALLOWED_ASSET_ORIGINS = [
-  'https://gamefw-remote-config.acamposruiz.workers.dev',
+  // El Worker de remote-config, que sirve por R2 lo que no cabe en su bundle
+  // (imagenes y video). Es el host que `REMOTE_CONFIG_CSP_HOST` inyecta en
+  // `img-src` y `media-src`, y el que ya llevan las builds publicadas.
+  //
+  // ⚠️ Antes aqui estaba el `*.workers.dev` de la cuenta, que la politica
+  // canonica de URLs prohibe expresamente. Se quedo atras en la migracion
+  // (ago-2026) y el efecto era el peor posible: rechazaba la URL BUENA y en
+  // el mensaje sugeria la LEGADA, o sea que empujaba a publicar una
+  // creatividad que el CSP de la app bloquea — y ese fallo es MUDO.
+  'https://config.leteoworks.com',
   ...(process.env.ADS_ALLOWED_ASSET_HOSTS ?? '')
     .split(',')
     .map((h) => h.trim())
@@ -288,7 +297,7 @@ for (const schemaFile of readdirSync(schemasDir)) {
         + '  El CSP la bloquearia y el anuncio no se montaria, SIN '
         + 'ningun error visible.\n'
         + '  → sirvela desde '
-        + `${ALLOWED_ASSET_ORIGINS[0]}/v1/assets/...`,
+        + `${ALLOWED_ASSET_ORIGINS[0]}/v1/shared/assets/...`,
       );
     }
   }

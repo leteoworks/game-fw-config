@@ -116,7 +116,7 @@
           "meta": {
             "name": "Prueba del remote-config de ads (A9)",
             "owner": "antonio",
-            "notes": "Imagen + \"Saber mas\" con link + Cerrar bloqueado 5 s con cuenta atras + mini-banner en la home. Solo beta."
+            "notes": "Pre-roll de video 6 s (desde R2 por el Worker: media-src no admite data:) + imagen + \"Saber mas\" con link + Cerrar bloqueado 5 s con cuenta atras + mini-banner en la home. Solo beta."
           }
         },
         "placement": "post-splash",
@@ -155,7 +155,35 @@
             }
           ]
         },
-        "showCountdown": true
+        "showCountdown": true,
+        "preRollVideo": {
+          "sources": [
+            {
+              "url": "https://config.leteoworks.com/v1/shared/assets/mock-ads/preroll-portrait.mp4",
+              "type": "video/mp4",
+              "orientation": "portrait"
+            },
+            {
+              "url": "https://config.leteoworks.com/v1/shared/assets/mock-ads/preroll-portrait.webm",
+              "type": "video/webm",
+              "orientation": "portrait"
+            },
+            {
+              "url": "https://config.leteoworks.com/v1/shared/assets/mock-ads/preroll-landscape.mp4",
+              "type": "video/mp4",
+              "orientation": "landscape"
+            },
+            {
+              "url": "https://config.leteoworks.com/v1/shared/assets/mock-ads/preroll-landscape.webm",
+              "type": "video/webm",
+              "orientation": "landscape"
+            }
+          ],
+          "maxDurationMs": 15000,
+          "skippableAfterMs": null,
+          "startTimeoutMs": null,
+          "allowAudio": false
+        }
       }
     ]
   }
