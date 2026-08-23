@@ -165,7 +165,12 @@
         "name.form.resolved",
         "ranking.opened",
         "ranking.session.summary",
-        "leaderboard.score.mismatch"
+        "leaderboard.score.mismatch",
+        "mp.congestion.checked",
+        "mp.congestion.blocked",
+        "mp.congestion.dismissed",
+        "mp.congestion.server",
+        "mp.congestion.sample"
       ],
       "blockedEvents": []
     },
