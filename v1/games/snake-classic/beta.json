@@ -170,7 +170,23 @@
         "mp.congestion.blocked",
         "mp.congestion.dismissed",
         "mp.congestion.server",
-        "mp.congestion.sample"
+        "mp.congestion.sample",
+        "store.tab.shown",
+        "store.product.shown",
+        "store.purchase.started",
+        "store.purchase.completed",
+        "store.purchase.failed",
+        "store.purchase.cancelled",
+        "store.restore.started",
+        "store.restore.completed",
+        "store.restore.failed",
+        "store.manage.opened",
+        "sub.required.shown",
+        "sub.required.cta",
+        "sub.required.dismissed",
+        "mp.quota.consumed",
+        "mp.quota.exhausted",
+        "mp.quota.blocked"
       ],
       "blockedEvents": []
     },
@@ -178,7 +194,7 @@
       "posthog": {
         "enabled": true,
         "batching": {
-          "flushIntervalMs": 30000,
+          "flushIntervalMs": 15000,
           "maxBatchSize": 50,
           "flushOnPageHide": true
         }
@@ -186,8 +202,8 @@
       "gamefw": {
         "enabled": true,
         "batching": {
-          "flushIntervalMs": 60000,
-          "maxBatchSize": 200,
+          "flushIntervalMs": 30000,
+          "maxBatchSize": 100,
           "flushOnPageHide": true
         }
       }
@@ -229,7 +245,7 @@
     "rollout": {
       "enabled": true,
       "cohort": {
-        "percent": 10
+        "percent": 100
       }
     },
     "signals": {
@@ -237,40 +253,39 @@
       "longTasks": true,
       "memory": true,
       "systems": true,
-      "entities": false,
-      "events": false
+      "entities": true,
+      "events": true
     }
   },
   "appUpdate": {
     "rollout": {
       "enabled": true,
       "variants": [
-        "ios",
         "android"
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.136"
+        "salt": "1.0.144"
       },
       "meta": {
-        "name": "Aviso de version 1.0.136 (soft)",
-        "updatedAt": "2026-08-22T12:37:19.270Z"
+        "name": "Aviso de version 1.0.144 (soft)",
+        "updatedAt": "2026-08-23T10:20:03.326Z"
       }
     },
     "mode": "soft",
-    "latestVersion": "1.0.136",
+    "latestVersion": "1.0.144",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.136 is available",
-        "body": "Version 1.0.136 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
+        "title": "Version 1.0.144 is available",
+        "body": "Version 1.0.144 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
       },
-      "zh-CN": {
-        "title": "新版本 1.0.136 已发布",
-        "body": "新版本 1.0.136 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
+      "zh-cn": {
+        "title": "新版本 1.0.144 已发布",
+        "body": "新版本 1.0.144 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
       }
     }
   }
