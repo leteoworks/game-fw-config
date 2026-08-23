@@ -11,6 +11,7 @@
       "paywall",
       "freewall",
       "wallConflict",
+      "monetization",
       "profiling",
       "ads",
       "appUpdate",
@@ -2529,6 +2530,1085 @@
           "type": "number",
           "minimum": 0,
           "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "monetization": {
+      "title": "Monetizacion (maestro)",
+      "description": "El interruptor de mas arriba de TODO lo que se cobra: pestaña de pagos y capa gratuita por cupo. Nace APAGADO, y apagado todo es gratis. Encendido no cobra nada por si solo: cada muro (paywall, MP, reintentos) conserva su propia flag y este es un AND por encima de todas ellas (ADR-042 D7).",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "rollout": {
+          "title": "Despliegue (maestro)",
+          "description": "A quien le llega la monetizacion: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Apagado (default) = todo gratis y sin pestaña de pagos. ATENCION: es un AND POR ENCIMA de los muros que ya existen (el del juego base y los que cada juego declare en su propia seccion): ENCENDERLO NO ENCIENDE NINGUN MURO por si solo, cada muro sigue mandando sobre si mismo. Sirve para apagarlo todo de golpe, no para activarlo todo de golpe.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
+              "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
+              "maxItems": 16,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64,
+                "enum": [
+                  "newPlayers",
+                  "veterans",
+                  "mpPlayers",
+                  "payers"
+                ]
+              },
+              "uniqueItems": true,
+              "x-segments": [
+                {
+                  "name": "newPlayers",
+                  "title": "Jugadores nuevos",
+                  "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                },
+                {
+                  "name": "veterans",
+                  "title": "Veteranos",
+                  "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                },
+                {
+                  "name": "mpPlayers",
+                  "title": "Juegan al multijugador",
+                  "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                },
+                {
+                  "name": "payers",
+                  "title": "Han pagado",
+                  "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
+                }
+              ]
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "storeTab": {
+          "title": "Pestaña de pagos",
+          "description": "La pestaña desde la que se compra dentro del juego, y desde la que se restauran las compras y se gestiona la suscripcion.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Se ve la pestaña",
+              "description": "Con el maestro ENCENDIDO, decide si la pestaña de pagos aparece. OJO: apagarla NO se la esconde a quien YA COMPRO. Esa regla vive en el juego (ADR-042 D7.2) y existe porque esconderla le quitaria \"Restaurar compras\" y la gestion de su suscripcion justo cuando mas los necesita, y App Store exige que restaurar sea accesible.",
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "quota": {
+          "title": "Cupo gratuito",
+          "description": "Capa gratuita por USOS: N usos cada T horas antes de encontrarse el muro. La ventana es DESLIZANTE (cada uso libera su hueco a su hora), no un contador comun que se reinicia a medianoche.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Cupo activo",
+              "description": "Enciende la capa gratuita: hasta N usos cada T horas sin pagar. Apagado (default) = sin capa gratuita, manda directamente el muro que corresponda.",
+              "type": "boolean"
+            },
+            "limit": {
+              "default": 4,
+              "title": "Usos por ventana",
+              "description": "Cuantos usos gratuitos caben en cada ventana. Entero >= 1. Un 0 (o un decimal) se RECHAZA y vale el default: \"aqui no juega nadie gratis\" NO se escribe con un cupo de 0, se escribe encendiendo el muro que toque (ADR-042 D6).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "windowHours": {
+              "default": 8,
+              "title": "Horas de la ventana",
+              "description": "Duracion de la ventana deslizante, en horas. Entero >= 1. Cada uso ocupa su hueco durante estas horas y lo libera solo, sin un reinicio comun para todo el parque.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          "additionalProperties": false
+        },
+        "overrides": {
+          "title": "Ajustes por variante",
+          "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android",
+              "browser",
+              "electron-windows",
+              "electron-linux",
+              "electron-mac-steam",
+              "electron-mac-appstore"
+            ]
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "rollout": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": false,
+                    "title": "Activo",
+                    "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+                    "type": "boolean"
+                  },
+                  "variants": {
+                    "default": null,
+                    "title": "Variantes de distribucion",
+                    "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "ios",
+                            "android",
+                            "browser",
+                            "electron-windows",
+                            "electron-linux",
+                            "electron-mac-steam",
+                            "electron-mac-appstore"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "formFactors": {
+                    "default": null,
+                    "title": "Tipos de dispositivo",
+                    "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "anyOf": [
+                      {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "enum": [
+                            "phone",
+                            "tablet",
+                            "desktop"
+                          ]
+                        }
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "versions": {
+                    "default": null,
+                    "title": "Rango de versiones",
+                    "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "min": {
+                            "default": null,
+                            "title": "Version minima",
+                            "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "max": {
+                            "default": null,
+                            "title": "Version maxima",
+                            "description": "Inclusive. Vacio = sin maximo.",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 32,
+                                "x-ui": {
+                                  "widget": "version"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Rango de versiones",
+                        "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "locales": {
+                    "default": [],
+                    "title": "Idiomas",
+                    "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+                    "x-invalid-item": "zxx",
+                    "maxItems": 32,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 16,
+                      "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+                    }
+                  },
+                  "countries": {
+                    "default": [],
+                    "title": "Paises",
+                    "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+                    "x-invalid-item": "ZZ",
+                    "maxItems": 64,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "pattern": "^[A-Z]{2}$"
+                    }
+                  },
+                  "schedule": {
+                    "default": null,
+                    "title": "Calendario",
+                    "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "from": {
+                            "default": null,
+                            "title": "Desde",
+                            "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "to": {
+                            "default": null,
+                            "title": "Hasta",
+                            "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                            "x-ui": {
+                              "widget": "datetime"
+                            },
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                                "x-ui": {
+                                  "widget": "datetime"
+                                }
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Calendario",
+                        "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "segments": {
+                    "default": [],
+                    "title": "Segmentos",
+                    "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Segmentos de este juego: newPlayers (Jugadores nuevos: Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio.); veterans (Veteranos: Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva.); mpPlayers (Juegan al multijugador: Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado.); payers (Han pagado: Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes.).",
+                    "x-rollout": "segments",
+                    "x-invalid-item": "invalidSegment",
+                    "maxItems": 16,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "enum": [
+                        "newPlayers",
+                        "veterans",
+                        "mpPlayers",
+                        "payers"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "x-segments": [
+                      {
+                        "name": "newPlayers",
+                        "title": "Jugadores nuevos",
+                        "description": "Instalaron el juego hace menos de 7 dias. Para campañas de bienvenida y para NO enseñar a un recien llegado un muro o un anuncio."
+                      },
+                      {
+                        "name": "veterans",
+                        "title": "Veteranos",
+                        "description": "Han arrancado el juego al menos 10 veces. Gente que vuelve: el publico de una oferta o de una mecanica nueva."
+                      },
+                      {
+                        "name": "mpPlayers",
+                        "title": "Juegan al multijugador",
+                        "description": "Han jugado al menos una partida online en este dispositivo. Para campañas del MP (torneos, suscripcion) sin molestar a quien no lo ha probado."
+                      },
+                      {
+                        "name": "payers",
+                        "title": "Han pagado",
+                        "description": "Tienen acceso de pago (compra unica, suscripcion del MP o DLC) en este dispositivo. Para no enseñarles muros ni ofertas de lo que ya tienen, o para una campaña solo para clientes."
+                      }
+                    ]
+                  },
+                  "cohort": {
+                    "title": "Cohorte",
+                    "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "percent": {
+                        "default": 100,
+                        "title": "Porcentaje del parque",
+                        "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                        "x-ui": {
+                          "widget": "percent"
+                        },
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100
+                      },
+                      "salt": {
+                        "default": "",
+                        "title": "Sal del sorteo",
+                        "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                        "type": "string",
+                        "maxLength": 64
+                      },
+                      "audience": {
+                        "title": "Tramo del parque",
+                        "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "from": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Desde",
+                                "description": "Inicio del tramo, inclusive (0-100)."
+                              },
+                              "to": {
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 100,
+                                "title": "Hasta",
+                                "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                              }
+                            },
+                            "required": [
+                              "from",
+                              "to"
+                            ],
+                            "title": "Tramo del parque",
+                            "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "layer": {
+                        "default": null,
+                        "title": "Capa (exclusion mutua)",
+                        "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      },
+                      "bucketBy": {
+                        "default": "device",
+                        "title": "Punto del parque por",
+                        "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                        "type": "string",
+                        "enum": [
+                          "device",
+                          "user"
+                        ]
+                      },
+                      "ramp": {
+                        "default": [],
+                        "title": "Rampa programada",
+                        "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                        "maxItems": 12,
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "at": {
+                              "type": "string",
+                              "format": "date-time",
+                              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                              "x-ui": {
+                                "widget": "datetime"
+                              },
+                              "title": "A partir de",
+                              "description": "Instante (UTC) en el que entra en vigor este escalon."
+                            },
+                            "percent": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 100,
+                              "title": "Porcentaje",
+                              "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                              "x-ui": {
+                                "widget": "percent"
+                              }
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "percent"
+                          ],
+                          "title": "Escalon",
+                          "description": "Un paso de la rampa: instante y porcentaje.",
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "experiment": {
+                    "default": null,
+                    "title": "Experimento (A/B)",
+                    "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "key": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Clave del experimento",
+                            "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                          },
+                          "variants": {
+                            "minItems": 1,
+                            "maxItems": 10,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string",
+                                  "maxLength": 64,
+                                  "pattern": "^[a-z][a-zA-Z0-9]*$",
+                                  "title": "Variante",
+                                  "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                                },
+                                "weight": {
+                                  "default": 1,
+                                  "title": "Peso",
+                                  "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                                  "type": "number",
+                                  "minimum": 0,
+                                  "maximum": 1000
+                                }
+                              },
+                              "required": [
+                                "name"
+                              ],
+                              "title": "Variante",
+                              "description": "Nombre y peso de una variante del experimento.",
+                              "additionalProperties": false
+                            },
+                            "title": "Variantes",
+                            "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "variants"
+                        ],
+                        "title": "Experimento",
+                        "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "meta": {
+                    "title": "Ficha de la campaña",
+                    "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Nombre",
+                        "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "owner": {
+                        "title": "Responsable",
+                        "description": "Quien responde por esta campaña (nombre o alias).",
+                        "type": "string",
+                        "maxLength": 80
+                      },
+                      "ticket": {
+                        "title": "Ticket",
+                        "description": "Issue, PR o enlace donde se decidio.",
+                        "x-ui": {
+                          "widget": "url"
+                        },
+                        "type": "string",
+                        "maxLength": 120
+                      },
+                      "notes": {
+                        "title": "Notas",
+                        "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                        "x-ui": {
+                          "multiline": true
+                        },
+                        "type": "string",
+                        "maxLength": 2000
+                      },
+                      "updatedAt": {
+                        "title": "Ultimo cambio",
+                        "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "title": "Despliegue",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "additionalProperties": false
+              },
+              "storeTab": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": true,
+                    "title": "Se ve la pestaña",
+                    "description": "Con el maestro ENCENDIDO, decide si la pestaña de pagos aparece. OJO: apagarla NO se la esconde a quien YA COMPRO. Esa regla vive en el juego (ADR-042 D7.2) y existe porque esconderla le quitaria \"Restaurar compras\" y la gestion de su suscripcion justo cuando mas los necesita, y App Store exige que restaurar sea accesible.",
+                    "type": "boolean"
+                  }
+                },
+                "title": "Pestaña de pagos",
+                "description": "La pestaña desde la que se compra dentro del juego, y desde la que se restauran las compras y se gestiona la suscripcion.",
+                "additionalProperties": false
+              },
+              "quota": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "default": false,
+                    "title": "Cupo activo",
+                    "description": "Enciende la capa gratuita: hasta N usos cada T horas sin pagar. Apagado (default) = sin capa gratuita, manda directamente el muro que corresponda.",
+                    "type": "boolean"
+                  },
+                  "limit": {
+                    "default": 4,
+                    "title": "Usos por ventana",
+                    "description": "Cuantos usos gratuitos caben en cada ventana. Entero >= 1. Un 0 (o un decimal) se RECHAZA y vale el default: \"aqui no juega nadie gratis\" NO se escribe con un cupo de 0, se escribe encendiendo el muro que toque (ADR-042 D6).",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  },
+                  "windowHours": {
+                    "default": 8,
+                    "title": "Horas de la ventana",
+                    "description": "Duracion de la ventana deslizante, en horas. Entero >= 1. Cada uso ocupa su hueco durante estas horas y lo libera solo, sin un reinicio comun para todo el parque.",
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "title": "Cupo gratuito",
+                "description": "Capa gratuita por USOS: N usos cada T horas antes de encontrarse el muro. La ventana es DESLIZANTE (cada uso libera su hueco a su hora), no un contador comun que se reinicia a medianoche.",
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
         }
       },
       "additionalProperties": false
