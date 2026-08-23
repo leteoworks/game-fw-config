@@ -61,131 +61,8 @@
           "type": "object",
           "properties": {
             "allowedEvents": {
-              "default": [
-                "run.started",
-                "run.ended",
-                "play.session.summary",
-                "device.profile",
-                "$exception",
-                "error.handled",
-                "signal.health",
-                "error.occurred",
-                "error.resource_failed",
-                "error.network",
-                "performance.degraded",
-                "locale.detection.mismatch",
-                "remote.config.applied",
-                "remote.config.fetched",
-                "remote.config.rejected",
-                "app.booted",
-                "screen.viewed",
-                "screen.exited",
-                "first.action.after.boot",
-                "run.input.breakdown",
-                "modal.opened",
-                "modal.closed",
-                "performance.fps",
-                "performance.load",
-                "migration.completed",
-                "migration.failed",
-                "paywall.shown",
-                "paywall.dismissed",
-                "freewall.shown",
-                "freewall.continued",
-                "paywall.purchase.started",
-                "paywall.purchase.completed",
-                "paywall.purchase.failed",
-                "paywall.purchase.cancelled",
-                "paywall.restore.started",
-                "paywall.restore.completed",
-                "paywall.restore.failed",
-                "death.detail",
-                "level.started",
-                "level.completed",
-                "record.broken",
-                "progress.milestone",
-                "speed.increased",
-                "food.eaten",
-                "run.restarted",
-                "powerup.collected",
-                "powerup.expired",
-                "extra.life.used",
-                "auto.snake.session",
-                "crash.recovery.detected",
-                "crash.recovery.resumed",
-                "tutorial.dismissed",
-                "music.toggled",
-                "bonus.level.entered",
-                "bonus.level.played",
-                "control.mode.chosen",
-                "orientation.chosen",
-                "settings.changed",
-                "profiling.hotspot",
-                "ads.impression",
-                "ads.view",
-                "ads.mini_click",
-                "ads.close",
-                "ads.autoclose",
-                "ads.dismiss",
-                "ads.abandon",
-                "ads.close_fallback",
-                "ads.press_stuck",
-                "ads.video_impression",
-                "ads.video_complete",
-                "ads.video_skip",
-                "ads.video_cap",
-                "ads.video_error",
-                "ads.video_stall",
-                "ads.gate_skipped",
-                "rollout.evaluated",
-                "remote_config.safe_mode.entered",
-                "app.update.shown",
-                "app.update.clicked",
-                "app.update.in_app_started",
-                "app.update.in_app_completed",
-                "app.update.in_app_cancelled",
-                "app.update.in_app_failed",
-                "app.update.store_opened",
-                "app.update.probe_failed",
-                "app.update.button_shown",
-                "app.update.wall_shown",
-                "app.update.prompt_shown",
-                "app.update.prompt_accepted",
-                "app.update.prompt_dismissed",
-                "app.update.skipped",
-                "app.update.adopted",
-                "mp.room.created",
-                "mp.join.requested",
-                "mp.join.accepted",
-                "mp.join.rejected",
-                "mp.match.started",
-                "mp.join.device",
-                "mp.match.ended",
-                "mp.death",
-                "mp.room.create.failed",
-                "mp.join.failed",
-                "mp.notify.toggled",
-                "mp.deeplink.new.room",
-                "mp.deeplink.new_room",
-                "mp.retry.requested",
-                "mp.retry.granted",
-                "mp.retry.denied",
-                "mp.congestion.checked",
-                "mp.congestion.blocked",
-                "mp.congestion.dismissed",
-                "mp.congestion.server",
-                "mp.congestion.sample",
-                "user.error.shown",
-                "session.started",
-                "session.ended",
-                "name.form.shown",
-                "name.form.resolved",
-                "ranking.opened",
-                "ranking.session.summary",
-                "leaderboard.score.mismatch"
-              ],
               "title": "Eventos permitidos",
-              "description": "Allowlist UNICA del juego (todos los destinos). Ausente = la del bundle; vacia = se silencia TODO; nula = manguera abierta. ⚠️ REEMPLAZA a la del bundle, no la amplia: un evento que no este aqui se descarta sin error.",
+              "description": "Allowlist UNICA del juego (todos los destinos). ⚠️ NO hace falta declararla: ausente = la que DERIVA el juego de sus eventos, que es la fuente de verdad. Vacia = se silencia TODO; nula = manguera abierta. Si la declaras, REEMPLAZA a la derivada, no la amplia: un evento que no este aqui se descarta sin error. Para apagar un evento concreto usa `blockedEvents`, que es lo que de verdad necesita ser remoto.",
               "anyOf": [
                 {
                   "type": "array",
@@ -3038,6 +2915,84 @@
             }
           },
           "additionalProperties": false
+        },
+        "copy": {
+          "title": "Textos comerciales (sobreescritura)",
+          "description": "Mapa `clave i18n del juego` → texto por idioma, para cambiar el copy de los muros, los modales de compra y la pestaña de pagos SIN publicar una version. Vacio (lo normal) = el jugador lee el texto que trae la app. Un override solo pisa los idiomas que declares; el resto siguen con el texto del juego. ⚠️ La clave es la del i18n: si cambia en el codigo, el override deja de aplicar y se vuelve al texto de la app (degrada al default, que es lo seguro).",
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "minLength": 1
+          },
+          "additionalProperties": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "minLength": 1
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title": "Texto por idioma",
+            "description": "Mapa idioma → texto (`es`, `en`, `pt-BR`…). La resolucion al idioma del jugador cae al idioma base y luego al ingles. Idiomas de este juego: en (English), es (Español), zh-CN (简体中文), ja (日本語), pt-BR (Português (Brasil)), de (Deutsch), fr (Français), ko (한국어), ru (Русский), tr (Türkçe), pl (Polski), it (Italiano), hi (हिन्दी).",
+            "x-keys": "locales",
+            "x-locales": [
+              {
+                "code": "en",
+                "title": "English"
+              },
+              {
+                "code": "es",
+                "title": "Español"
+              },
+              {
+                "code": "zh-CN",
+                "title": "简体中文"
+              },
+              {
+                "code": "ja",
+                "title": "日本語"
+              },
+              {
+                "code": "pt-BR",
+                "title": "Português (Brasil)"
+              },
+              {
+                "code": "de",
+                "title": "Deutsch"
+              },
+              {
+                "code": "fr",
+                "title": "Français"
+              },
+              {
+                "code": "ko",
+                "title": "한국어"
+              },
+              {
+                "code": "ru",
+                "title": "Русский"
+              },
+              {
+                "code": "tr",
+                "title": "Türkçe"
+              },
+              {
+                "code": "pl",
+                "title": "Polski"
+              },
+              {
+                "code": "it",
+                "title": "Italiano"
+              },
+              {
+                "code": "hi",
+                "title": "हिन्दी"
+              }
+            ]
+          }
         },
         "quota": {
           "title": "Cupo gratuito",
