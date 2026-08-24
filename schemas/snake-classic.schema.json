@@ -6437,6 +6437,29 @@
           },
           "additionalProperties": false
         },
+        "delta": {
+          "title": "Ahorro de datos en el multijugador (ADR-044)",
+          "description": "Manda solo los cambios del tablero en vez del tablero entero. Nace apagado: ver el aviso de la casilla.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": false,
+              "title": "Mandar solo los cambios (ahorra datos moviles)",
+              "description": "El anfitrion manda el tablero ENTERO en cada paso: ~9 KB, unos 179 MB que se descarga el movil de cada jugador en una partida de tres minutos. Con esto manda solo lo que cambia: ~200 bytes, unas 45 veces menos. OJO: NACE APAGADO y encenderlo tiene riesgo — un jugador con una version anterior de la app no entiende el mensaje nuevo y SE LE QUEDA LA PARTIDA CONGELADA. Encender solo cuando la version que lo entiende este repartida.",
+              "type": "boolean"
+            },
+            "keyframeTicks": {
+              "default": 30,
+              "title": "Cada cuantos pasos se manda el tablero entero igualmente",
+              "description": "Red de seguridad: aunque un jugador pierda el hilo de los cambios, cada tantos pasos le llega el tablero completo y se recupera solo. Bajarlo mucho anula el ahorro; subirlo mucho alarga la recuperacion.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 600
+            }
+          },
+          "additionalProperties": false
+        },
         "congestion": {
           "title": "Aforo del multijugador",
           "description": "El limite de jugadores concurrentes y su interruptor.",
