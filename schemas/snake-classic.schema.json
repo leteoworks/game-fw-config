@@ -3025,6 +3025,23 @@
           },
           "additionalProperties": false
         },
+        "offline": {
+          "title": "Sin conexion",
+          "description": "Que pasa con lo comprado cuando no se puede preguntar a la tienda. El pago unico NO caduca nunca (once-owned); esto solo gobierna la ventana de gracia de una SUSCRIPCION ya caducada.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "subscriptionGraceDays": {
+              "default": 7,
+              "title": "Dias de gracia sin red (suscripcion)",
+              "description": "Cuanto sigue funcionando una suscripcion CADUCADA mientras no se puede hablar con la tienda. Existe porque quedarse sin cobertura no es dejar de pagar. ⚠️ Calibralo contra la DURACION de tu suscripcion: 14 dias son el 3,8% de una anual y el 15,5% de una trimestral. Solo afecta al periodo YA caducado; una suscripcion viva no depende de esto.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 90
+            }
+          },
+          "additionalProperties": false
+        },
         "overrides": {
           "title": "Ajustes por variante",
           "description": "Lo que cambia en una variante concreta (ios, android, browser, electron-*). Solo hace falta declarar lo que difiere; el resto hereda de la base. Un `rollout` aqui sustituye el de la base ENTERO para esa variante.",
@@ -3564,6 +3581,22 @@
                 },
                 "title": "Cupo gratuito",
                 "description": "Capa gratuita por USOS: N usos cada T horas antes de encontrarse el muro. La ventana es DESLIZANTE (cada uso libera su hueco a su hora), no un contador comun que se reinicia a medianoche.",
+                "additionalProperties": false
+              },
+              "offline": {
+                "type": "object",
+                "properties": {
+                  "subscriptionGraceDays": {
+                    "default": 7,
+                    "title": "Dias de gracia sin red (suscripcion)",
+                    "description": "Cuanto sigue funcionando una suscripcion CADUCADA mientras no se puede hablar con la tienda. Existe porque quedarse sin cobertura no es dejar de pagar. ⚠️ Calibralo contra la DURACION de tu suscripcion: 14 dias son el 3,8% de una anual y el 15,5% de una trimestral. Solo afecta al periodo YA caducado; una suscripcion viva no depende de esto.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 90
+                  }
+                },
+                "title": "Sin conexion",
+                "description": "Que pasa con lo comprado cuando no se puede preguntar a la tienda. El pago unico NO caduca nunca (once-owned); esto solo gobierna la ventana de gracia de una SUSCRIPCION ya caducada.",
                 "additionalProperties": false
               }
             },
@@ -6364,6 +6397,42 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 99999
+            }
+          },
+          "additionalProperties": false
+        },
+        "authority": {
+          "title": "Quien simula el multijugador (ADR-044)",
+          "description": "El conmutador entre el modelo historico sobre Photon y la autoridad en la nube. Nace en local-host: desplegar el servidor NO cambia el comportamiento de nadie hasta que se cambia aqui.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "mode": {
+              "default": "local-host",
+              "title": "Quien simula la partida",
+              "description": "local-host = uno de los jugadores simula y difunde por Photon (modelo historico: funciona sin servidor propio, pero el anfitrion juega con ventaja y su movil en segundo plano ralentiza la sala entera). cloud-server = lo simula un servidor y nadie juega con ventaja. auto = el servidor si esta sano, y Photon como red de seguridad. OJO: cambiarlo afecta a la SIGUIENTE partida, no a las que estan en curso, y las dos opciones tienen bolsas de emparejamiento SEPARADAS (quien juega en una no ve las partidas de la otra).",
+              "type": "string",
+              "enum": [
+                "auto",
+                "local-host",
+                "cloud-server"
+              ]
+            },
+            "cloudFailureThreshold": {
+              "default": 2,
+              "title": "Fallos seguidos antes de rendirse con el servidor",
+              "description": "Si el servidor no responde estas veces seguidas, el juego deja de intentarlo un rato y usa Photon. Sin esto, una caida se paga una vez por jugador y por intento, en esperas.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "cloudCooldownMs": {
+              "default": 60000,
+              "title": "Cuanto se espera antes de reintentar el servidor (ms)",
+              "description": "Primera espera tras rendirse. Se DOBLA con cada tanda de fallos (con techo) para que una caida larga no se reintente cada minuto. Un solo exito lo resetea.",
+              "type": "integer",
+              "minimum": 1000,
+              "maximum": 900000
             }
           },
           "additionalProperties": false
