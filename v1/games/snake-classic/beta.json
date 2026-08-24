@@ -186,5 +186,10 @@
         }
       }
     ]
+  },
+  "mp": {
+    "authority": {
+      "mode": "auto"
+    }
   }
 }
