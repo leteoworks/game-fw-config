@@ -189,7 +189,7 @@
   },
   "mp": {
     "authority": {
-      "mode": "local-host"
+      "mode": "auto"
     }
   }
 }
