@@ -3038,6 +3038,14 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 90
+            },
+            "revocationConfirmHours": {
+              "default": 12,
+              "title": "Horas para confirmar una revocacion",
+              "description": "Cuando la tienda dice que el jugador ya no tiene el producto, NO se le quita a la primera: se apunta la fecha y solo se le quita si vuelve a decirlo pasadas estas horas. Un fallo pasajero de la tienda no revoca nunca por si solo; un reembolso real revoca igual, solo que un poco mas tarde. ⚠️ Bajarlo a 0 revoca a la primera: util para PROBARLO, peligroso en produccion.",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 168
             }
           },
           "additionalProperties": false
@@ -3593,6 +3601,14 @@
                     "type": "integer",
                     "minimum": 0,
                     "maximum": 90
+                  },
+                  "revocationConfirmHours": {
+                    "default": 12,
+                    "title": "Horas para confirmar una revocacion",
+                    "description": "Cuando la tienda dice que el jugador ya no tiene el producto, NO se le quita a la primera: se apunta la fecha y solo se le quita si vuelve a decirlo pasadas estas horas. Un fallo pasajero de la tienda no revoca nunca por si solo; un reembolso real revoca igual, solo que un poco mas tarde. ⚠️ Bajarlo a 0 revoca a la primera: util para PROBARLO, peligroso en produccion.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 168
                   }
                 },
                 "title": "Sin conexion",
