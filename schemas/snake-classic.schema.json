@@ -6434,6 +6434,17 @@
                 "cloud-server"
               ]
             },
+            "attestation": {
+              "default": "off",
+              "title": "Comprobar que la app es genuina",
+              "description": "Pide al movil una prueba de que la app no esta modificada y el dispositivo es real (Play Integrity en Android). off = ni se mira. log = se comprueba y se ANOTA, pero se deja pasar: sirve para medir a cuanta gente legitima le fallaria ANTES de cerrarle la puerta. enforce = se exige. OJO: falla con emuladores, dispositivos rooteados y builds de depuracion, asi que en `enforce` no se puede probar desde un emulador. Nace en off a proposito.",
+              "type": "string",
+              "enum": [
+                "off",
+                "log",
+                "enforce"
+              ]
+            },
             "cloudFailureThreshold": {
               "default": 2,
               "title": "Fallos seguidos antes de rendirse con el servidor",
@@ -6449,6 +6460,21 @@
               "type": "integer",
               "minimum": 1000,
               "maximum": 900000
+            }
+          },
+          "additionalProperties": false
+        },
+        "testing": {
+          "title": "Modo pruebas",
+          "description": "Para probar desde un emulador. Nace apagado y se apaga solo con volver a apagarlo — no caduca, asi que acuerdate.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "relaxGuards": {
+              "default": false,
+              "title": "Modo pruebas: dejar entrar a un emulador",
+              "description": "Enciendelo para probar el multijugador desde un emulador o una build local, y APAGALO al terminar. Nace apagado. Relaja EXACTAMENTE las dos cosas que le cierran la puerta a un emulador: (1) deja de exigir la prueba de app genuina (Play Integrity falla SIEMPRE fuera de una instalacion de Play) y (2) deja de exigir la llave de la build (una build local no la lleva). NO toca el cupo de salas por IP, que es la defensa que protege la cuota compartida de la cuenta: 20 salas por minuto no le estorban a nadie que este probando, y quitarlo si abriria un agujero de verdad. OJO: mientras este encendido, esas dos puertas estan abiertas para TODO EL MUNDO, no solo para ti. Cada conexion que se aprovecha queda anotada en la analitica (`mp_server.gate.relaxed`) para que no se quede encendido en el olvido.",
+              "type": "boolean"
             }
           },
           "additionalProperties": false
