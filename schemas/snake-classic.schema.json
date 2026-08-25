@@ -6437,7 +6437,7 @@
             "buildKey": {
               "default": "off",
               "title": "Exigir la llave de la build",
-              "description": "Una cadena que la app presenta al conectar. Frena a quien solo encontro la URL del servidor. OJO: NO es autenticacion — viaja dentro de la app y quien abra el AAB la extrae. Es un cerrojo de bicicleta. off = ni se mira. log = se comprueba y se CUENTA, pero se deja pasar. enforce = se exige. ⚠️ NO pases a `enforce` a ojo: en cuanto se exige, toda build ya instalada que no la lleve deja de poder jugar, y no hay forma de saber a ojo si la release nueva esta repartida. Deja esto en `log` y mira el panel `mp_server.gate.build_key`: cuando el porcentaje de conexiones con llave valida llegue a ~100 %, entonces si.",
+              "description": "Una cadena que la app presenta al conectar. Frena a quien solo encontro la URL del servidor. OJO: NO es autenticacion — viaja dentro de la app y quien abra el AAB la extrae. Es un cerrojo de bicicleta. off = ni se mira. log = se comprueba y se CUENTA, pero se deja pasar. enforce = se exige. ⚠️ NO pases a `enforce` a ojo: en cuanto se exige, toda build ya instalada que no la lleve deja de poder jugar, y no hay forma de saber a ojo si la release nueva esta repartida. Deja esto en `log` y mira el panel `mp.gate.key`: cuando el porcentaje de conexiones con llave valida llegue a ~100 %, entonces si.",
               "type": "string",
               "enum": [
                 "off",
@@ -6484,7 +6484,7 @@
             "relaxGuards": {
               "default": false,
               "title": "Modo pruebas: dejar entrar a un emulador",
-              "description": "Enciendelo para probar el multijugador desde un emulador o una build local, y APAGALO al terminar. Nace apagado. Relaja EXACTAMENTE las dos cosas que le cierran la puerta a un emulador: (1) deja de exigir la prueba de app genuina (Play Integrity falla SIEMPRE fuera de una instalacion de Play) y (2) deja de exigir la llave de la build (una build local no la lleva). NO toca el cupo de salas por IP, que es la defensa que protege la cuota compartida de la cuenta: 20 salas por minuto no le estorban a nadie que este probando, y quitarlo si abriria un agujero de verdad. OJO: mientras este encendido, esas dos puertas estan abiertas para TODO EL MUNDO, no solo para ti. Cada conexion que se aprovecha queda anotada en la analitica (`mp_server.gate.relaxed`) para que no se quede encendido en el olvido.",
+              "description": "Enciendelo para probar el multijugador desde un emulador o una build local, y APAGALO al terminar. Nace apagado. Relaja EXACTAMENTE las dos cosas que le cierran la puerta a un emulador: (1) deja de exigir la prueba de app genuina (Play Integrity falla SIEMPRE fuera de una instalacion de Play) y (2) deja de exigir la llave de la build (una build local no la lleva). NO toca el cupo de salas por IP, que es la defensa que protege la cuota compartida de la cuenta: 20 salas por minuto no le estorban a nadie que este probando, y quitarlo si abriria un agujero de verdad. OJO: mientras este encendido, esas dos puertas estan abiertas para TODO EL MUNDO, no solo para ti. Cada conexion que se aprovecha queda anotada en la analitica (`mp.gate.relaxed`) para que no se quede encendido en el olvido.",
               "type": "boolean"
             }
           },
