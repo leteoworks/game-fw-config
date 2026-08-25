@@ -106,7 +106,7 @@
   },
   "mp": {
     "authority": {
-      "buildKey": "log"
+      "buildKey": "enforce"
     }
   }
 }
