@@ -189,7 +189,8 @@
   },
   "mp": {
     "authority": {
-      "mode": "auto"
+      "mode": "auto",
+      "buildKey": "log"
     }
   }
 }
