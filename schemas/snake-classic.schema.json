@@ -6490,6 +6490,21 @@
           },
           "additionalProperties": false
         },
+        "netcode": {
+          "title": "Netcode",
+          "description": "Como se pinta tu propia serpiente mientras el servidor confirma tus giros.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "prediction": {
+              "default": true,
+              "title": "Tu serpiente responde al instante (prediccion)",
+              "description": "En una partida del servidor tu giro tarda un viaje de ida y vuelta en verse. Con esto tu serpiente se pinta por adelantado con tus giros pendientes, y cuando el servidor confirma no salta (si esta de acuerdo). Solo cambia lo que se pinta, nunca quien gana. Apagalo si en algun movil se viera raro: vuelve a pintarse lo ultimo que dijo el servidor.",
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
         "delta": {
           "title": "Ahorro de datos en el multijugador (ADR-044)",
           "description": "Manda solo los cambios del tablero en vez del tablero entero. Nace apagado: ver el aviso de la casilla.",
