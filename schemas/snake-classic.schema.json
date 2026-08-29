@@ -228,6 +228,7 @@
               "default": null,
               "title": "Variantes de distribucion",
               "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -253,6 +254,7 @@
               "default": null,
               "title": "Tipos de dispositivo",
               "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -766,6 +768,7 @@
                     "default": null,
                     "title": "Variantes de distribucion",
                     "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -791,6 +794,7 @@
                     "default": null,
                     "title": "Tipos de dispositivo",
                     "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -1300,6 +1304,7 @@
               ],
               "title": "Variantes de distribucion",
               "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -1325,6 +1330,7 @@
               "default": null,
               "title": "Tipos de dispositivo",
               "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -1858,6 +1864,7 @@
                     "default": null,
                     "title": "Variantes de distribucion",
                     "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -1883,6 +1890,7 @@
                     "default": null,
                     "title": "Tipos de dispositivo",
                     "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -2438,6 +2446,7 @@
               "default": null,
               "title": "Variantes de distribucion",
               "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -2463,6 +2472,7 @@
               "default": null,
               "title": "Tipos de dispositivo",
               "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -3082,6 +3092,7 @@
                     "default": null,
                     "title": "Variantes de distribucion",
                     "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -3107,6 +3118,7 @@
                     "default": null,
                     "title": "Tipos de dispositivo",
                     "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -3644,6 +3656,7 @@
               "default": null,
               "title": "Variantes de distribucion",
               "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -3669,6 +3682,7 @@
               "default": null,
               "title": "Tipos de dispositivo",
               "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -4334,6 +4348,7 @@
                     "default": null,
                     "title": "Variantes de distribucion",
                     "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -4359,6 +4374,7 @@
                     "default": null,
                     "title": "Tipos de dispositivo",
                     "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+                    "x-invalid-item": "none",
                     "anyOf": [
                       {
                         "type": "array",
@@ -5701,6 +5717,7 @@
               "default": null,
               "title": "Variantes de distribucion",
               "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
@@ -5726,6 +5743,7 @@
               "default": null,
               "title": "Tipos de dispositivo",
               "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
               "anyOf": [
                 {
                   "type": "array",
