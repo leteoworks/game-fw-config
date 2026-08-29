@@ -79,27 +79,27 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.161"
+        "salt": "1.0.163"
       },
       "meta": {
-        "name": "Aviso de version 1.0.161 (soft)",
-        "updatedAt": "2026-08-29T09:12:51.741Z"
+        "name": "Aviso de version 1.0.163 (soft)",
+        "updatedAt": "2026-08-29T11:51:20.004Z"
       }
     },
     "mode": "soft",
-    "latestVersion": "1.0.161",
+    "latestVersion": "1.0.163",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.161 is available",
-        "body": "Version 1.0.161 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
+        "title": "Version 1.0.163 is available",
+        "body": "Version 1.0.163 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
       },
       "zh-cn": {
-        "title": "新版本 1.0.161 已发布",
-        "body": "新版本 1.0.161 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
+        "title": "新版本 1.0.163 已发布",
+        "body": "新版本 1.0.163 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
       }
     }
   },
