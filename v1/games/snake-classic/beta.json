@@ -95,7 +95,7 @@
       {
         "id": "prueba-remote-config-ads",
         "rollout": {
-          "enabled": true,
+          "enabled": false,
           "cohort": {
             "percent": 100
           },
