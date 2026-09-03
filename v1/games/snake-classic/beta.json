@@ -25,7 +25,7 @@
   },
   "paywall": {
     "rollout": {
-      "enabled": false
+      "enabled": true
     },
     "triggers": [
       {
@@ -55,6 +55,24 @@
       "cooldownDays": 7
     }
   },
+  "monetization": {
+    "rollout": {
+      "enabled": true,
+      "meta": {
+        "name": "Sesion de pruebas manuales 1.0.165",
+        "updatedAt": "2026-09-03T17:45:52.735Z"
+      }
+    },
+    "quota": {
+      "enabled": true,
+      "limit": 2,
+      "windowHours": 1
+    },
+    "offline": {
+      "subscriptionGraceDays": 7,
+      "revocationConfirmHours": 0
+    }
+  },
   "profiling": {
     "rollout": {
       "enabled": true,
@@ -69,38 +87,6 @@
       "systems": true,
       "entities": true,
       "events": true
-    }
-  },
-  "appUpdate": {
-    "rollout": {
-      "enabled": true,
-      "variants": [
-        "android"
-      ],
-      "cohort": {
-        "percent": 100,
-        "salt": "1.0.167"
-      },
-      "meta": {
-        "name": "Aviso de version 1.0.167 (soft)",
-        "updatedAt": "2026-09-03T17:22:01.153Z"
-      }
-    },
-    "mode": "soft",
-    "latestVersion": "1.0.167",
-    "hardPercent": 100,
-    "checkStore": true,
-    "inAppUpdate": true,
-    "showPrompt": true,
-    "messages": {
-      "en": {
-        "title": "Version 1.0.167 is available",
-        "body": "Version 1.0.167 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
-      },
-      "zh-cn": {
-        "title": "新版本 1.0.167 已发布",
-        "body": "新版本 1.0.167 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
-      }
     }
   },
   "ads": {
@@ -187,10 +173,54 @@
       }
     ]
   },
+  "appUpdate": {
+    "rollout": {
+      "enabled": true,
+      "variants": [
+        "android"
+      ],
+      "cohort": {
+        "percent": 100,
+        "salt": "1.0.167"
+      },
+      "meta": {
+        "name": "Aviso de version 1.0.167 (soft)",
+        "updatedAt": "2026-09-03T17:22:01.153Z"
+      }
+    },
+    "mode": "soft",
+    "latestVersion": "1.0.167",
+    "hardPercent": 100,
+    "checkStore": true,
+    "inAppUpdate": true,
+    "showPrompt": true,
+    "messages": {
+      "en": {
+        "title": "Version 1.0.167 is available",
+        "body": "Version 1.0.167 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
+      },
+      "zh-cn": {
+        "title": "新版本 1.0.167 已发布",
+        "body": "新版本 1.0.167 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
+      }
+    }
+  },
   "mp": {
     "authority": {
       "mode": "auto",
       "buildKey": "enforce"
+    },
+    "paywall": {
+      "enabled": true,
+      "triggerGames": 0
+    },
+    "retry": {
+      "paywall": {
+        "enabled": true,
+        "platforms": {
+          "ios": false
+        }
+      }
     }
   }
 }
