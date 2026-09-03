@@ -25,7 +25,7 @@
   },
   "paywall": {
     "rollout": {
-      "enabled": true
+      "enabled": false
     },
     "triggers": [
       {
