@@ -242,20 +242,35 @@
       "tr": "Satın alımı geri yükle",
       "zh-CN": "恢复购买"
     },
+    "snk.multiplayer.retry.purchase.restoreHint": {
+      "es": "¿Ya lo compraste? Recupera tu compra tras reinstalar o cambiar de móvil.",
+      "en": "Already bought it? Get your purchase back after reinstalling or switching phones.",
+      "de": "Schon gekauft? Hol dir deinen Kauf nach einer Neuinstallation oder einem Gerätewechsel zurück.",
+      "fr": "Déjà acheté ? Récupère ton achat après une réinstallation ou un changement de téléphone.",
+      "hi": "पहले खरीदा है? रीइंस्टॉल करने या फ़ोन बदलने के बाद अपनी खरीद वापस पाएँ।",
+      "it": "Già acquistato? Recupera il tuo acquisto dopo una reinstallazione o un cambio di telefono.",
+      "ja": "購入済み？ 再インストールや機種変更のあとは、ここで購入を復元できるよ。",
+      "ko": "이미 구매했나요? 다시 설치하거나 기기를 바꾼 뒤 여기서 구매를 복원하세요.",
+      "pl": "Masz już zakup? Odzyskaj go po ponownej instalacji lub zmianie telefonu.",
+      "pt-BR": "Já comprou? Recupere sua compra após reinstalar ou trocar de celular.",
+      "ru": "Уже покупали? Восстановите покупку после переустановки или смены телефона.",
+      "tr": "Daha önce satın aldın mı? Yeniden kurulum veya telefon değişikliğinden sonra satın alımını geri getir.",
+      "zh-CN": "已经购买过？重装或更换手机后可在此恢复购买。"
+    },
     "snk.multiplayer.retry.purchase.subtitle": {
-      "es": "Juega online y vuelve a la partida al morir.",
-      "en": "Play online and jump back in when you die.",
-      "de": "Spiel online und steig nach dem Tod wieder ein.",
-      "fr": "Joue en ligne et reviens dans la partie quand tu meurs.",
-      "hi": "ऑनलाइन खेलें और मरने पर खेल में वापस आएँ।",
-      "it": "Gioca online e torna in partita quando muori.",
-      "ja": "オンラインで遊んで、倒れても復帰しよう。",
-      "ko": "온라인으로 즐기고, 죽어도 다시 참가하세요.",
-      "pl": "Graj online i wracaj do gry po śmierci.",
-      "pt-BR": "Jogue online e volte para a partida quando morrer.",
-      "ru": "Играй онлайн и возвращайся в игру после гибели.",
-      "tr": "Çevrimiçi oyna ve öldüğünde oyuna geri dön.",
-      "zh-CN": "畅玩在线对战，阵亡后还能重新加入。"
+      "es": "Juega online sin límite de partidas.",
+      "en": "Play online with no match limit.",
+      "de": "Spiele online ohne Partienlimit.",
+      "fr": "Joue en ligne sans limite de parties.",
+      "hi": "बिना मैच सीमा के ऑनलाइन खेलें।",
+      "it": "Gioca online senza limiti di partite.",
+      "ja": "対戦数の制限なしでオンライン対戦。",
+      "ko": "대전 횟수 제한 없이 온라인 플레이.",
+      "pl": "Graj online bez limitu gier.",
+      "pt-BR": "Jogue online sem limite de partidas.",
+      "ru": "Играй онлайн без ограничения по матчам.",
+      "tr": "Sınırsız maçla çevrimiçi oyna.",
+      "zh-CN": "在线畅玩，对局不限次数。"
     },
     "snk.multiplayer.retry.purchase.termsLink": {
       "es": "Términos",
@@ -481,6 +496,21 @@
       "ru": "Восстановить покупки",
       "tr": "Satın alımları geri yükle",
       "zh-CN": "恢复购买"
+    },
+    "snk.paywall.restoreHint": {
+      "es": "¿Ya lo compraste? Recupera tu compra tras reinstalar o cambiar de móvil.",
+      "en": "Already bought it? Get your purchase back after reinstalling or switching phones.",
+      "de": "Schon gekauft? Hol dir deinen Kauf nach einer Neuinstallation oder einem Gerätewechsel zurück.",
+      "fr": "Déjà acheté ? Récupère ton achat après une réinstallation ou un changement de téléphone.",
+      "hi": "पहले खरीदा है? रीइंस्टॉल करने या फ़ोन बदलने के बाद अपनी खरीद वापस पाएँ।",
+      "it": "Già acquistato? Recupera il tuo acquisto dopo una reinstallazione o un cambio di telefono.",
+      "ja": "購入済み？ 再インストールや機種変更のあとは、ここで購入を復元できるよ。",
+      "ko": "이미 구매했나요? 다시 설치하거나 기기를 바꾼 뒤 여기서 구매를 복원하세요.",
+      "pl": "Masz już zakup? Odzyskaj go po ponownej instalacji lub zmianie telefonu.",
+      "pt-BR": "Já comprou? Recupere sua compra após reinstalar ou trocar de celular.",
+      "ru": "Уже покупали? Восстановите покупку после переустановки или смены телефона.",
+      "tr": "Daha önce satın aldın mı? Yeniden kurulum veya telefon değişikliğinden sonra satın alımını geri getir.",
+      "zh-CN": "已经购买过？重装或更换手机后可在此恢复购买。"
     },
     "snk.paywall.restoreNoneBody": {
       "es": "No encontramos una compra previa en esta cuenta.",
@@ -946,6 +976,21 @@
       "ru": "Прошлых покупок не нашлось.",
       "tr": "Geçmiş bir satın alım bulamadık.",
       "zh-CN": "未找到过往购买记录。"
+    },
+    "snk.store.restoreHint": {
+      "es": "¿Ya lo compraste? Recupera tu compra tras reinstalar o cambiar de móvil.",
+      "en": "Already bought it? Get your purchase back after reinstalling or switching phones.",
+      "de": "Schon gekauft? Hol dir deinen Kauf nach einer Neuinstallation oder einem Gerätewechsel zurück.",
+      "fr": "Déjà acheté ? Récupère ton achat après une réinstallation ou un changement de téléphone.",
+      "hi": "पहले खरीदा है? रीइंस्टॉल करने या फ़ोन बदलने के बाद अपनी खरीद वापस पाएँ।",
+      "it": "Già acquistato? Recupera il tuo acquisto dopo una reinstallazione o un cambio di telefono.",
+      "ja": "購入済み？ 再インストールや機種変更のあとは、ここで購入を復元できるよ。",
+      "ko": "이미 구매했나요? 다시 설치하거나 기기를 바꾼 뒤 여기서 구매를 복원하세요.",
+      "pl": "Masz już zakup? Odzyskaj go po ponownej instalacji lub zmianie telefonu.",
+      "pt-BR": "Já comprou? Recupere sua compra após reinstalar ou trocar de celular.",
+      "ru": "Уже покупали? Восстановите покупку после переустановки или смены телефона.",
+      "tr": "Daha önce satın aldın mı? Yeniden kurulum veya telefon değişikliğinden sonra satın alımını geri getir.",
+      "zh-CN": "已经购买过？重装或更换手机后可在此恢复购买。"
     },
     "snk.store.restorePending": {
       "es": "Restaurando…",
