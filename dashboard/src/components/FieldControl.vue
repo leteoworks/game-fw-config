@@ -45,6 +45,21 @@ const emit = defineEmits(['set', 'unset', 'assets-changed']);
 
 const f = computed(() => props.field);
 
+/**
+ * El interruptor de un sobre de despliegue (`…rollout.enabled`) es EL campo
+ * que enciende o apaga una campaña, y se perdia entre los demas: se pinta
+ * como un boton grande en su propia fila, con pulso mientras esta apagado
+ * y una leyenda que dice que hay que pulsarlo.
+ */
+const esInterruptorDelSobre = computed(
+  () => f.value.widget === 'toggle' && /(^|\.)rollout\.enabled$/.test(f.value.path),
+);
+
+/** Pulsar el boton grande enciende o apaga, aunque el campo estuviera sin definir. */
+function alternarInterruptor() {
+  set(valorMostrado.value !== true);
+}
+
 /** Valor a enseñar: el escrito o, si no hay, el default del schema. */
 const valorMostrado = computed(
   () => (f.value.present ? f.value.value : f.value.default),
@@ -111,7 +126,15 @@ function fijarFecha(local) {
 </script>
 
 <template>
-  <div class="campo" :class="{ ausente: !f.present, malo: misErrores.length }">
+  <div
+    class="campo"
+    :class="{
+      ausente: !f.present,
+      malo: misErrores.length,
+      'campo--interruptor': esInterruptorDelSobre,
+      'campo--interruptor-apagado': esInterruptorDelSobre && valorMostrado !== true,
+    }"
+  >
     <div class="cabecera">
       <label class="etiqueta">
         {{ f.label }}
@@ -139,9 +162,41 @@ function fijarFecha(local) {
 
     <p v-if="f.description" class="descripcion">{{ f.description }}</p>
 
-    <div class="control" :class="{ inerte: !f.present }">
+    <div class="control" :class="{ inerte: !f.present && !esInterruptorDelSobre }">
+      <!-- el interruptor de un sobre: boton grande en su propia fila -->
+      <div v-if="esInterruptorDelSobre" class="sobre-interruptor">
+        <button
+          type="button"
+          class="sobre-interruptor__boton"
+          :class="valorMostrado === true ? 'encendido' : 'apagado'"
+          :aria-pressed="valorMostrado === true"
+          @click="alternarInterruptor"
+        >
+          <span class="sobre-interruptor__icono" aria-hidden="true">
+            {{ valorMostrado === true ? '●' : '○' }}
+          </span>
+          <span class="sobre-interruptor__texto">
+            <strong>{{ valorMostrado === true ? 'ACTIVA' : 'APAGADA' }}</strong>
+            <span>{{ valorMostrado === true ? 'pulsa para apagarla' : 'pulsa para activarla' }}</span>
+          </span>
+        </button>
+        <p class="sobre-interruptor__leyenda">
+          <template v-if="valorMostrado === true">
+            ✅ Encendida. Sigue contando el calendario, el tramo y la cohorte
+            de abajo, y hay que <strong>guardar y publicar</strong> para que la
+            app la vea.
+          </template>
+          <template v-else>
+            👉 <strong>Pulsa aquí para activarla.</strong> Con el interruptor
+            apagado nada de lo demás se evalúa: la campaña no la ve nadie por
+            mucho que rellenes el resto. Después, <strong>guardar y
+            publicar</strong>.
+          </template>
+        </p>
+      </div>
+
       <!-- booleano -->
-      <label v-if="f.widget === 'toggle'" class="interruptor">
+      <label v-else-if="f.widget === 'toggle'" class="interruptor">
         <input
           type="checkbox"
           :checked="valorMostrado === true"
@@ -397,6 +452,64 @@ function fijarFecha(local) {
 
 .interruptor { display: inline-flex; align-items: center; gap: 8px; }
 .interruptor input { width: auto; }
+
+/* ── El interruptor del sobre: fila propia, grande, con pulso si esta apagado ── */
+.campo--interruptor {
+  grid-column: 1 / -1;
+  flex: 1 1 100%;
+  width: 100%;
+  box-sizing: border-box;
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--acento, #4f8cff);
+  background: var(--panel);
+}
+.campo--interruptor-apagado {
+  border-color: var(--aviso, #ffb454);
+  animation: sobre-pulso-borde 1.6s ease-in-out infinite;
+}
+.sobre-interruptor { display: grid; gap: 10px; justify-items: center; }
+.sobre-interruptor__boton {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  width: 100%; max-width: 640px; min-height: 72px; padding: 14px 22px;
+  margin: 0 auto;
+  font-size: 18px; line-height: 1.2; text-align: center;
+  border-radius: 14px; border: 2px solid transparent; cursor: pointer;
+  transition: transform .12s ease, box-shadow .2s ease, background .2s ease;
+}
+.sobre-interruptor__boton:active { transform: scale(.98); }
+.sobre-interruptor__boton.apagado {
+  background: linear-gradient(135deg, #b8541c, #ff8a3d);
+  color: #fff;
+  box-shadow: 0 0 0 0 rgba(255, 138, 61, .7);
+  animation: sobre-pulso 1.6s ease-in-out infinite;
+}
+.sobre-interruptor__boton.apagado:hover { filter: brightness(1.08); }
+.sobre-interruptor__boton.encendido {
+  background: linear-gradient(135deg, #1f7a3a, #3fb950);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(63, 185, 80, .35);
+}
+.sobre-interruptor__icono { font-size: 30px; line-height: 1; flex: 0 0 auto; }
+.sobre-interruptor__texto { display: grid; gap: 2px; justify-items: center; }
+.sobre-interruptor__texto strong { font-size: 22px; letter-spacing: .06em; }
+.sobre-interruptor__texto span { font-size: 13px; opacity: .92; }
+.sobre-interruptor__leyenda {
+  margin: 0; max-width: 640px; text-align: center;
+  font-size: 14px; line-height: 1.5; color: var(--texto);
+}
+@keyframes sobre-pulso {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 138, 61, .75); }
+  70%  { box-shadow: 0 0 0 16px rgba(255, 138, 61, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 138, 61, 0); }
+}
+@keyframes sobre-pulso-borde {
+  0%, 100% { border-color: var(--aviso, #ffb454); }
+  50%      { border-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campo--interruptor-apagado, .sobre-interruptor__boton.apagado { animation: none; }
+}
 
 .radios { display: flex; flex-wrap: wrap; gap: 14px; }
 .radios label { display: inline-flex; align-items: center; gap: 6px; }
