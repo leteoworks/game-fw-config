@@ -257,8 +257,8 @@
       "buildKey": "enforce"
     },
     "paywall": {
-      "enabled": true,
-      "triggerGames": 0
+      "enabled": false,
+      "triggerGames": 2
     },
     "retry": {
       "paywall": {
