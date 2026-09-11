@@ -17,7 +17,8 @@
       "appUpdate",
       "mp",
       "debugChannel",
-      "ops"
+      "ops",
+      "support"
     ],
     "segments": [
       "newPlayers",
@@ -7178,6 +7179,27 @@
           "type": "number",
           "minimum": 0,
           "maximum": 100
+        }
+      },
+      "additionalProperties": false
+    },
+    "support": {
+      "title": "Soporte",
+      "description": "Contacto con el estudio: el correo publico y el interruptor del formulario del juego.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "email": {
+          "title": "Correo de soporte",
+          "description": "La direccion que ve el jugador en Opciones → Contacto y a la que llegan los tickets del formulario. Vacio = support@leteoworks.com.",
+          "default": "support@leteoworks.com",
+          "type": "string"
+        },
+        "formEnabled": {
+          "default": true,
+          "title": "Formulario abierto",
+          "description": "Apagado, la pestaña solo enseña el correo (escribir directamente sigue funcionando). Util si el buzon se inunda o hay que parar el envio de verificaciones.",
+          "type": "boolean"
         }
       },
       "additionalProperties": false
