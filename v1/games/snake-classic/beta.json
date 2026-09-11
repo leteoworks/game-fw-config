@@ -57,7 +57,7 @@
   },
   "monetization": {
     "rollout": {
-      "enabled": false,
+      "enabled": true,
       "meta": {
         "name": "Sesion de pruebas manuales 1.0.165",
         "updatedAt": "2026-09-03T17:45:52.735Z"
