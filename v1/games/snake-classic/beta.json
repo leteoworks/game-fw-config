@@ -181,73 +181,28 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.177"
+        "salt": "1.0.178"
       },
       "meta": {
-        "name": "Aviso de version 1.0.177 (hard)",
-        "notes": "Muro de la beta 1.0.177 (Android): actualizacion obligatoria por debajo de 1.0.177",
-        "updatedAt": "2026-09-10T09:58:01.141Z"
+        "name": "Aviso de version 1.0.178 (hard)",
+        "updatedAt": "2026-09-11T10:31:58.875Z"
       }
     },
     "mode": "hard",
-    "latestVersion": "1.0.177",
-    "minSupportedVersion": "1.0.177",
+    "latestVersion": "1.0.178",
+    "minSupportedVersion": "1.0.178",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.177 is required",
-        "body": "Version 1.0.177 is out, with fixes and improvements.\n\nThis update is required to keep playing. Tap Update to continue."
-      },
-      "es": {
-        "title": "Se requiere la versión 1.0.177",
-        "body": "La versión 1.0.177 ya está disponible, con correcciones y mejoras.\n\nEsta actualización es obligatoria para seguir jugando. Pulsa Actualizar para continuar."
+        "title": "Version 1.0.178 is available",
+        "body": ""
       },
       "zh-cn": {
-        "title": "需要更新到 1.0.177 版本",
-        "body": "1.0.177 版本已发布，修复了一些问题并做了改进。\n\n必须更新后才能继续游戏。点击「更新」继续。"
-      },
-      "ja": {
-        "title": "バージョン 1.0.177 への更新が必要です",
-        "body": "バージョン 1.0.177 が公開されました。不具合の修正と改善が含まれています。\n\nプレイを続けるには更新が必要です。「更新」をタップしてください。"
-      },
-      "pt-br": {
-        "title": "A versão 1.0.177 é obrigatória",
-        "body": "A versão 1.0.177 já está disponível, com correções e melhorias.\n\nEsta atualização é obrigatória para continuar jogando. Toque em Atualizar para continuar."
-      },
-      "de": {
-        "title": "Version 1.0.177 ist erforderlich",
-        "body": "Version 1.0.177 ist da, mit Fehlerbehebungen und Verbesserungen.\n\nDieses Update ist erforderlich, um weiterzuspielen. Tippe auf „Aktualisieren“, um fortzufahren."
-      },
-      "fr": {
-        "title": "La version 1.0.177 est requise",
-        "body": "La version 1.0.177 est disponible, avec des corrections et des améliorations.\n\nCette mise à jour est requise pour continuer à jouer. Appuie sur Mettre à jour pour continuer."
-      },
-      "ko": {
-        "title": "버전 1.0.177(으)로 업데이트해야 합니다",
-        "body": "버전 1.0.177이(가) 출시되었습니다. 오류 수정과 개선 사항이 포함되어 있습니다.\n\n계속 플레이하려면 업데이트가 필요합니다. '업데이트'를 눌러 계속하세요."
-      },
-      "ru": {
-        "title": "Требуется версия 1.0.177",
-        "body": "Вышла версия 1.0.177 с исправлениями и улучшениями.\n\nЭто обновление обязательно, чтобы продолжить игру. Нажмите «Обновить», чтобы продолжить."
-      },
-      "tr": {
-        "title": "Sürüm 1.0.177 gerekli",
-        "body": "1.0.177 sürümü yayımlandı; hatalar giderildi ve iyileştirmeler yapıldı.\n\nOynamaya devam etmek için bu güncelleme zorunludur. Devam etmek için Güncelle'ye dokun."
-      },
-      "pl": {
-        "title": "Wymagana jest wersja 1.0.177",
-        "body": "Wersja 1.0.177 jest już dostępna, z poprawkami i ulepszeniami.\n\nTa aktualizacja jest wymagana, aby grać dalej. Naciśnij Aktualizuj, aby kontynuować."
-      },
-      "it": {
-        "title": "È richiesta la versione 1.0.177",
-        "body": "La versione 1.0.177 è disponibile, con correzioni e miglioramenti.\n\nQuesto aggiornamento è necessario per continuare a giocare. Tocca Aggiorna per continuare."
-      },
-      "hi": {
-        "title": "वर्शन 1.0.177 ज़रूरी है",
-        "body": "वर्शन 1.0.177 आ गया है, जिसमें सुधार और बेहतर बदलाव शामिल हैं।\n\nखेलना जारी रखने के लिए यह अपडेट ज़रूरी है। जारी रखने के लिए 'अपडेट' दबाएँ।"
+        "title": "新版本 1.0.178 已发布",
+        "body": ""
       }
     }
   },
