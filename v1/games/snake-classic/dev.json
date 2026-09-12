@@ -51,7 +51,7 @@
       }
     ],
     "frequency": {
-      "mode": "cooldown",
+      "mode": "always",
       "cooldownDays": 7
     }
   },
@@ -108,6 +108,24 @@
     "authority": {
       "mode": "auto",
       "buildKey": "enforce"
+    },
+    "paywall": {
+      "enabled": false
+    }
+  },
+  "monetization": {
+    "rollout": {
+      "enabled": true,
+      "meta": {
+        "name": "Todo gratis, con aviso (freewall) al entrar en el nivel 4",
+        "updatedAt": "2026-09-12T10:08:05.000Z"
+      }
+    },
+    "storeTab": {
+      "enabled": false
+    },
+    "quota": {
+      "enabled": false
     }
   }
 }

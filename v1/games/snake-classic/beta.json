@@ -25,7 +25,7 @@
   },
   "paywall": {
     "rollout": {
-      "enabled": true
+      "enabled": false
     },
     "triggers": [
       {
@@ -57,20 +57,17 @@
   },
   "monetization": {
     "rollout": {
-      "enabled": false,
+      "enabled": true,
       "meta": {
-        "name": "Sesion de pruebas manuales 1.0.165",
-        "updatedAt": "2026-09-03T17:45:52.735Z"
+        "name": "Todo gratis, con aviso (freewall) al entrar en el nivel 4",
+        "updatedAt": "2026-09-12T10:08:05.000Z"
       }
     },
     "quota": {
-      "enabled": true,
-      "limit": 2,
-      "windowHours": 1
+      "enabled": false
     },
-    "offline": {
-      "subscriptionGraceDays": 7,
-      "revocationConfirmHours": 0
+    "storeTab": {
+      "enabled": false
     }
   },
   "profiling": {
