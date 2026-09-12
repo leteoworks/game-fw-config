@@ -181,10 +181,10 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.182"
+        "salt": "1.0.183"
       },
       "meta": {
-        "name": "Aviso de version 1.0.182 (hard)",
+        "name": "Aviso de version 1.0.183 (hard)",
         "updatedAt": "2026-09-12T08:13:20.820Z"
       }
     },
