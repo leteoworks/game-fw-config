@@ -189,15 +189,15 @@
       }
     },
     "mode": "hard",
-    "latestVersion": "1.0.182",
-    "minSupportedVersion": "1.0.182",
+    "latestVersion": "1.0.183",
+    "minSupportedVersion": "1.0.183",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.182 is available",
+        "title": "Version 1.0.183 is available",
         "body": ""
       },
       "zh-cn": {
