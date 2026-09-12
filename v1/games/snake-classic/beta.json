@@ -181,27 +181,27 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.181"
+        "salt": "1.0.182"
       },
       "meta": {
-        "name": "Aviso de version 1.0.181 (hard)",
-        "updatedAt": "2026-09-12T07:44:49.879Z"
+        "name": "Aviso de version 1.0.182 (hard)",
+        "updatedAt": "2026-09-12T08:13:20.820Z"
       }
     },
     "mode": "hard",
-    "latestVersion": "1.0.181",
-    "minSupportedVersion": "1.0.181",
+    "latestVersion": "1.0.182",
+    "minSupportedVersion": "1.0.182",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.181 is available",
+        "title": "Version 1.0.182 is available",
         "body": ""
       },
       "zh-cn": {
-        "title": "新版本 1.0.181 已发布",
+        "title": "新版本 1.0.182 已发布",
         "body": ""
       }
     }
