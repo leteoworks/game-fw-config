@@ -51,7 +51,7 @@
       }
     ],
     "frequency": {
-      "mode": "always",
+      "mode": "session",
       "cooldownDays": 7
     }
   },
