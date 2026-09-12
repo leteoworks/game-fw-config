@@ -7185,10 +7185,16 @@
     },
     "support": {
       "title": "Soporte",
-      "description": "Contacto con el estudio: el correo publico y el interruptor del formulario del juego.",
+      "description": "Contacto con el estudio: si la pestaña existe, el correo publico y el interruptor del formulario del juego.",
       "default": {},
       "type": "object",
       "properties": {
+        "enabled": {
+          "default": true,
+          "title": "Pestaña Contacto",
+          "description": "Apagado, Opciones no enseña la pestaña Contacto y el servicio deja de aceptar tickets de este juego. Encendido de fabrica: un juego publicado sin forma de escribir al estudio es peor que cualquier motivo para apagarlo.",
+          "type": "boolean"
+        },
         "email": {
           "title": "Correo de soporte",
           "description": "La direccion que ve el jugador en Opciones → Contacto y a la que llegan los tickets del formulario. Vacio = support@leteoworks.com.",
