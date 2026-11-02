@@ -110,6 +110,11 @@
     },
     "paywall": {
       "enabled": false
+    },
+    "retry": {
+      "paywall": {
+        "enabled": false
+      }
     }
   },
   "monetization": {
