@@ -178,28 +178,27 @@
       ],
       "cohort": {
         "percent": 100,
-        "salt": "1.0.189"
+        "salt": "1.0.196"
       },
       "meta": {
-        "name": "Aviso de version 1.0.189 (hard)",
-        "updatedAt": "2026-11-02T19:19:21.446Z"
+        "name": "Aviso de version 1.0.196 (soft)",
+        "updatedAt": "2026-11-13T15:17:49.558Z"
       }
     },
-    "mode": "hard",
-    "latestVersion": "1.0.189",
-    "minSupportedVersion": "1.0.189",
+    "mode": "soft",
+    "latestVersion": "1.0.196",
     "hardPercent": 100,
     "checkStore": true,
     "inAppUpdate": true,
     "showPrompt": true,
     "messages": {
       "en": {
-        "title": "Version 1.0.189 is available",
-        "body": ""
+        "title": "Version 1.0.196 is available",
+        "body": "Version 1.0.196 is out, with fixes and improvements.\n\nUpdate now to play the latest version."
       },
       "zh-cn": {
-        "title": "新版本 1.0.189 已发布",
-        "body": ""
+        "title": "新版本 1.0.196 已发布",
+        "body": "新版本 1.0.196 已经上线，修复了一些问题并做了改进。\n\n现在更新即可体验最新版本。"
       }
     }
   },
