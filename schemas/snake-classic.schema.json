@@ -216,7 +216,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -406,6 +406,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
@@ -953,6 +1001,54 @@
                       }
                     ]
                   },
+                  "age": {
+                    "x-invalid-value": {
+                      "minDays": 0,
+                      "maxDays": 0
+                    },
+                    "title": "Antiguedad",
+                    "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "minDays": {
+                            "default": null,
+                            "title": "Desde el dia",
+                            "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxDays": {
+                            "default": null,
+                            "title": "Hasta el dia",
+                            "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Antiguedad",
+                        "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
@@ -1234,7 +1330,7 @@
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -1482,6 +1578,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
@@ -2049,6 +2193,54 @@
                       }
                     ]
                   },
+                  "age": {
+                    "x-invalid-value": {
+                      "minDays": 0,
+                      "maxDays": 0
+                    },
+                    "title": "Antiguedad",
+                    "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "minDays": {
+                            "default": null,
+                            "title": "Desde el dia",
+                            "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxDays": {
+                            "default": null,
+                            "title": "Hasta el dia",
+                            "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Antiguedad",
+                        "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
@@ -2330,7 +2522,7 @@
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "triggers": {
@@ -2624,6 +2816,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
@@ -3277,6 +3517,54 @@
                       }
                     ]
                   },
+                  "age": {
+                    "x-invalid-value": {
+                      "minDays": 0,
+                      "maxDays": 0
+                    },
+                    "title": "Antiguedad",
+                    "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "minDays": {
+                            "default": null,
+                            "title": "Desde el dia",
+                            "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxDays": {
+                            "default": null,
+                            "title": "Hasta el dia",
+                            "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Antiguedad",
+                        "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
                   "segments": {
                     "default": [],
                     "title": "Segmentos",
@@ -3558,7 +3846,7 @@
                   }
                 },
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "additionalProperties": false
               },
               "storeTab": {
@@ -3644,7 +3932,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -3834,6 +4122,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
@@ -4336,7 +4672,7 @@
               },
               "rollout": {
                 "title": "Despliegue",
-                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+                "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
                 "default": {},
                 "type": "object",
                 "properties": {
@@ -4526,6 +4862,54 @@
                         },
                         "title": "Calendario",
                         "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "age": {
+                    "x-invalid-value": {
+                      "minDays": 0,
+                      "maxDays": 0
+                    },
+                    "title": "Antiguedad",
+                    "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "minDays": {
+                            "default": null,
+                            "title": "Desde el dia",
+                            "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                            "anyOf": [
+                              {
+                                "type": "number",
+                                "minimum": 0
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "maxDays": {
+                            "default": null,
+                            "title": "Hasta el dia",
+                            "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "title": "Antiguedad",
+                        "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                         "additionalProperties": false
                       },
                       {
@@ -5705,7 +6089,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -5895,6 +6279,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
@@ -6639,7 +7071,7 @@
       "properties": {
         "rollout": {
           "title": "Despliegue",
-          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
           "default": {},
           "type": "object",
           "properties": {
@@ -6829,6 +7261,54 @@
                   },
                   "title": "Calendario",
                   "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
                   "additionalProperties": false
                 },
                 {
