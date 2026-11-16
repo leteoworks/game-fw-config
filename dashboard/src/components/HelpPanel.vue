@@ -426,10 +426,11 @@ const juego = computed(() => props.gameId || 'snake-classic');
         </li>
       </ul>
       <p>
-        Para probarlo sin esperar días: en una build de desarrollo o beta, la
-        pestaña <strong>Rollout</strong> de Ajustes deja simular la
-        antigüedad (override <code>ageDays</code>), y el endpoint
-        <code>/evaluate</code> acepta <code>ageDays=N</code> (sección 9).
+        Para probarlo sin esperar días: el endpoint <code>/evaluate</code>
+        acepta <code>ageDays=N</code> (sección 9), y desde el portátil
+        <code>pnpm rollout:explain --age-days=N</code> dice si entraría un
+        jugador con N días. La pestaña <strong>Rollout</strong> de Ajustes
+        todavía no permite simular la antigüedad.
       </p>
 
       <h3>Segmentos (<code>segments</code>)</h3>
