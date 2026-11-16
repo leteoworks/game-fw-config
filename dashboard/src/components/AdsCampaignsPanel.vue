@@ -52,6 +52,15 @@ import { formatLocal } from '../lib/datetime.mjs';
  * (la capa existe para que NO se pisen). Si hay holdout global, una cinta
  * lo dice arriba: ese porcentaje del parque no recibe nada, en ninguna
  * seccion, y el mapa de abajo reparte solo el resto.
+ *
+ * ## La antiguedad (`age`)
+ *
+ * Por campaña, a que jugadores apunta por dias desde su ancla verificada
+ * («jugadores con 7–30 días»). El panel no conoce el ancla de nadie, asi
+ * que no la mete en el mapa del parque: avisa de lo que se ve sin datos,
+ * un intervalo vacio o invalido (no la vera NADIE, en silencio) y una
+ * antiguedad sin `versions.min` (las builds anteriores al eje la ignoran y
+ * la enseñarian a todo el mundo).
  */
 
 const props = defineProps({
@@ -183,6 +192,7 @@ const filas = computed(() => campanas.value.map((c, i) => {
     capaSePisa: companeros.some((e) => e.solapa),
     identidad: d.bucketBy,
     experimento: d.experiment,
+    antiguedad: d.age,
     indice: i,
     // Una campaña recien añadida tiene `id: ''`: sin esto los avisos
     // empezarian por un hueco («  no tiene nombre…») y no se sabria de cual
@@ -387,6 +397,27 @@ const pesosACero = computed(
   () => filas.value.filter((f) => f.experimento?.allZero === true),
 );
 
+/**
+ * Antiguedad vacia o invalida (`max <= min`, un «desde» negativo, un tipo
+ * que no valida): el juego la trata como «nadie». Se publica sin error y
+ * la campaña no aparece; el validador la para, pero aqui se ve antes.
+ */
+const antiguedadesVacias = computed(
+  () => filas.value.filter((f) => f.activa && f.antiguedad.empty),
+);
+
+/**
+ * Antiguedad sin minimo de version: una build anterior al eje no sabe de
+ * `age` y la ignora, asi que a esos jugadores les llegaria la campaña sea
+ * cual sea su antiguedad.
+ */
+const antiguedadSinVersion = computed(
+  () => filas.value.filter(
+    (f) => f.activa && f.antiguedad.restricts && !f.antiguedad.empty
+      && f.antiguedad.minVersion === null,
+  ),
+);
+
 /** Capas compartidas con otro sobre del JSON (de esta seccion o de otra). */
 const capasCompartidas = computed(
   () => filas.value.filter((f) => f.capa && f.companeros.length > 0),
@@ -405,7 +436,8 @@ const hayAvisos = computed(() => (
   || sinFicha.value.length || paisesMalos.value.length
   || idiomasMalos.value.length || variantesRepetidas.value.length
   || pesosACero.value.length || capasCompartidas.value.length
-  || capasSolas.value.length
+  || capasSolas.value.length || antiguedadesVacias.value.length
+  || antiguedadSinVersion.value.length
 ));
 
 function cambiarPolitica(valor) {
@@ -594,6 +626,19 @@ function cambiarPolitica(valor) {
           (<code>{{ l.idiomas.invalid.join(', ') }}</code>): BCP-47 en
           minúsculas (es, es-es, pt-br). El validador los rechaza al guardar.
         </li>
+        <li v-for="a in antiguedadesVacias" :key="'av' + a.indice" class="aviso malo">
+          <strong>{{ a.id }}</strong> tiene una antigüedad que no deja entrar a
+          nadie: {{ a.antiguedad.text }}. El intervalo es «desde» (incluido)
+          – «hasta» (excluido), en días y sin negativos; deja vacío el extremo
+          que no acote. El validador la rechaza al guardar.
+        </li>
+        <li v-for="a in antiguedadSinVersion" :key="'as' + a.indice" class="aviso">
+          <strong>{{ a.id }}</strong> filtra por antigüedad
+          ({{ a.antiguedad.text }}) pero no fija versión mínima: las builds
+          anteriores al eje <code>age</code> lo ignoran y la enseñarían a
+          todo el mundo. Pon en «Rango de versiones» la primera versión que
+          lo entiende.
+        </li>
         <li v-for="v in variantesRepetidas" :key="'vr' + v.indice" class="aviso malo">
           El experimento de <strong>{{ v.id }}</strong> repite la variante
           <code>{{ v.experimento.duplicates.join(', ') }}</code>: la feature y
@@ -657,7 +702,7 @@ function cambiarPolitica(valor) {
         <thead>
           <tr>
             <th>#</th><th>Campaña</th><th>Cuándo</th><th>Público ahora</th>
-            <th>Segmentos · idioma · país</th><th>Experimento</th><th>Peso</th>
+            <th>Segmentos · idioma · país · antigüedad</th><th>Experimento</th><th>Peso</th>
             <th>Imágenes</th><th>Vídeo</th><th>Botones</th>
           </tr>
         </thead>
@@ -745,6 +790,11 @@ function cambiarPolitica(valor) {
                     :class="{ malo: f.paises.invalid.includes(p) }"
                   >{{ p }}</code>
                 </template>
+              </div>
+              <div class="campanas__detalle">
+                antigüedad:
+                <span v-if="!f.antiguedad.restricts" class="tenue">cualquiera</span>
+                <span v-else :class="{ malo: f.antiguedad.empty }">{{ f.antiguedad.text }}</span>
               </div>
             </td>
             <td>
@@ -909,6 +959,8 @@ function cambiarPolitica(valor) {
 .campanas__estado.expired { color: var(--error, #b3261e); }
 .campanas__detalle { font-size: 0.76rem; opacity: 0.7; margin-top: 2px; }
 .campanas__detalle.malo { color: var(--error, #b3261e); opacity: 1; }
+/* Un trozo del detalle en rojo (la antigüedad que no deja entrar a nadie). */
+.campanas__detalle .malo { color: var(--error, #b3261e); }
 /* Idiomas y paises: codigos cortos; en rojo los que el validador rechaza. */
 .campanas__codigo {
   font-size: 0.72rem;

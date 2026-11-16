@@ -18,6 +18,7 @@ import {
   bucketByOf,
   collectLayers,
   COUNTRY_PATTERN,
+  describeAge,
   describeCampaign,
   describeCountries,
   describeExperiment,
@@ -27,6 +28,7 @@ import {
   effectivePercent,
   effectiveReach,
   experimentWeightsAllZero,
+  formatDays,
   formatShare,
   globalHoldout,
   invalidCountries,
@@ -36,6 +38,7 @@ import {
   layerSharers,
   LOCALE_PATTERN,
   metaGaps,
+  minVersionOf,
   rampDescents,
   rampState,
   rolloutVocabulary,
@@ -529,4 +532,80 @@ test('describeCampaign trae idiomas, paises, capa, identidad y experimento', () 
     { now: AHORA, countryPattern: '^[a-z]{2}$' },
   );
   assert.deepEqual(laxo.countries.invalid, []);
+});
+
+// ─── Antiguedad (age) ─────────────────────────────────────────────────
+
+test('sin antiguedad, o sin extremos, no restringe', () => {
+  for (const age of [undefined, null, { minDays: null, maxDays: null }, {}]) {
+    const d = describeAge(age);
+    assert.equal(d.restricts, false);
+    assert.equal(d.empty, false);
+    assert.equal(d.text, 'cualquier antigüedad');
+  }
+});
+
+test('el intervalo [min, max) se describe en dias', () => {
+  assert.equal(describeAge({ minDays: 7, maxDays: 30 }).text, 'jugadores con 7–30 días');
+  assert.equal(describeAge({ minDays: 30, maxDays: null }).text, 'jugadores con 30 días o más');
+  assert.equal(describeAge({ minDays: null, maxDays: 1 }).text, 'jugadores con menos de 1 día');
+  // Decimales: doce horas.
+  const media = describeAge({ minDays: null, maxDays: 0.5 });
+  assert.equal(media.text, 'jugadores con menos de 0.5 días');
+  assert.equal(media.empty, false);
+  assert.equal(formatDays(1), '1 día');
+  assert.equal(formatDays(2), '2 días');
+});
+
+test('max <= min (sin minimo cuenta 0) es «nadie», como en el juego', () => {
+  for (const age of [
+    { minDays: 30, maxDays: 7 },
+    { minDays: 7, maxDays: 7 },
+    { minDays: null, maxDays: 0 },
+    { maxDays: -2 },
+  ]) {
+    const d = describeAge(age);
+    assert.equal(d.restricts, true, JSON.stringify(age));
+    assert.equal(d.empty, true, JSON.stringify(age));
+    assert.match(d.text, /^nadie/);
+  }
+});
+
+test('lo que el contrato no valida pasa entero a «nadie» (x-invalid-value)', () => {
+  for (const age of [
+    { minDays: -1, maxDays: 7 },
+    { minDays: '7', maxDays: 30 },
+    'siete',
+    [7, 30],
+  ]) {
+    const d = describeAge(age);
+    assert.equal(d.empty, true, JSON.stringify(age));
+    assert.equal(d.invalid, true, JSON.stringify(age));
+  }
+});
+
+test('describeCampaign trae la antiguedad y el minimo de version', () => {
+  const d = describeCampaign({
+    rollout: {
+      enabled: true,
+      age: { minDays: 7, maxDays: 30 },
+      versions: { min: '1.0.140', max: null },
+    },
+  }, { now: AHORA });
+  assert.equal(d.age.restricts, true);
+  assert.equal(d.age.text, 'jugadores con 7–30 días');
+  assert.equal(d.age.minVersion, '1.0.140');
+  const sinVersion = describeCampaign(
+    { rollout: { age: { minDays: 7 } } },
+    { now: AHORA },
+  );
+  assert.equal(sinVersion.age.minVersion, null);
+  assert.equal(minVersionOf({ versions: { min: '  ' } }), null);
+  // Sin sobre: no restringe.
+  assert.equal(describeCampaign({}, { now: AHORA }).age.restricts, false);
+});
+
+test('el schema real trae el eje age en el sobre de las campañas', () => {
+  const rollout = bannerRolloutSchema(schemaReal);
+  assert.ok(rollout.properties.age, 'con antigüedad');
 });

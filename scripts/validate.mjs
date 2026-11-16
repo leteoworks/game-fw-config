@@ -9,6 +9,8 @@ import Ajv from 'ajv/dist/2020.js';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { antiguedadesVacias } from './lib/age-ranges.mjs';
+
 const ajv = new Ajv({ allErrors: true, strict: false });
 
 /**
@@ -248,6 +250,18 @@ for (const schemaFile of readdirSync(schemasDir)) {
         + '  El juego lo trata como "nadie": la campaña no se enseñaria a '
         + 'ningun jugador\n  sin que nada avise. → pon desde < hasta, o '
         + 'apaga la campaña (rollout.enabled: false).',
+      );
+    }
+
+    for (const age of antiguedadesVacias(data)) {
+      failed = true;
+      console.error(
+        `FAIL ${gameId}/${configFile}: antiguedad que no deja entrar a nadie `
+        + `en ${age.at} (${age.motivo})\n`
+        + '  El juego la trata como "nadie": la campaña no se enseñaria a '
+        + 'ningun jugador\n  sin que nada avise. → pon 0 <= desde < hasta '
+        + '(dias), deja vacio el\n  extremo que no acote, o quita la '
+        + 'antiguedad.',
       );
     }
 

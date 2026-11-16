@@ -389,6 +389,49 @@ const juego = computed(() => props.gameId || 'snake-classic');
         campo ves las dos lecturas.
       </p>
 
+      <h3>Antigüedad (<code>age</code>)</h3>
+      <p>
+        «Desde el día» – «hasta el día»: a qué jugadores llega según los días
+        que han pasado desde un instante que <strong>verificó un
+        servidor</strong> (la compra en la tienda, o la primera vez que el
+        servidor vio al jugador). Nunca la fecha del móvil ni la de
+        instalación: esas las cambia el jugador. El intervalo es
+        <strong>[desde, hasta)</strong>: «desde» incluido, «hasta» excluido.
+        Cualquiera de los dos puede quedar vacío, y admite decimales
+        (<code>0.5</code> = doce horas). Ejemplos: solo «desde» 30 = «a partir
+        del día 30» (algo que se desbloquea al mes de la compra); solo
+        «hasta» 7 = «durante los primeros 7 días» (una bienvenida); 7 – 30 =
+        jugadores con entre una semana y un mes.
+      </p>
+      <ul>
+        <li>
+          <strong>Sin ese dato, no entra nadie.</strong> Si el juego aún no
+          tiene la fecha verificada del jugador (primer arranque sin red, un
+          juego que no la aporta), una antigüedad con algún extremo lo deja
+          fuera. Ante la duda, fuera: es el mismo criterio que el país.
+        </li>
+        <li>
+          <strong>«Hasta» menor o igual que «desde» = nadie.</strong> Igual
+          que el tramo invertido: la campaña se publica sin error y no la ve
+          ningún jugador. El panel de campañas lo marca en rojo y el validador
+          lo rechaza al guardar. Sin «desde», cuenta como 0.
+        </li>
+        <li>
+          <strong>Úsalo con una versión mínima</strong>
+          (<code>versions.min</code>). Una build publicada antes de que
+          existiera este eje <em>no lo entiende y lo ignora</em>: a esos
+          jugadores les llegaría la campaña tenga la antigüedad que tenga.
+          Pon como mínimo la primera versión que lo entiende; el panel lo
+          recuerda si falta.
+        </li>
+      </ul>
+      <p>
+        Para probarlo sin esperar días: en una build de desarrollo o beta, la
+        pestaña <strong>Rollout</strong> de Ajustes deja simular la
+        antigüedad (override <code>ageDays</code>), y el endpoint
+        <code>/evaluate</code> acepta <code>ageDays=N</code> (sección 9).
+      </p>
+
       <h3>Segmentos (<code>segments</code>)</h3>
       <p>
         Grupos de jugadores que el juego define por su comportamiento. Se
@@ -543,6 +586,10 @@ const juego = computed(() => props.gameId || 'snake-classic');
           y lista no vacía, fuera).
         </li>
         <li><strong>Calendario</strong>, con el reloj corregido por el servidor.</li>
+        <li>
+          <strong>Antigüedad</strong> (días desde la fecha verificada; sin
+          ella y con algún extremo, fuera).
+        </li>
         <li><strong>Segmentos</strong> (todos los marcados).</li>
         <li>
           <strong>Cohorte</strong>: el porcentaje EFECTIVO (la rampa ya
@@ -573,6 +620,7 @@ const juego = computed(() => props.gameId || 'snake-classic');
           <tr><td><code>locale</code></td><td>Su idioma no casa con ninguno de la lista (o no se conoce).</td></tr>
           <tr><td><code>country</code></td><td>Su país no está en la lista, o el juego aún no lo conoce.</td></tr>
           <tr><td><code>schedule</code></td><td>Fuera de la ventana del calendario.</td></tr>
+          <tr><td><code>age</code></td><td>Sus días desde la fecha verificada quedan fuera de [desde, hasta), o el juego no tiene esa fecha, o el intervalo está vacío.</td></tr>
           <tr><td><code>segment</code></td><td>No cumple alguno de los segmentos exigidos (o uno es desconocido).</td></tr>
           <tr><td><code>cohort</code></td><td>Su punto del parque queda por encima del porcentaje efectivo.</td></tr>
           <tr><td><code>audience</code></td><td>Su punto cae fuera del tramo (o el tramo está invertido, o no hay identidad estable).</td></tr>
@@ -899,7 +947,7 @@ paywall.rollout.cohort:
         <li>
           <strong>El panel de campañas</strong> de la pestaña Publicidad: sin
           avisos rojos (tramo vacío, alcance recortado por el porcentaje,
-          calendario caducado o invertido, rampa que baja, segmento
+          calendario caducado o invertido, antigüedad vacía, rampa que baja, segmento
           desconocido, país o idioma mal escrito, variante repetida, ids
           repetidos, campañas de más) y con los huecos que quieras tener, no
           otros. Si hay capa compartida, que los tramos sean estancos.
@@ -922,7 +970,7 @@ paywall.rollout.cohort:
           <code>/evaluate</code> y añadiendo el contexto como parámetros:
           <pre class="ayuda__ejemplo">…/v1/{{ juego }}/{{ canal || 'prod' }}/evaluate?id=&lt;anonymousId&gt;&amp;variant=android&amp;formFactor=phone
     &amp;version=1.0.134&amp;locale=es-es&amp;country=ES&amp;segments=veterans,payers
-    &amp;now=2026-12-24T10:00:00Z</pre>
+    &amp;now=2026-12-24T10:00:00Z&amp;ageDays=30</pre>
           Devuelve el veredicto de <strong>todas</strong> las campañas del
           canal para ese contexto (permitida o no, motivo, posición,
           porcentaje efectivo, variante del experimento y su cuota esperada)
@@ -932,7 +980,9 @@ paywall.rollout.cohort:
           <code>country</code> usa el país desde el que haces la petición,
           que es justo lo que verá un móvil de ese país
           (<code>countrySource</code> dice cuál se usó); sin <code>now</code>,
-          ahora. Es la forma de contestar «¿qué ve este dispositivo?» pegando
+          ahora; sin <code>ageDays</code> (días desde la fecha verificada),
+          el jugador no tiene antigüedad y una campaña con <code>age</code>
+          sale rechazada por <code>age</code>. Es la forma de contestar «¿qué ve este dispositivo?» pegando
           su <code>anonymousId</code>. Los sobres que no validan salen en
           <code>invalid</code>.
         </li>

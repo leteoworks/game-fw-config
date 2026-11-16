@@ -20,6 +20,11 @@
  *    porcentaje`) y el tramo se aplica ENCIMA (`desde <= posicion < hasta`).
  *    Asi que el publico real de una campaña es `[desde, min(hasta, %))`: un
  *    tramo 50–100 con la rampa al 10 % no deja entrar a NADIE todavia.
+ *  - **Antiguedad** (`age`): dias `[minDays, maxDays)` desde el ancla que
+ *    verifico un servidor (compra, primera vez visto). `maxDays <= minDays`
+ *    (sin minimo cuenta 0) o un `minDays` negativo / un tipo que no valida
+ *    = nadie (fail-closed, el contrato los coacciona a `{0, 0}`). El panel
+ *    no conoce el ancla de nadie: describe a quien apunta, no cuantos son.
  *  - **Segmentos**: el jugador tiene que cumplir TODOS; un nombre que el
  *    juego no conoce no deja entrar a nadie (fail-closed).
  *  - **Idiomas y paises** (ADR-041): listas blancas; vacias = todos. El
@@ -324,6 +329,77 @@ export function invalidCountries(countries, pattern = COUNTRY_PATTERN) {
   return invalidByPattern(countries, pattern ?? COUNTRY_PATTERN);
 }
 
+// ─── Antiguedad ───────────────────────────────────────────────────────
+
+/** `1` → «1 día»; `7` → «7 días»; `0.5` → «0.5 días». */
+export function formatDays(n) {
+  return `${n} ${n === 1 ? 'día' : 'días'}`;
+}
+
+const esExtremo = (v) => v === null || v === undefined
+  || (typeof v === 'number' && Number.isFinite(v));
+
+/**
+ * La antiguedad del sobre, descrita: si restringe, sus extremos, si deja
+ * fuera a TODO el mundo (`empty`) y un texto corto («jugadores con 7–30
+ * días»).
+ *
+ * Replica el contrato del juego: un `age` que no valida (no es objeto, un
+ * extremo que no es numero, un `minDays` negativo) pasa ENTERO a `{0, 0}`
+ * (`x-invalid-value`), y un intervalo vacio o invertido (`maxDays <=
+ * minDays`, sin minimo cuenta 0) tambien. Los dos son «nadie», y es
+ * justo lo que el panel tiene que gritar: se publica sin error y no lo ve
+ * ningun jugador.
+ */
+export function describeAge(age) {
+  const nada = {
+    restricts: false, minDays: null, maxDays: null, empty: false,
+    invalid: false, text: 'cualquier antigüedad',
+  };
+  if (age === null || age === undefined) return nada;
+  if (
+    typeof age !== 'object' || Array.isArray(age)
+    || !esExtremo(age.minDays) || !esExtremo(age.maxDays)
+  ) {
+    return {
+      ...nada, restricts: true, empty: true, invalid: true,
+      text: 'nadie (antigüedad no válida)',
+    };
+  }
+  const minDays = age.minDays ?? null;
+  const maxDays = age.maxDays ?? null;
+  if (minDays === null && maxDays === null) return nada;
+  const base = { restricts: true, minDays, maxDays, invalid: false };
+  if (minDays !== null && minDays < 0) {
+    return {
+      ...base, empty: true, invalid: true,
+      text: `nadie («desde» negativo: ${minDays})`,
+    };
+  }
+  const bajo = minDays ?? 0;
+  if (maxDays !== null && maxDays <= bajo) {
+    return {
+      ...base, empty: true,
+      text: `nadie (intervalo vacío: ${bajo}–${maxDays} días)`,
+    };
+  }
+  let text;
+  if (minDays !== null && maxDays !== null) {
+    text = `jugadores con ${minDays}–${maxDays} días`;
+  } else if (minDays !== null) {
+    text = `jugadores con ${formatDays(minDays)} o más`;
+  } else {
+    text = `jugadores con menos de ${formatDays(maxDays)}`;
+  }
+  return { ...base, empty: false, text };
+}
+
+/** `versions.min` del sobre, si lo hay (string no vacio), o `null`. */
+export function minVersionOf(rollout) {
+  const m = rollout?.versions?.min;
+  return typeof m === 'string' && m.trim() !== '' ? m.trim() : null;
+}
+
 // ─── Capa, identidad del sorteo y experimento ─────────────────────────
 
 /** Capa de exclusion mutua del sobre, o `null` (eje propio de la seccion). */
@@ -527,6 +603,13 @@ export function describeCampaign(campaign, {
     layer: layerOf(cohort),
     bucketBy: bucketByOf(cohort),
     experiment: describeExperiment(experimentOf(rollout)),
+    age: {
+      ...describeAge(rollout.age),
+      // Una build anterior al eje IGNORA `age` y enseñaria la campaña a todo
+      // el mundo: por eso la antiguedad va con `versions.min`. Sin minimo de
+      // version, el panel lo recuerda.
+      minVersion: minVersionOf(rollout),
+    },
     enabled: rollout.enabled === true,
     schedule: {
       state: estado,

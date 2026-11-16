@@ -7,7 +7,7 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "dashboard": "node dashboard/server/index.mjs",
-    "test": "node --test dashboard/src/lib/*.test.mjs dashboard/server/*.test.mjs"
+    "test": "node --test scripts/lib/*.test.mjs dashboard/src/lib/*.test.mjs dashboard/server/*.test.mjs"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
