@@ -1,0 +1,252 @@
+{
+  "schemaVersion": 1,
+  "common": {
+    "revision": "l34-placeholder",
+    "rollout": {
+      "enabled": true,
+      "variants": null,
+      "formFactors": null,
+      "versions": null,
+      "locales": [],
+      "countries": [],
+      "schedule": null,
+      "age": null,
+      "segments": [],
+      "cohort": {
+        "percent": 100,
+        "salt": "",
+        "audience": null,
+        "layer": null,
+        "bucketBy": "device",
+        "ramp": []
+      },
+      "experiment": null,
+      "meta": {}
+    },
+    "economy": {
+      "accessCardPercent": 20,
+      "sequenceChamberPrizePercent": 20
+    },
+    "inventory": {
+      "backpackSlotsPerPurchase": 2,
+      "backpackPurchases": [
+        {
+          "costPercent": 10
+        },
+        {
+          "costPercent": 20
+        },
+        {
+          "costPercent": 35
+        }
+      ]
+    },
+    "stamina": {
+      "runCostPerSecond": 12,
+      "jumpCost": 8,
+      "throwCost": {
+        "min": 5,
+        "max": 15
+      },
+      "beamCostPerSecond": 6
+    },
+    "stealth": {
+      "sightRangeMeters": {
+        "lit": 8,
+        "dim": 4.5,
+        "dark": 2
+      },
+      "hearingAlertThreshold": 1,
+      "floorNoiseMultiplier": {
+        "glassDebris": 1.5,
+        "metal": 1.3,
+        "tile": 1,
+        "concrete": 0.7,
+        "sand": 0.6,
+        "unknown": 1
+      },
+      "traceLifetimeSeconds": {
+        "blood": 30,
+        "footprints": 30
+      }
+    },
+    "knifeDwarf": {
+      "healthHp": 15,
+      "slashDamageHp": 4,
+      "slashIntervalSeconds": 1,
+      "wanderSpeedMetersPerSecond": 1.2,
+      "followSpeedMetersPerSecond": 2.8,
+      "runSpeedMetersPerSecond": 4.5,
+      "followMinMeters": 5,
+      "followMaxMeters": 7,
+      "attackRadiusMeters": 10,
+      "fleeRadiusMeters": 4,
+      "hideSeconds": 6,
+      "callRadiusMeters": 25,
+      "callCooldownSeconds": 8,
+      "loseTrackSeconds": 20,
+      "dashStamina": {
+        "staminaMax": 100,
+        "costPerDash": 30,
+        "regenPerSecond": 10
+      },
+      "dash": {
+        "distanceMeters": 3,
+        "durationSeconds": 0.25,
+        "minGapSeconds": 0.6,
+        "turnMinDegrees": 60,
+        "turnMaxDegrees": 120,
+        "caughtDistanceMeters": 2,
+        "resumeDestinationAfterSeconds": 3
+      },
+      "stones": {
+        "routeRadiusMeters": 15,
+        "damageHp": 3,
+        "speedMetersPerSecond": 12,
+        "spreadAtSixMetersMeters": 0.5,
+        "throwIntervalSeconds": 1.5,
+        "maxThrowersPerSwarm": 2
+      },
+      "ambush": {
+        "triggerSightMeters": 3,
+        "chaseStartMeters": 4,
+        "chaseKeepMeters": 10,
+        "chaseDropSeconds": 3,
+        "fleeToAmbushMaxSteps": 25,
+        "lookoutReliefSeconds": 10
+      }
+    },
+    "armadillo": {
+      "dizzySeconds": 2,
+      "curlUpSeconds": 0.8,
+      "rollSafetyCutoffSeconds": 10,
+      "healthHp": 50,
+      "rollHitPlayerDamageHp": 20,
+      "rollHitEnemyDamageHp": 20,
+      "patrolSpeedMetersPerSecond": 1.5,
+      "searchSpeedMetersPerSecond": 3,
+      "rollSpeedMetersPerSecond": 14,
+      "rollNoiseRadiusMeters": 30,
+      "grazeAngleDegrees": 10
+    },
+    "crawler": {
+      "patrolSpeedMetersPerSecond": 0.3,
+      "investigateSpeedMetersPerSecond": 0.5,
+      "chaseSpeedMetersPerSecond": 0.8,
+      "sightMultiplier": 0.75,
+      "darkRevealMeters": 1.5,
+      "grabReachMeters": 1,
+      "biteDamageHp": 4,
+      "healthHp": 30,
+      "stompDamageHp": 15,
+      "dragNoiseRadiusMeters": 3
+    },
+    "crumblingFloor": {
+      "warningSeconds": 1,
+      "restoreSeconds": 5,
+      "warningNoiseRadiusMeters": 8,
+      "fallNoiseRadiusMeters": 20
+    },
+    "collapsingCeiling": {
+      "triggerSeconds": 3,
+      "warningSeconds": 1,
+      "regenSeconds": 20,
+      "standingDamageHp": 60,
+      "lowPostureDamageHp": 40,
+      "impact": 120,
+      "noiseRadiusMeters": 30
+    },
+    "crawlGap": {
+      "soundAttenuation": 0.5
+    },
+    "stones": {
+      "pickupSeconds": 1,
+      "pickupNoiseRadiusMeters": 2,
+      "weightKg": 0.2,
+      "perSlot": 5,
+      "impactNoiseRadiusMeters": 10,
+      "playerHitDamageHp": 2
+    },
+    "chamber": {
+      "enabled": true
+    },
+    "ranking": {
+      "submit": {
+        "enabled": false
+      }
+    }
+  },
+  "solo": {
+    "revision": "l34-placeholder",
+    "rollout": {
+      "enabled": true,
+      "variants": null,
+      "formFactors": null,
+      "versions": null,
+      "locales": [],
+      "countries": [],
+      "schedule": null,
+      "age": null,
+      "segments": [],
+      "cohort": {
+        "percent": 100,
+        "salt": "",
+        "audience": null,
+        "layer": null,
+        "bucketBy": "device",
+        "ramp": []
+      },
+      "experiment": null,
+      "meta": {}
+    },
+    "economy": {
+      "startingFundsLevel1": null,
+      "levelRewardBase": null
+    },
+    "dynamicBalance": {
+      "extraLifeRaisePercent": 10,
+      "dropPercent": 10,
+      "dropEveryLevels": 2,
+      "raiseCapPercent": 50,
+      "mazeRewardsFromDeath": 5,
+      "fogClearItemsFromDeath": 20
+    }
+  },
+  "versus": {
+    "revision": "l34-placeholder",
+    "rollout": {
+      "enabled": true,
+      "variants": null,
+      "formFactors": null,
+      "versions": null,
+      "locales": [],
+      "countries": [],
+      "schedule": null,
+      "age": null,
+      "segments": [],
+      "cohort": {
+        "percent": 100,
+        "salt": "",
+        "audience": null,
+        "layer": null,
+        "bucketBy": "device",
+        "ramp": []
+      },
+      "experiment": null,
+      "meta": {}
+    },
+    "enabled": {
+      "steam": false,
+      "ps5": false,
+      "roblox": false
+    },
+    "queues": [],
+    "economy": {
+      "startingCredits": 1600,
+      "rivalKillBonusPercent": 10
+    },
+    "monk": {
+      "deliveryCountdownSeconds": 20
+    }
+  }
+}

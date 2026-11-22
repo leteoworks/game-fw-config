@@ -1,0 +1,2996 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gamefw.dev/remote-config/loop-grid.schema.json",
+  "title": "Remote config de loop-grid",
+  "description": "GENERADO desde el contrato zod de balance de Loop Grid (scripts/lib/loop-grid-balance, LG-E83-01) con `pnpm exec tsx scripts/lib/loop-grid-balance/cli.ts`. NO editar a mano: su test de deriva falla si difiere del generado.",
+  "x-generated": {
+    "gameId": "loop-grid",
+    "schemaVersion": 1,
+    "sections": [
+      "common",
+      "solo",
+      "versus"
+    ],
+    "segments": [],
+    "locales": []
+  },
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1,
+      "title": "Version del contrato",
+      "description": "La version del contrato con la que se escribio este fichero. El juego solo aplica ficheros de su misma version."
+    },
+    "common": {
+      "title": "Balance común",
+      "description": "Parámetros de balance que comparten un jugador y multijugador (parte core, L155). Se genera desde una sola fuente para todos los productos: no la edites aquí. Los clientes lo aplican al empezar la siguiente run o partida, nunca a mitad de nivel (LG-E83-03/04). Con el despliegue apagado, el cliente usa sus valores de build.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "revision": {
+          "default": "l34-placeholder",
+          "title": "Revisión de los valores",
+          "description": "Etiqueta de esta versión de los valores comunes; la reporta balance.params.applied. Súbela al cambiar una cifra.",
+          "x-lg-value": "placeholder",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9.-]*$"
+        },
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Este juego no define segmentos todavia.",
+              "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
+              "maxItems": 0,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "uniqueItems": true,
+              "x-segments": []
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "economy": {
+          "title": "Economía común",
+          "description": "Porcentajes de la economía que valen en los dos perfiles.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "accessCardPercent": {
+              "default": 20,
+              "title": "Tarjeta de acceso (% de los créditos iniciales)",
+              "description": "Precio de la tarjeta de acceso como porcentaje de los créditos iniciales del laberinto (13 § créditos, C1 §570).",
+              "x-lg-param": "LG_P_ACCESS_CARD_PRICE",
+              "x-lg-value": "canon",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "sequenceChamberPrizePercent": {
+              "default": 20,
+              "title": "Premio de la Cámara de la Secuencia (%)",
+              "description": "Premio de la Cámara como porcentaje de los créditos iniciales (13 § créditos, L17).",
+              "x-lg-param": "LG_P_SEQUENCE_CHAMBER_PRIZE",
+              "x-lg-value": "canon",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "inventory": {
+          "title": "Inventario",
+          "description": "Ampliaciones de mochila. Las bandas de peso son del catálogo del cuerpo (atributos.json), no de aquí.",
+          "x-lg-param": "LG_P_BACKPACK_UPGRADES",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "backpackSlotsPerPurchase": {
+              "default": 2,
+              "title": "Ranuras por ampliación",
+              "description": "Ranuras que añade cada ampliación de mochila de la tienda (13 § inventario y peso, L66).",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "backpackPurchases": {
+              "default": [
+                {
+                  "costPercent": 10
+                },
+                {
+                  "costPercent": 20
+                },
+                {
+                  "costPercent": 35
+                }
+              ],
+              "title": "Ampliaciones por laberinto y su coste",
+              "description": "Una entrada por ampliación que se puede comprar en un laberinto, en orden de compra (hoy 3: ~10 / ~20 / ~35 % de los créditos iniciales, creciente). El número de entradas ES el tope de compras: no hay un segundo campo que lo repita.",
+              "minItems": 1,
+              "maxItems": 10,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "costPercent": {
+                    "default": 10,
+                    "title": "Coste (% de los créditos iniciales)",
+                    "description": "Precio de esta compra como porcentaje de los créditos iniciales del laberinto.",
+                    "x-lg-value": "placeholder",
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  }
+                },
+                "title": "Compra de ampliación",
+                "description": "Una ampliación de mochila, en el orden en que se compra.",
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "stamina": {
+          "title": "Estamina: gasto por acción",
+          "description": "Costes base por acción (13 § estamina, a calibrar). Máximo, recuperación, dash, carga y jadeo son del catálogo del cuerpo.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "runCostPerSecond": {
+              "default": 12,
+              "title": "Correr (por segundo)",
+              "description": "Estamina que gasta correr cada segundo, antes del multiplicador de gasto del cuerpo.",
+              "x-lg-param": "LG_P_STAMINA",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "jumpCost": {
+              "default": 8,
+              "title": "Saltar",
+              "description": "Estamina por salto (también el amortiguado).",
+              "x-lg-param": "LG_P_STAMINA_ACTION_COSTS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "throwCost": {
+              "title": "Gasto de arrojar un objeto",
+              "description": "Estamina por lanzamiento según la fuerza (13 § estamina). El mínimo no puede pasar del máximo.",
+              "x-lg-param": "LG_P_STAMINA_ACTION_COSTS",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "min": {
+                  "default": 5,
+                  "title": "Mínimo",
+                  "description": "Gasto de arrojar con la fuerza mínima.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "max": {
+                  "default": 15,
+                  "title": "Máximo",
+                  "description": "Gasto de arrojar con la fuerza máxima.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              },
+              "additionalProperties": false
+            },
+            "beamCostPerSecond": {
+              "default": 6,
+              "title": "Equilibrio en viga (por segundo)",
+              "description": "Estamina que gasta mantener el equilibrio en una viga.",
+              "x-lg-param": "LG_P_STAMINA_ACTION_COSTS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        },
+        "stealth": {
+          "title": "Sigilo",
+          "description": "Percepción y rastros (13 § sigilo, placeholder).",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "sightRangeMeters": {
+              "title": "Alcance de vista (m)",
+              "description": "Por estado de luz del objetivo (13 § sigilo). Las especies con vista propia la derivan de esta con su multiplicador.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "lit": {
+                  "default": 8,
+                  "title": "Con luz",
+                  "description": "Alcance de vista del enemigo a un objetivo iluminado.",
+                  "x-lg-param": "LG_P_SIGHT_LIT",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "dim": {
+                  "default": 4.5,
+                  "title": "En penumbra",
+                  "description": "Alcance de vista a un objetivo en penumbra.",
+                  "x-lg-param": "LG_P_SIGHT_DIM",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "dark": {
+                  "default": 2,
+                  "title": "A oscuras",
+                  "description": "Alcance de vista a un objetivo a oscuras.",
+                  "x-lg-param": "LG_P_SIGHT_DARK",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              },
+              "additionalProperties": false
+            },
+            "hearingAlertThreshold": {
+              "default": 1,
+              "title": "Umbral de alerta del oído",
+              "description": "El enemigo reacciona si el ruido recibido (ruido ÷ distancia × suelo) supera este umbral.",
+              "x-lg-param": "LG_P_NOISE_ALERT_THRESHOLD",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "floorNoiseMultiplier": {
+              "title": "Ruido por suelo (×)",
+              "description": "Multiplicador del ruido de pasos por material (13 § sigilo). Se compone con el de la carga.",
+              "x-lg-param": "LG_P_NOISE_FLOOR_MULT",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "glassDebris": {
+                  "default": 1.5,
+                  "title": "Cristales y escombros",
+                  "description": "Multiplicador del ruido de pasos sobre cristales o escombros.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "metal": {
+                  "default": 1.3,
+                  "title": "Metal",
+                  "description": "Multiplicador del ruido de pasos sobre metal.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "tile": {
+                  "default": 1,
+                  "title": "Baldosa (normal)",
+                  "description": "Multiplicador del suelo normal.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "concrete": {
+                  "default": 0.7,
+                  "title": "Cemento",
+                  "description": "Multiplicador del ruido de pasos sobre cemento.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "sand": {
+                  "default": 0.6,
+                  "title": "Arena",
+                  "description": "Multiplicador del ruido de pasos sobre arena.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                },
+                "unknown": {
+                  "default": 1,
+                  "title": "Sin dato",
+                  "description": "Multiplicador de un suelo sin material declarado.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10
+                }
+              },
+              "additionalProperties": false
+            },
+            "traceLifetimeSeconds": {
+              "title": "Duración de rastros (s)",
+              "description": "El aceite dura hasta arder (no es una cifra). El holograma y el marcado del peón son del multijugador (LG-E57-46).",
+              "x-lg-param": "LG_P_TRACE_LIFETIMES",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "blood": {
+                  "default": 30,
+                  "title": "Sangre",
+                  "description": "Segundos que dura un rastro de sangre.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "footprints": {
+                  "default": 30,
+                  "title": "Huellas",
+                  "description": "Segundos que dura un rastro de huellas.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "knifeDwarf": {
+          "title": "Enano con cuchillo",
+          "description": "L104–L107, L114, L127: valores en juego. La distancia de seguimiento mínima no puede pasar de la máxima.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "healthHp": {
+              "default": 15,
+              "title": "Vida",
+              "description": "PV del enano.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "slashDamageHp": {
+              "default": 4,
+              "title": "Daño del tajo",
+              "description": "PV por tajo y enano (esquivable).",
+              "x-lg-param": "LG_P_KNIFE_DWARF_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "slashIntervalSeconds": {
+              "default": 1,
+              "title": "Intervalo del tajo",
+              "description": "Segundos entre tajos del mismo enano.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "wanderSpeedMetersPerSecond": {
+              "default": 1.2,
+              "title": "Velocidad al merodear",
+              "description": "m/s merodeando.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "followSpeedMetersPerSecond": {
+              "default": 2.8,
+              "title": "Velocidad al seguir",
+              "description": "m/s siguiendo al jugador sin atacar.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "runSpeedMetersPerSecond": {
+              "default": 4.5,
+              "title": "Velocidad corriendo",
+              "description": "m/s corriendo. Tiene que quedar por debajo del esprint mínimo del jugador y del zombi corredor (cotas del cuerpo).",
+              "x-lg-param": "LG_P_KNIFE_DWARF_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "followMinMeters": {
+              "default": 5,
+              "title": "Seguimiento: distancia mínima",
+              "description": "Banda a la que el enjambre te sigue sin atacar.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_FOLLOW_DISTANCE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "followMaxMeters": {
+              "default": 7,
+              "title": "Seguimiento: distancia máxima",
+              "description": "Dentro de la vista con luz, para que te vean.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_FOLLOW_DISTANCE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "attackRadiusMeters": {
+              "default": 10,
+              "title": "Radio del ataque en grupo",
+              "description": "Radio alrededor del jugador en el que se cuentan los enanos para atacar (el umbral es de la generación).",
+              "x-lg-param": "LG_P_KNIFE_DWARF_ATTACK_RADIUS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "fleeRadiusMeters": {
+              "default": 4,
+              "title": "Radio de huida",
+              "description": "Si te acercas a menos de esto con menos del umbral, huyen.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_FLEE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "hideSeconds": {
+              "default": 6,
+              "title": "Tiempo escondido",
+              "description": "Segundos escondido tras huir.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_FLEE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "callRadiusMeters": {
+              "default": 25,
+              "title": "Radio del aviso (silbido)",
+              "description": "Radio por recorrido del silbido de aviso.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_CALL",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "callCooldownSeconds": {
+              "default": 8,
+              "title": "Espera entre avisos",
+              "description": "Segundos entre dos avisos del mismo enano.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_CALL",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "loseTrackSeconds": {
+              "default": 20,
+              "title": "Perderte",
+              "description": "Segundos sin percibirte hasta que el enjambre se disuelve.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_LOSE_TIME",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "dashStamina": {
+              "title": "Estamina del enano",
+              "description": "L107 (13 § dash y estamina del enano).",
+              "x-lg-param": "LG_P_KNIFE_DWARF_STAMINA",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "staminaMax": {
+                  "default": 100,
+                  "title": "Estamina máxima",
+                  "description": "Estamina propia del enano (solo la gasta el dash).",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "costPerDash": {
+                  "default": 30,
+                  "title": "Coste por dash",
+                  "description": "Con 100 y 30, tres dashes seguidos.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "regenPerSecond": {
+                  "default": 10,
+                  "title": "Recarga por segundo",
+                  "description": "También corriendo (correr no gasta).",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              },
+              "additionalProperties": false
+            },
+            "dash": {
+              "title": "Dash del enano",
+              "description": "L107/L114. El giro mínimo no puede pasar del máximo.",
+              "x-lg-param": "LG_P_KNIFE_DWARF_DASH",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "distanceMeters": {
+                  "default": 3,
+                  "title": "Distancia",
+                  "description": "Metros que recorre el dash.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "durationSeconds": {
+                  "default": 0.25,
+                  "title": "Duración",
+                  "description": "Dura el dash; es invulnerable mientras tanto (L114).",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "minGapSeconds": {
+                  "default": 0.6,
+                  "title": "Espera mínima entre dashes",
+                  "description": "Segundos mínimos entre dos dashes seguidos.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "turnMinDegrees": {
+                  "default": 60,
+                  "title": "Giro mínimo",
+                  "description": "Giro respecto a la dirección de huida, hacia el lado con camino libre.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 360
+                },
+                "turnMaxDegrees": {
+                  "default": 120,
+                  "title": "Giro máximo",
+                  "description": "Giro máximo respecto a la dirección de huida.",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 360
+                },
+                "caughtDistanceMeters": {
+                  "default": 2,
+                  "title": "Distancia de «pillado»",
+                  "description": "Jugador a esta distancia (su ataque cuerpo a cuerpo) dispara el dash.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_DASH_TRIGGER",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "resumeDestinationAfterSeconds": {
+                  "default": 3,
+                  "title": "Retomar el destino tras",
+                  "description": "Con estamina para otro dash y este tiempo desde el último, retoma su destino (emboscada, L114).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_DASH_TRIGGER",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                }
+              },
+              "additionalProperties": false
+            },
+            "stones": {
+              "title": "Piedras del enano",
+              "description": "L127 (13 § montículos y enanos que tiran piedras).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "routeRadiusMeters": {
+                  "default": 15,
+                  "title": "Distancia de ruta al montículo",
+                  "description": "Ruta máxima hasta un montículo para ir a por piedras (y para no olvidarlo).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_RADIUS",
+                  "x-lg-value": "canon",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "damageHp": {
+                  "default": 3,
+                  "title": "Daño de su piedra",
+                  "description": "PV que quita una piedra del enano si impacta.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_DAMAGE",
+                  "x-lg-value": "canon",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "speedMetersPerSecond": {
+                  "default": 12,
+                  "title": "Velocidad del tiro",
+                  "description": "Velocidad de la piedra lanzada por un enano.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_THROW",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "spreadAtSixMetersMeters": {
+                  "default": 0.5,
+                  "title": "Dispersión a 6 m",
+                  "description": "Desvío del tiro a 6 m.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_THROW",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "throwIntervalSeconds": {
+                  "default": 1.5,
+                  "title": "Espera entre tiros",
+                  "description": "Segundos mínimos entre dos tiros del mismo enano.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_THROW",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "maxThrowersPerSwarm": {
+                  "default": 2,
+                  "title": "Tiradores a la vez por enjambre",
+                  "description": "Enanos de un mismo enjambre a la vez en el ciclo de la piedra; el resto sigue acechando.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_STONE_MAX_THROWERS",
+                  "x-lg-value": "canon",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                }
+              },
+              "additionalProperties": false
+            },
+            "ambush": {
+              "title": "Emboscada de enanos (en juego)",
+              "description": "L106/L114: lo que decide la IA en juego. Porcentaje, tamaño, distancias, patrulla y correa son de la generación.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "triggerSightMeters": {
+                  "default": 3,
+                  "title": "Disparo por verte",
+                  "description": "Distancia a la que el grupo escondido te ve y salta aunque no entres en el callejón.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_AMBUSH_TRIGGER_SIGHT",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "chaseStartMeters": {
+                  "default": 4,
+                  "title": "Inicio de la persecución",
+                  "description": "Te acercas a menos de esto (el radio de huida de L104).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_CHASE",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "chaseKeepMeters": {
+                  "default": 10,
+                  "title": "Mantener la persecución",
+                  "description": "Sigue mientras estás a esta distancia como mucho.",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_CHASE",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "chaseDropSeconds": {
+                  "default": 3,
+                  "title": "Dejar la persecución",
+                  "description": "Segundos alejándote para que la deje (L114).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_CHASE",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                },
+                "fleeToAmbushMaxSteps": {
+                  "default": 25,
+                  "title": "Huida hacia la emboscada (pasos)",
+                  "description": "Distancia de camino máxima a la que un enano perseguido huye hacia una emboscada activa (L114).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_AMBUSH_FLEE_MAX_STEPS",
+                  "x-lg-value": "placeholder",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000
+                },
+                "lookoutReliefSeconds": {
+                  "default": 10,
+                  "title": "Relevo del oteador",
+                  "description": "Segundos desde la muerte del oteador hasta que sale el relevo. Patrulla y correa son de la generación (LG-E89).",
+                  "x-lg-param": "LG_P_KNIFE_DWARF_LOOKOUT_RELIEF_TIME",
+                  "x-lg-value": "placeholder",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 3600
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "armadillo": {
+          "title": "Armadillo de pinchos",
+          "description": "L105, valores en juego. Rebotes, peso, límite y colocación son del contrato del laberinto y de la generación.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "dizzySeconds": {
+              "default": 2,
+              "title": "Mareo",
+              "description": "Segundos mareado tras el último rebote (canon «~2 s»).",
+              "x-lg-param": "LG_P_ARMADILLO_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "curlUpSeconds": {
+              "default": 0.8,
+              "title": "Enrollarse",
+              "description": "Telegrafiado con un chasquido.",
+              "x-lg-param": "LG_P_ARMADILLO_TIMES",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "rollSafetyCutoffSeconds": {
+              "default": 10,
+              "title": "Corte de seguridad rodando",
+              "description": "Segundos rodando sin completar los rebotes (provisional).",
+              "x-lg-param": "LG_P_ARMADILLO_TIMES",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "healthHp": {
+              "default": 50,
+              "title": "Vida (forma normal)",
+              "description": "Invulnerable en bola.",
+              "x-lg-param": "LG_P_ARMADILLO_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "rollHitPlayerDamageHp": {
+              "default": 20,
+              "title": "Golpe rodando al jugador",
+              "description": "PV al jugador (más el derribo por impacto).",
+              "x-lg-param": "LG_P_ARMADILLO_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "rollHitEnemyDamageHp": {
+              "default": 20,
+              "title": "Golpe rodando a un enemigo",
+              "description": "PV a cada enemigo arrollado.",
+              "x-lg-param": "LG_P_ARMADILLO_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "patrolSpeedMetersPerSecond": {
+              "default": 1.5,
+              "title": "Patrulla",
+              "description": "m/s patrullando en forma normal.",
+              "x-lg-param": "LG_P_ARMADILLO_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "searchSpeedMetersPerSecond": {
+              "default": 3,
+              "title": "Búsqueda",
+              "description": "m/s buscando en forma normal.",
+              "x-lg-param": "LG_P_ARMADILLO_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "rollSpeedMetersPerSecond": {
+              "default": 14,
+              "title": "Rodando",
+              "description": "m/s rodando (mucho más que el esprint máximo).",
+              "x-lg-param": "LG_P_ARMADILLO_ROLL_SPEED",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "rollNoiseRadiusMeters": {
+              "default": 30,
+              "title": "Ruido rodando",
+              "description": "Radio del ruido continuo mientras rueda (despierta hordas, L96).",
+              "x-lg-param": "LG_P_ARMADILLO_ROLL_NOISE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "grazeAngleDegrees": {
+              "default": 10,
+              "title": "Ángulo de roce",
+              "description": "Un contacto más tangente desliza sin contar como rebote.",
+              "x-lg-param": "LG_P_ARMADILLO_GRAZE_ANGLE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 360
+            }
+          },
+          "additionalProperties": false
+        },
+        "crawler": {
+          "title": "Zombi reptador",
+          "description": "L134, valores en juego. Peso, límite y separación son de la generación.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "patrolSpeedMetersPerSecond": {
+              "default": 0.3,
+              "title": "Patrulla",
+              "description": "m/s patrullando.",
+              "x-lg-param": "LG_P_CRAWLER_SPEEDS",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "investigateSpeedMetersPerSecond": {
+              "default": 0.5,
+              "title": "Investigar",
+              "description": "m/s investigando.",
+              "x-lg-param": "LG_P_CRAWLER_SPEEDS",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "chaseSpeedMetersPerSecond": {
+              "default": 0.8,
+              "title": "Perseguir",
+              "description": "m/s persiguiendo.",
+              "x-lg-param": "LG_P_CRAWLER_SPEEDS",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "sightMultiplier": {
+              "default": 0.75,
+              "title": "Vista (× la común)",
+              "description": "Su alcance por luz = este factor × sigilo.sightRange.",
+              "x-lg-param": "LG_P_CRAWLER_SIGHT_MULT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            },
+            "darkRevealMeters": {
+              "default": 1.5,
+              "title": "Visible a oscuras desde",
+              "description": "Distancia a la que se le distingue a oscuras sin luz.",
+              "x-lg-param": "LG_P_CRAWLER_DARK_REVEAL",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "grabReachMeters": {
+              "default": 1,
+              "title": "Alcance del agarre",
+              "description": "Agarre de tobillo (canon «≤ ~1 m»).",
+              "x-lg-param": "LG_P_CRAWLER_GRAB",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "biteDamageHp": {
+              "default": 4,
+              "title": "Mordisco por ciclo",
+              "description": "PV por ciclo del agarre, sin sangrado.",
+              "x-lg-param": "LG_P_CRAWLER_GRAB",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "healthHp": {
+              "default": 30,
+              "title": "Vida",
+              "description": "PV del reptador (canon «~30»).",
+              "x-lg-param": "LG_P_CRAWLER_COMBAT",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "stompDamageHp": {
+              "default": 15,
+              "title": "Pisotón del jugador",
+              "description": "PV que le quita un pisotón (dos lo matan).",
+              "x-lg-param": "LG_P_CRAWLER_COMBAT",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "dragNoiseRadiusMeters": {
+              "default": 3,
+              "title": "Ruido de arrastre",
+              "description": "Radio del ruido al moverse; no despierta hordas.",
+              "x-lg-param": "LG_P_CRAWLER_DRAG_NOISE",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        },
+        "crumblingFloor": {
+          "title": "Suelo rompible",
+          "description": "L121, valores en juego. Cupo, largo y distancias son de la generación; el vacío del tramo, del contrato del laberinto.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "warningSeconds": {
+              "default": 1,
+              "title": "Aviso",
+              "description": "Tiembla y cruje antes de caer.",
+              "x-lg-param": "LG_P_CRUMBLING_FLOOR_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "restoreSeconds": {
+              "default": 5,
+              "title": "Reposición",
+              "description": "Segundos para reponerse tras caer (si el vacío está libre).",
+              "x-lg-param": "LG_P_CRUMBLING_FLOOR_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "warningNoiseRadiusMeters": {
+              "default": 8,
+              "title": "Ruido del aviso",
+              "description": "Radio del crujido del aviso.",
+              "x-lg-param": "LG_P_CRUMBLING_FLOOR_NOISE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "fallNoiseRadiusMeters": {
+              "default": 20,
+              "title": "Ruido de la caída",
+              "description": "Radio del ruido al caer.",
+              "x-lg-param": "LG_P_CRUMBLING_FLOOR_NOISE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        },
+        "collapsingCeiling": {
+          "title": "Techo colapsable",
+          "description": "L122, valores en juego. Cupo y distancias son de la generación.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "triggerSeconds": {
+              "default": 3,
+              "title": "Tiempo debajo para disparar",
+              "description": "Humano debajo seguido para que se dispare.",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "warningSeconds": {
+              "default": 1,
+              "title": "Aviso",
+              "description": "Polvo y crujido antes de caer.",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "regenSeconds": {
+              "default": 20,
+              "title": "Regeneración",
+              "description": "Segundos hasta volver a estar armado.",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_TIMES",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "standingDamageHp": {
+              "default": 60,
+              "title": "Daño de pie",
+              "description": "PV de los escombros de pie (más el derribo).",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_DAMAGE",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "lowPostureDamageHp": {
+              "default": 40,
+              "title": "Daño agachado, a cuatro patas o tumbado",
+              "description": "PV en postura baja, sin derribo (canon «~40»).",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_DAMAGE",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "impact": {
+              "default": 120,
+              "title": "Impacto contra la robustez",
+              "description": "Impacto con el que se resuelve el derribo de pie.",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_DAMAGE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "noiseRadiusMeters": {
+              "default": 30,
+              "title": "Ruido del estruendo",
+              "description": "Atrae enemigos y despierta hordas.",
+              "x-lg-param": "LG_P_COLLAPSING_CEILING_NOISE",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        },
+        "crawlGap": {
+          "title": "Paredes de arrastre",
+          "description": "L123, valores en juego. Cupo, atajo y holgura son de la generación y del contrato del laberinto.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "soundAttenuation": {
+              "default": 0.5,
+              "title": "Atenuación del sonido por el hueco",
+              "description": "Factor del radio de un ruido que pasa por el hueco.",
+              "x-lg-param": "LG_P_CRAWL_GAP_SOUND_ATTENUATION",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10
+            }
+          },
+          "additionalProperties": false
+        },
+        "stones": {
+          "title": "Piedras de los montículos",
+          "description": "L126, valores en juego. Cupo y distancias son de la generación.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "pickupSeconds": {
+              "default": 1,
+              "title": "Recoger una piedra",
+              "description": "Segundos que tarda recoger una piedra.",
+              "x-lg-param": "LG_P_STONE_PICKUP",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            },
+            "pickupNoiseRadiusMeters": {
+              "default": 2,
+              "title": "Ruido de recoger",
+              "description": "Radio del ruido al recoger.",
+              "x-lg-param": "LG_P_STONE_PICKUP",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "weightKg": {
+              "default": 0.2,
+              "title": "Peso (kg)",
+              "description": "Peso de una piedra pequeña.",
+              "x-lg-param": "LG_P_STONE_ITEM",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "perSlot": {
+              "default": 5,
+              "title": "Piedras por hueco",
+              "description": "Piedras que caben en un hueco del inventario.",
+              "x-lg-param": "LG_P_STONE_ITEM",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "impactNoiseRadiusMeters": {
+              "default": 10,
+              "title": "Ruido del impacto",
+              "description": "Radio del primer impacto de una piedra (canon «~10 m»).",
+              "x-lg-param": "LG_P_STONE_NOISE",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "playerHitDamageHp": {
+              "default": 2,
+              "title": "Daño a un enemigo",
+              "description": "PV de una piedra lanzada por un jugador que golpea a un enemigo (daño mínimo, canon).",
+              "x-lg-param": "LG_P_STONE_HIT_DAMAGE",
+              "x-lg-value": "placeholder",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 10000
+            }
+          },
+          "additionalProperties": false
+        },
+        "chamber": {
+          "title": "Cámara de la Secuencia",
+          "description": "Kill-switch remoto de la Cámara (LG-E19-01).",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Cámara de la Secuencia activa",
+              "description": "Kill-switch de la Cámara (LG-E19-01): apagado, la Cámara queda sellada a partir del siguiente laberinto; nunca a mitad de uno.",
+              "x-lg-value": "canon",
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ranking": {
+          "title": "Ranking",
+          "description": "Kill-switches del ranking (LG-E27-01).",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "submit": {
+              "title": "Envío al ranking",
+              "description": "Emisión de la run verificable al cerrar la run.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "default": false,
+                  "title": "Envío al ranking activo",
+                  "description": "Kill-switch del emisor de VerifiableRun (LG-E27-01). Apagado por defecto: el cliente no envía nada hasta que exista el servicio (LG-E85).",
+                  "x-lg-value": "canon",
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "solo": {
+      "title": "Balance de un jugador",
+      "description": "Columnas del perfil solo (parte single, L155): economía de la run y balanceo dinámico. Los clientes lo aplican al empezar la siguiente run o partida, nunca a mitad de nivel (LG-E83-03/04). Con el despliegue apagado, el cliente usa sus valores de build.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "revision": {
+          "default": "l34-placeholder",
+          "title": "Revisión de los valores",
+          "description": "Etiqueta de esta versión de los valores de un jugador; la reporta balance.params.applied. Súbela al cambiar una cifra.",
+          "x-lg-value": "placeholder",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9.-]*$"
+        },
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Este juego no define segmentos todavia.",
+              "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
+              "maxItems": 0,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "uniqueItems": true,
+              "x-segments": []
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "economy": {
+          "title": "Economía de un jugador",
+          "description": "Créditos de la run (13 § créditos y recompensas).",
+          "x-lg-param": "LG_P_SOLO_RUN_CREDITS",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "startingFundsLevel1": {
+              "default": null,
+              "title": "Fondo inicial del nivel 1",
+              "description": "Créditos con los que empieza la run. 🔸 Sin cifra en la definición («placeholder pequeño, p. ej. 0–200», 13 § créditos): vacío = el cliente usa su fallback.",
+              "x-lg-value": "placeholder",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "levelRewardBase": {
+              "default": null,
+              "title": "Recompensa base por superar un nivel",
+              "description": "Créditos por nivel superado, «moderadamente baja» y de escalado lento (C1 §579). 🔸 Sin cifra en la definición: vacío = el cliente usa su fallback.",
+              "x-lg-value": "placeholder",
+              "anyOf": [
+                {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1000000
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "dynamicBalance": {
+          "title": "Balanceo dinámico (anti-frustración)",
+          "description": "13 § balanceo dinámico (L23/L34).",
+          "x-lg-param": "LG_P_DYNAMIC_BALANCE",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "extraLifeRaisePercent": {
+              "default": 10,
+              "title": "Subida por usar la vida extra (%)",
+              "description": "La recompensa base por nivel sube este porcentaje cada vez que se usa la vida extra para pasar un nivel.",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "dropPercent": {
+              "default": 10,
+              "title": "Bajada sin usarla (%)",
+              "description": "Lo que baja la recompensa tras los niveles seguidos sin vida extra, hasta volver al valor base.",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "dropEveryLevels": {
+              "default": 2,
+              "title": "Niveles sin vida extra por bajada",
+              "description": "Cada cuántos niveles seguidos sin necesitarla baja.",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "raiseCapPercent": {
+              "default": 50,
+              "title": "Techo de la subida (%)",
+              "description": "La subida acumulada no pasa de esto.",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "mazeRewardsFromDeath": {
+              "default": 5,
+              "title": "Recompensas en el laberinto desde la muerte n.º",
+              "description": "Desde esta muerte en el mismo nivel aparecen recompensas por el laberinto (créditos, vida extra…).",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            },
+            "fogClearItemsFromDeath": {
+              "default": 20,
+              "title": "Ítems quita-niebla desde la muerte n.º",
+              "description": "Desde esta muerte aparecen ítems que quitan la niebla de guerra en un radio.",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "versus": {
+      "title": "Balance multijugador",
+      "description": "Columnas del perfil versus (parte multi, L155): modo por plataforma, colas con su contentTier y economía de la partida. Los clientes lo aplican al empezar la siguiente run o partida, nunca a mitad de nivel (LG-E83-03/04). Con el despliegue apagado, el cliente usa sus valores de build.",
+      "default": {},
+      "type": "object",
+      "properties": {
+        "revision": {
+          "default": "l34-placeholder",
+          "title": "Revisión de los valores",
+          "description": "Etiqueta de esta versión de los valores multijugador; la reporta balance.params.applied. Súbela al cambiar una cifra.",
+          "x-lg-value": "placeholder",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z0-9][a-z0-9.-]*$"
+        },
+        "rollout": {
+          "title": "Despliegue",
+          "description": "A quien le toca: interruptor, variantes, tipo de dispositivo, versiones, idiomas, paises, calendario, antiguedad, segmentos, cohorte y experimento. Se evalua en ese orden. La ficha no se evalua: es para las personas.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "default": true,
+              "title": "Activo",
+              "description": "Interruptor. Apagado, nada de lo que sigue se evalua.",
+              "type": "boolean"
+            },
+            "variants": {
+              "default": null,
+              "title": "Variantes de distribucion",
+              "description": "Lista blanca. Vacio/ausente = todas. Las variantes son ios, android, browser, electron-windows, electron-linux, electron-mac-steam y electron-mac-appstore.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "ios",
+                      "android",
+                      "browser",
+                      "electron-windows",
+                      "electron-linux",
+                      "electron-mac-steam",
+                      "electron-mac-appstore"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "formFactors": {
+              "default": null,
+              "title": "Tipos de dispositivo",
+              "description": "Lista blanca: phone, tablet, desktop. Ausente = todos.",
+              "x-invalid-item": "none",
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "phone",
+                      "tablet",
+                      "desktop"
+                    ]
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "versions": {
+              "default": null,
+              "title": "Rango de versiones",
+              "description": "Versiones INSTALADAS de la app a las que aplica. Vacio = todas. Inclusive por los dos lados.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "default": null,
+                      "title": "Version minima",
+                      "description": "Inclusive. Vacio = sin minimo. Una version que no se pueda leer no restringe (fail-open): un rango mal escrito nunca deja a nadie fuera por accidente.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "max": {
+                      "default": null,
+                      "title": "Version maxima",
+                      "description": "Inclusive. Vacio = sin maximo.",
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 32,
+                          "x-ui": {
+                            "widget": "version"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Rango de versiones",
+                  "description": "Versiones INSTALADAS de la app a las que aplica. Sirve para empezar por los mas atrasados o para excluir una version con un problema conocido.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "locales": {
+              "default": [],
+              "title": "Idiomas",
+              "description": "Lista blanca de idiomas del jugador (BCP-47 en minusculas: es, es-es, pt-br). \"es\" casa con cualquier es-*. Vacio = todos.",
+              "x-invalid-item": "zxx",
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 16,
+                "pattern": "^[a-z]{2,3}(-[a-z0-9]{2,8})*$"
+              }
+            },
+            "countries": {
+              "default": [],
+              "title": "Paises",
+              "description": "Lista blanca de paises (ISO alfa-2 en MAYUSCULAS: ES, MX, US). El pais lo determina el servidor de remote-config desde la conexion, sin geolocalizar en el movil. Sin pais conocido (primer arranque sin red) una lista no vacia NO deja entrar. Vacio = todos.",
+              "x-invalid-item": "ZZ",
+              "maxItems": 64,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            },
+            "schedule": {
+              "default": null,
+              "title": "Calendario",
+              "description": "Opcional. Ventana [desde, hasta) en UTC. Vacio = siempre. Se compara con la hora del servidor, no con la del dispositivo.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "from": {
+                      "default": null,
+                      "title": "Desde",
+                      "description": "Instante (UTC) a partir del cual aplica, inclusive. Vacio = desde ya.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "to": {
+                      "default": null,
+                      "title": "Hasta",
+                      "description": "Instante (UTC) en el que deja de aplicar, exclusive. Vacio = sin fin. Permite caducar una campaña sin volver a publicar.",
+                      "x-ui": {
+                        "widget": "datetime"
+                      },
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                          "x-ui": {
+                            "widget": "datetime"
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Calendario",
+                  "description": "Ventana de tiempo en la que la campaña esta viva. Se puede publicar hoy una campaña que empieza la semana que viene y que se apaga sola al terminar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "age": {
+              "x-invalid-value": {
+                "minDays": 0,
+                "maxDays": 0
+              },
+              "title": "Antiguedad",
+              "description": "Opcional. Dias [desde, hasta) desde la compra o la primera vez que el SERVIDOR vio al jugador (lo aporta el juego; nunca la fecha del dispositivo). Vacio = sin restriccion. Sin ese dato no entra nadie.",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "minDays": {
+                      "default": null,
+                      "title": "Desde el dia",
+                      "description": "Dias desde el ancla verificada (compra o primera vez visto), INCLUSIVE. Vacio = sin minimo. 30 = a partir del dia 30. Admite decimales (0.5 = doce horas).",
+                      "anyOf": [
+                        {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "maxDays": {
+                      "default": null,
+                      "title": "Hasta el dia",
+                      "description": "Dias desde el ancla verificada, EXCLUSIVE. Vacio = sin maximo. 7 = durante los primeros 7 dias. Un maximo menor o igual que el minimo no deja entrar a nadie.",
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "title": "Antiguedad",
+                  "description": "Dias [desde, hasta) desde un instante que VERIFICO un servidor (la compra en la tienda o la primera vez que el servidor vio al jugador; nunca la fecha del dispositivo). Sin ese dato, una antiguedad con algun extremo NO deja entrar.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "segments": {
+              "default": [],
+              "title": "Segmentos",
+              "description": "Segmentos nombrados que el jugador tiene que cumplir TODOS (los define el juego: \"nuevos\", \"han jugado al MP\"…). Vacio = sin restriccion. Un nombre que el juego no conoce no deja entrar a nadie. Este juego no define segmentos todavia.",
+              "x-rollout": "segments",
+              "x-invalid-item": "invalidSegment",
+              "maxItems": 0,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 64
+              },
+              "uniqueItems": true,
+              "x-segments": []
+            },
+            "cohort": {
+              "title": "Cohorte",
+              "description": "A que parte del parque llega, de forma estable por jugador (hash de su identidad anonima).",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "default": 100,
+                  "title": "Porcentaje del parque",
+                  "description": "0-100. Subirlo solo AÑADE gente (nadie que ya lo tenia lo pierde); bajarlo si puede quitar. 100 = todo el mundo, incluida la primera sesion sin identidad resuelta.",
+                  "x-ui": {
+                    "widget": "percent"
+                  },
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "salt": {
+                  "default": "",
+                  "title": "Sal del sorteo",
+                  "description": "Texto libre y estable. Cambiarlo REBARAJA a todo el parque: es la palanca para volver a sortear (p. ej. poner la version publicada para que cada release estrene sorteo). No tocarlo a mitad de un despliegue por fases.",
+                  "type": "string",
+                  "maxLength": 64
+                },
+                "audience": {
+                  "title": "Tramo del parque",
+                  "description": "Opcional. Compartimento [desde, hasta) del eje 0-100 de esta seccion. Vacio = sin tramo (solo cuenta el porcentaje).",
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "from": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Desde",
+                          "description": "Inicio del tramo, inclusive (0-100)."
+                        },
+                        "to": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "title": "Hasta",
+                          "description": "Fin del tramo, EXCLUSIVE (0-100)."
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to"
+                      ],
+                      "title": "Tramo del parque",
+                      "description": "Cada jugador ocupa un punto FIJO del eje 0-100 de esta seccion; el tramo [desde, hasta) dice que puntos entran. Dos tramos que no se solapan reparten el parque en compartimentos estancos. Sin identidad estable (primer arranque) un tramo NO deja entrar. Un tramo vacio o invertido (desde >= hasta) no deja entrar a nadie.",
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "layer": {
+                  "default": null,
+                  "title": "Capa (exclusion mutua)",
+                  "description": "Opcional. Las campañas de DISTINTAS secciones que comparten capa se sortean sobre el MISMO eje: con tramos que no se solapan, un jugador cae en una sola (p. ej. que quien ve el anuncio de Navidad no vea el muro de Navidad). Vacio = eje propio de la seccion.",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "bucketBy": {
+                  "default": "device",
+                  "title": "Punto del parque por",
+                  "description": "device = identidad anonima del dispositivo (siempre disponible); user = identidad de la cuenta del jugador, la misma en todos sus dispositivos (cae a device si no ha iniciado sesion). Solo tiene efecto en juegos con cuentas.",
+                  "type": "string",
+                  "enum": [
+                    "device",
+                    "user"
+                  ]
+                },
+                "ramp": {
+                  "default": [],
+                  "title": "Rampa programada",
+                  "description": "Escalones (instante UTC → porcentaje) que suben el porcentaje solos, sin publicar en cada paso: 1 % hoy, 10 % el lunes, 50 % el jueves, 100 % el domingo. El vigente es el ultimo escalon cuyo instante ya paso; antes del primero manda el porcentaje de arriba. Vacio = sin rampa.",
+                  "maxItems": 12,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+                        "x-ui": {
+                          "widget": "datetime"
+                        },
+                        "title": "A partir de",
+                        "description": "Instante (UTC) en el que entra en vigor este escalon."
+                      },
+                      "percent": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 100,
+                        "title": "Porcentaje",
+                        "description": "Porcentaje del parque a partir de ese instante. Los escalones deberian SUBIR: bajar es un rollback, y eso se hace a mano.",
+                        "x-ui": {
+                          "widget": "percent"
+                        }
+                      }
+                    },
+                    "required": [
+                      "at",
+                      "percent"
+                    ],
+                    "title": "Escalon",
+                    "description": "Un paso de la rampa: instante y porcentaje.",
+                    "additionalProperties": false
+                  }
+                }
+              },
+              "additionalProperties": false
+            },
+            "experiment": {
+              "default": null,
+              "title": "Experimento (A/B)",
+              "description": "Opcional. A quien entra se le asigna una variante estable y ponderada, independiente del porcentaje. Vacio = sin experimento (la feature recibe variante nula).",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z][a-zA-Z0-9]*$",
+                      "title": "Clave del experimento",
+                      "description": "Identificador camelCase (precioNavidad26). Cambiarla REASIGNA las variantes de todo el parque: no tocarla a mitad de experimento."
+                    },
+                    "variants": {
+                      "minItems": 1,
+                      "maxItems": 10,
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "pattern": "^[a-z][a-zA-Z0-9]*$",
+                            "title": "Variante",
+                            "description": "Nombre camelCase (control, precioAlto…). La feature lo lee del veredicto y la telemetria lo lleva en rollout.evaluated."
+                          },
+                          "weight": {
+                            "default": 1,
+                            "title": "Peso",
+                            "description": "Reparto relativo: dos variantes con peso 1 son 50/50; pesos 3 y 1 son 75/25. Un peso 0 deja la variante definida pero sin nadie.",
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1000
+                          }
+                        },
+                        "required": [
+                          "name"
+                        ],
+                        "title": "Variante",
+                        "description": "Nombre y peso de una variante del experimento.",
+                        "additionalProperties": false
+                      },
+                      "title": "Variantes",
+                      "description": "Al menos una. La primera suele ser el control. Si la suma de pesos es 0, todo el mundo recibe la primera."
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "variants"
+                  ],
+                  "title": "Experimento",
+                  "description": "A/B dentro de la campaña: a quien entra se le asigna una variante ponderada y estable; la feature decide que enseñar segun el nombre.",
+                  "additionalProperties": false
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "meta": {
+              "title": "Ficha de la campaña",
+              "description": "Datos operativos: nombre, responsable, ticket, notas y fecha del ultimo cambio. No afectan al juego; sirven para saber de quien es cada campaña y cuales sobran.",
+              "default": {},
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "Nombre",
+                  "description": "Nombre humano de la campaña (\"Navidad 2026\").",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "owner": {
+                  "title": "Responsable",
+                  "description": "Quien responde por esta campaña (nombre o alias).",
+                  "type": "string",
+                  "maxLength": 80
+                },
+                "ticket": {
+                  "title": "Ticket",
+                  "description": "Issue, PR o enlace donde se decidio.",
+                  "x-ui": {
+                    "widget": "url"
+                  },
+                  "type": "string",
+                  "maxLength": 120
+                },
+                "notes": {
+                  "title": "Notas",
+                  "description": "Por que existe y que se espera de ella. Lo que le gustaria leer a quien la encuentre dentro de seis meses.",
+                  "x-ui": {
+                    "multiline": true
+                  },
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "updatedAt": {
+                  "title": "Ultimo cambio",
+                  "description": "Cuando se toco por ultima vez (UTC). La auditoria de deuda lo usa para señalar campañas apagadas desde hace demasiado.",
+                  "x-ui": {
+                    "widget": "datetime"
+                  },
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "enabled": {
+          "title": "Modo versus por plataforma",
+          "description": "`modes.versus.enabled` por plataforma (L155): qué plataformas ofrecen el multijugador.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "steam": {
+              "default": false,
+              "title": "Multijugador en Steam",
+              "description": "Ofrecer el modo versus en Steam. Apagado por defecto (nada dormido, L72).",
+              "x-lg-value": "placeholder",
+              "type": "boolean"
+            },
+            "ps5": {
+              "default": false,
+              "title": "Multijugador en PlayStation 5",
+              "description": "Ofrecer el modo versus en PlayStation 5. Apagado por defecto (nada dormido, L72).",
+              "x-lg-value": "placeholder",
+              "type": "boolean"
+            },
+            "roblox": {
+              "default": false,
+              "title": "Multijugador en Roblox",
+              "description": "Ofrecer el modo versus en Roblox. Apagado por defecto (nada dormido, L72).",
+              "x-lg-value": "placeholder",
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "queues": {
+          "default": [],
+          "title": "Colas",
+          "description": "Colas del multijugador con su contentTier fijo (18 § contentTier). Vacío = no hay colas que ofrecer. Un id no se repite.",
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 48,
+                "pattern": "^[a-z][a-z0-9-]*$",
+                "title": "Id de la cola",
+                "description": "Identificador estable de la cola (minúsculas, cifras y guiones). Lo nombran la asignación de partida y la telemetría.",
+                "x-lg-value": "placeholder"
+              },
+              "contentTier": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 1000,
+                "title": "Nivel de contenido (contentTier)",
+                "description": "Dificultad fija del contenido de esta cola (R6): cupo de especies, titanes y piezas del subset.",
+                "x-lg-value": "canon"
+              }
+            },
+            "required": [
+              "id",
+              "contentTier"
+            ],
+            "title": "Cola",
+            "description": "Una cola del multijugador y su dificultad fija.",
+            "additionalProperties": false
+          }
+        },
+        "economy": {
+          "title": "Economía multijugador",
+          "description": "Créditos de la partida (13 § créditos y recompensas).",
+          "x-lg-param": "LG_P_VERSUS_ECONOMY",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "startingCredits": {
+              "default": 1600,
+              "title": "Créditos iniciales",
+              "description": "Créditos universales con los que empieza cada jugador (fija que el 20 % de la Cámara sea 320; 13 § créditos).",
+              "x-lg-value": "placeholder",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "rivalKillBonusPercent": {
+              "default": 10,
+              "title": "Bonus por matar a un rival (%)",
+              "description": "Porcentaje de los créditos iniciales por cada rival muerto (C1 §633).",
+              "x-lg-value": "canon",
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            }
+          },
+          "additionalProperties": false
+        },
+        "monk": {
+          "title": "Monje",
+          "description": "L108/L109 en multijugador. La escuadra de enanos deriva del umbral de ataque (generación), no se repite aquí.",
+          "default": {},
+          "type": "object",
+          "properties": {
+            "deliveryCountdownSeconds": {
+              "default": 20,
+              "title": "Cuenta atrás de la entrega",
+              "description": "Segundos entre entregar una receta al monje y la recompensa (solo MP, L109).",
+              "x-lg-param": "LG_P_MONK_COOKING_COUNTDOWN",
+              "x-lg-value": "canon",
+              "type": "number",
+              "minimum": 0,
+              "maximum": 3600
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion"
+  ],
+  "additionalProperties": false
+}
