@@ -1,0 +1,347 @@
+{
+  "$comment": "GENERADO desde el contrato zod de balance de Loop Grid (scripts/lib/loop-grid-balance, LG-E83-01) con `pnpm exec tsx scripts/lib/loop-grid-balance/cli.ts`. NO editar a mano: su test de deriva falla si difiere del generado.",
+  "catalogFormat": 1,
+  "gameId": "loop-grid",
+  "superProperties": [
+    "product",
+    "mode"
+  ],
+  "platformProperty": "platform",
+  "events": [
+    {
+      "name": "run.started",
+      "description": "Se crea una run del perfil de un jugador.",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "const": "loop-grid",
+            "title": "Producto",
+            "description": "Clave interna del producto que emite (L155); sale del descriptor de producto del cliente, nunca de un literal."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "solo",
+              "versus"
+            ],
+            "title": "Perfil",
+            "description": "Perfil de reglas de la partida: solo o versus."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "steam",
+              "ps5",
+              "roblox"
+            ],
+            "title": "Plataforma",
+            "description": "Plataforma del cliente que emite."
+          },
+          "startLevel": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "title": "Nivel inicial",
+            "description": "Nivel con el que empieza la run."
+          },
+          "contentTier": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "title": "contentTier",
+            "description": "Dificultad del contenido: en solo sale del nivel de la run; en versus, de la cola (R6)."
+          }
+        },
+        "required": [
+          "product",
+          "mode",
+          "platform",
+          "startLevel",
+          "contentTier"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "run.level.result",
+      "description": "Termina un intento de un nivel de la run: lo que corrige el balance (muertes y tiempo por nivel, detecciones, créditos).",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "const": "loop-grid",
+            "title": "Producto",
+            "description": "Clave interna del producto que emite (L155); sale del descriptor de producto del cliente, nunca de un literal."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "solo",
+              "versus"
+            ],
+            "title": "Perfil",
+            "description": "Perfil de reglas de la partida: solo o versus."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "steam",
+              "ps5",
+              "roblox"
+            ],
+            "title": "Plataforma",
+            "description": "Plataforma del cliente que emite."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "title": "Nivel",
+            "description": "Nivel jugado."
+          },
+          "contentTier": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "title": "contentTier",
+            "description": "Dificultad del contenido: en solo sale del nivel de la run; en versus, de la cola (R6)."
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "died",
+              "abandoned"
+            ],
+            "title": "Resultado",
+            "description": "Superado, muerte o abandono del intento."
+          },
+          "attempt": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "title": "Intento",
+            "description": "Número de intento en este nivel."
+          },
+          "durationSeconds": {
+            "type": "number",
+            "minimum": 0,
+            "title": "Duración (s)",
+            "description": "Tiempo del intento, medido por el cliente."
+          },
+          "deathsInLevel": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "title": "Muertes en el nivel",
+            "description": "Muertes acumuladas en este nivel (ayudas de la 5.ª y la 20.ª)."
+          },
+          "detections": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "title": "Detecciones",
+            "description": "Veces que un enemigo pasó a alerta en el intento."
+          },
+          "creditsEarned": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "title": "Créditos ganados",
+            "description": "Créditos obtenidos en el intento."
+          },
+          "extraLifeUsed": {
+            "type": "boolean",
+            "title": "Vida extra usada",
+            "description": "Si se usó la vida extra para pasar el nivel."
+          },
+          "deathCause": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^[A-Z][A-Z0-9_]*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Causa de la muerte",
+            "description": "Id de la causa (enemigo, caída, estado, KILL_BUOY…); null si no murió."
+          }
+        },
+        "required": [
+          "product",
+          "mode",
+          "platform",
+          "level",
+          "contentTier",
+          "outcome",
+          "attempt",
+          "durationSeconds",
+          "deathsInLevel",
+          "detections",
+          "creditsEarned",
+          "extraLifeUsed",
+          "deathCause"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "player.detected",
+      "description": "Un enemigo pasa a alerta o persecución por un estímulo del jugador.",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "const": "loop-grid",
+            "title": "Producto",
+            "description": "Clave interna del producto que emite (L155); sale del descriptor de producto del cliente, nunca de un literal."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "solo",
+              "versus"
+            ],
+            "title": "Perfil",
+            "description": "Perfil de reglas de la partida: solo o versus."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "steam",
+              "ps5",
+              "roblox"
+            ],
+            "title": "Plataforma",
+            "description": "Plataforma del cliente que emite."
+          },
+          "enemyId": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Enemigo",
+            "description": "Id de catálogo del enemigo (KNIFE_DWARF…)."
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "sight",
+              "noise",
+              "trace",
+              "scent"
+            ],
+            "title": "Canal",
+            "description": "Estímulo que lo delató: vista, ruido, rastro u olor."
+          },
+          "posture": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]*$",
+            "title": "Postura",
+            "description": "Postura del jugador al ser detectado."
+          },
+          "contentTier": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "title": "contentTier",
+            "description": "Dificultad del contenido: en solo sale del nivel de la run; en versus, de la cola (R6)."
+          }
+        },
+        "required": [
+          "product",
+          "mode",
+          "platform",
+          "enemyId",
+          "channel",
+          "posture",
+          "contentTier"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "balance.params.applied",
+      "description": "El cliente aplica los parámetros de balance al empezar una run o partida (LG-E83-03/04).",
+      "schema": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "product": {
+            "type": "string",
+            "const": "loop-grid",
+            "title": "Producto",
+            "description": "Clave interna del producto que emite (L155); sale del descriptor de producto del cliente, nunca de un literal."
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "solo",
+              "versus"
+            ],
+            "title": "Perfil",
+            "description": "Perfil de reglas de la partida: solo o versus."
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "steam",
+              "ps5",
+              "roblox"
+            ],
+            "title": "Plataforma",
+            "description": "Plataforma del cliente que emite."
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "remote",
+              "cache",
+              "build"
+            ],
+            "title": "Origen",
+            "description": "Remote-config válido, caché o fallback de build."
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "title": "Versión del contrato",
+            "description": "schemaVersion del fichero aplicado."
+          },
+          "commonRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "title": "Revisión común",
+            "description": "common.revision aplicada."
+          },
+          "profileRevision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "title": "Revisión del perfil",
+            "description": "solo.revision o versus.revision aplicada."
+          }
+        },
+        "required": [
+          "product",
+          "mode",
+          "platform",
+          "source",
+          "schemaVersion",
+          "commonRevision",
+          "profileRevision"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}
